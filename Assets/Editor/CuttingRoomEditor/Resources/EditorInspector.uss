@@ -1,0 +1,120 @@
+#inspector {
+	padding: 4px;
+}
+
+#title {
+	-unity-font-style: bold;
+	color: white;
+	font-size: 16px;
+	padding-top: 6px;
+	padding-bottom: 6px;
+}
+
+.inspector-section-container {
+	margin-top: 4px;
+	margin-bottom: 4px;
+}
+
+.add-tag-controls-container {
+	flex-direction: row;
+	padding-bottom: 6px;
+}
+
+.tag-row {
+	padding: 8px;
+	margin-bottom: 4px;
+	border-radius: 10px;
+	flex-direction: row;
+	background-color: #476d94;
+	-unity-text-align: middle-center;
+}
+
+.tag-field-label {
+	width: 20%;
+	-unity-text-align: middle-right;
+}
+
+.tag-field-value {
+	flex-grow: 1;
+}
+
+.constraint-row {
+	padding: 8px;
+	margin-bottom: 4px;
+	border-radius: 10px;
+	flex-direction: row;
+	background-color: #7d4143;
+	-unity-text-align: middle-center;
+}
+
+.constraint-button {
+	height: 20px;
+	width: 20px;
+	max-height: 20px;
+	max-width: 20px;
+}
+
+.add-constraint-controls-container {
+	flex-direction: row;
+	padding-bottom: 6px;
+}
+
+.constraint-title {
+	width: 100%;
+	margin-left: 2%;
+	margin-bottom: 3%;
+	-unity-text-align: middle-left;
+	-unity-font-style: bold;
+}
+
+.constraint-fields-container {
+	width: 100%;
+	margin-left: 2%;
+	padding-bottom: 6px;
+}
+
+.constraint-field-label {
+	width: 30%;
+	-unity-text-align: middle-right;
+}
+
+.constraint-field-value {
+	flex-grow: 1;
+}
+
+.trigger-row {
+	padding: 8px;
+	margin-bottom: 4px;
+	border-radius: 10px;
+	flex-direction: row;
+	background-color: #716379;
+	-unity-text-align: middle-center;
+}
+
+.add-trigger-controls-container {
+	flex-direction: row;
+	padding-bottom: 6px;
+}
+
+.trigger-title {
+	width: 100%;
+	margin-left: 2%;
+	margin-bottom: 3%;
+	-unity-text-align: middle-left;
+	-unity-font-style: bold;
+}
+
+.trigger-fields-container {
+	width: 100%;
+	margin-left: 2%;
+	padding-bottom: 6px;
+}
+
+.trigger-field-label {
+	width: 30%;
+	-unity-text-align: middle-right;
+}
+
+.trigger-field-value {
+	flex-grow: 1;
+}

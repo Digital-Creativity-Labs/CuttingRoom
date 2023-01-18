@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6193bfad6901e284098419ef30595741, type: 3}
+  m_Name: TimedNarrative
+  m_EditorClassIdentifier: 
+  narrativeObjectNodeStates:
+  - narrativeObjectGuid: 31440e4f-9ef3-40ab-9a05-89212f179a67
+    position: {x: -15, y: 53}
+  - narrativeObjectGuid: 2cde4d88-818f-4028-980d-9c8b781d6bf5
+    position: {x: 367, y: 151}
+  - narrativeObjectGuid: 2d0a3d05-8a4c-476f-8c7b-101bebfdca24
+    position: {x: 367, y: -33}
+  viewContainerStates:
+  - narrativeObjectGuid: 0
+    narrativeObjectNodeGuids:
+    - 31440e4f-9ef3-40ab-9a05-89212f179a67
+    - 2cde4d88-818f-4028-980d-9c8b781d6bf5
+    - 2d0a3d05-8a4c-476f-8c7b-101bebfdca24
+  viewContainerStackGuids:
+  - 0

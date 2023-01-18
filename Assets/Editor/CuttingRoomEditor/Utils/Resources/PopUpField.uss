@@ -1,0 +1,3 @@
+.pop-up-field {
+	flex-grow: 1;
+}

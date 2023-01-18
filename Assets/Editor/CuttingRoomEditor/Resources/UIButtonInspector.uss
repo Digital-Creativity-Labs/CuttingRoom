@@ -1,0 +1,25 @@
+﻿.button-list-element {
+	padding: 8px;
+	margin-bottom: 4px;
+	border-radius: 10px;
+	flex-direction: row;
+	background-color: #40555c;
+	-unity-text-align: middle-center;
+}
+
+.button-title {
+	width: 100%;
+	margin-left: 2%;
+	margin-bottom: 3%;
+	-unity-text-align: middle-left;
+	-unity-font-style: bold;
+}
+
+.button-field-label {
+	width: 30%;
+	-unity-text-align: middle-right;
+}
+
+.button-field-value {
+	flex-grow: 1;
+}

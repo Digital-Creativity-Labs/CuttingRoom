@@ -1,0 +1,12 @@
+#title {
+	background-color: #264653;
+	-unity-font-style: bold;
+	color: white;
+}
+
+#media-toggle { 
+	margin-left: 6px;
+	margin-right: 6px;
+	margin-top: 8px;
+	margin-bottom: 8px;
+}

@@ -1,0 +1,25 @@
+#navigation-toolbar {
+  flex-direction: row;
+  align-items: center;
+  align-content: flex-end;
+  height: 32px;
+}
+
+#toolbar-button {
+	border-radius: 6px;
+	height: 20px;
+	margin: 2px;
+}
+
+#back-image {
+	width: 24px;
+	height: auto;
+	margin-left: 3px;
+	margin-right: 3px;
+	margin-top: 3px;
+	margin-bottom: 3px;
+}
+
+#nav-spacer {
+	-unity-text-align: middle-center;
+}

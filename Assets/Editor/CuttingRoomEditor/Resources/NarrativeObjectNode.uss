@@ -1,0 +1,54 @@
+#title-label {
+	width: 150px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+#contents {
+	background-color: #3F3F3F;
+}
+
+#root-icon {
+    background-image: resource("Icons/root-icon");
+	width: 24px;
+	height: 24px;
+	align-self: center;
+	/* No need for margin right as label element to the right provides that margin.*/
+	margin-left: 6px;
+	margin-top: 6px;
+	margin-bottom: 6px;
+}
+
+#candidate-icon {
+    background-image: resource("Icons/candidate-icon");
+	width: 24px;
+	height: 24px;
+	align-self: center;
+	/* No need for margin right as label element to the right provides that margin.*/
+	margin-left: 6px;
+	margin-top: 6px;
+	margin-bottom: 6px;
+}
+
+#layer-icon {
+    background-image: resource("Icons/layer-icon");
+	width: 24px;
+	height: 24px;
+	align-self: center;
+	/* No need for margin right as label element to the right provides that margin.*/
+	margin-left: 6px;
+	margin-top: 6px;
+	margin-bottom: 6px;
+}
+
+.title-icon-primary {
+    -unity-background-image-tint-color: #d6a63e;
+}
+
+.title-icon-secondary {
+    -unity-background-image-tint-color: #cfcfcf;
+}
+
+.constraint-container {
+	margin-bottom: 6px;
+}

@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6193bfad6901e284098419ef30595741, type: 3}
+  m_Name: VariableNarrative
+  m_EditorClassIdentifier: 
+  narrativeObjectNodeStates:
+  - narrativeObjectGuid: b490e06d-c3d3-4e29-bf1b-1d38e551cc7b
+    position: {x: 603, y: -283}
+  - narrativeObjectGuid: df25f675-2b54-46d5-ad12-aed5745fe27c
+    position: {x: 917, y: -205}
+  - narrativeObjectGuid: abcd84de-e790-4372-8d20-f4d328211c0b
+    position: {x: 917, y: -339}
+  viewContainerStates:
+  - narrativeObjectGuid: 0
+    narrativeObjectNodeGuids:
+    - b490e06d-c3d3-4e29-bf1b-1d38e551cc7b
+    - df25f675-2b54-46d5-ad12-aed5745fe27c
+    - abcd84de-e790-4372-8d20-f4d328211c0b
+  viewContainerStackGuids:
+  - 0
