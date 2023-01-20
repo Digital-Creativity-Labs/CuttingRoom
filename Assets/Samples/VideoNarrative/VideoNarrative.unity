@@ -370,8 +370,6 @@ MonoBehaviour:
   fullscreen: 1
   width: 1920
   height: 1080
-  marginTopPercent: 0
-  marginLeftPercent: 0
   marginTop: 0
   marginLeft: 0
 --- !u!1 &7125925
@@ -706,8 +704,6 @@ MonoBehaviour:
   fullscreen: 1
   width: 1920
   height: 1080
-  marginTopPercent: 0
-  marginLeftPercent: 0
   marginTop: 0
   marginLeft: 0
 --- !u!114 &118441153
@@ -895,8 +891,6 @@ MonoBehaviour:
   fullscreen: 1
   width: 1920
   height: 1080
-  marginTopPercent: 0
-  marginLeftPercent: 0
   marginTop: 0
   marginLeft: 0
 --- !u!1 &505902126
@@ -1106,9 +1100,7 @@ MonoBehaviour:
   fullscreen: 0
   width: 480
   height: 270
-  marginTopPercent: 0
-  marginLeftPercent: 0
-  marginTop: 50
+  marginTop: 300
   marginLeft: 5
 --- !u!114 &632542753
 MonoBehaviour:
@@ -1221,9 +1213,7 @@ MonoBehaviour:
   fullscreen: 0
   width: 480
   height: 270
-  marginTopPercent: 0
-  marginLeftPercent: 0
-  marginTop: 50
+  marginTop: 300
   marginLeft: 975
 --- !u!114 &742091958
 MonoBehaviour:
@@ -1990,9 +1980,7 @@ MonoBehaviour:
   fullscreen: 0
   width: 480
   height: 270
-  marginTopPercent: 0
-  marginLeftPercent: 0
-  marginTop: 50
+  marginTop: 300
   marginLeft: 490
 --- !u!114 &953973412
 MonoBehaviour:
@@ -2402,8 +2390,6 @@ MonoBehaviour:
   fullscreen: 1
   width: 1920
   height: 1080
-  marginTopPercent: 0
-  marginLeftPercent: 0
   marginTop: 0
   marginLeft: 0
 --- !u!114 &1114946518
@@ -2573,8 +2559,6 @@ MonoBehaviour:
   fullscreen: 1
   width: 1920
   height: 1080
-  marginTopPercent: 0
-  marginLeftPercent: 0
   marginTop: 0
   marginLeft: 0
 --- !u!114 &1189640586
@@ -2773,8 +2757,6 @@ MonoBehaviour:
   fullscreen: 1
   width: 1920
   height: 1080
-  marginTopPercent: 0
-  marginLeftPercent: 0
   marginTop: 0
   marginLeft: 0
 --- !u!114 &1504551320
@@ -2928,8 +2910,6 @@ MonoBehaviour:
   fullscreen: 1
   width: 1920
   height: 1080
-  marginTopPercent: 0
-  marginLeftPercent: 0
   marginTop: 0
   marginLeft: 0
 --- !u!114 &1615880548
@@ -3084,8 +3064,6 @@ MonoBehaviour:
   fullscreen: 1
   width: 1920
   height: 1080
-  marginTopPercent: 0
-  marginLeftPercent: 0
   marginTop: 0
   marginLeft: 0
 --- !u!114 &1897549526
@@ -3161,8 +3139,6 @@ MonoBehaviour:
   fullscreen: 1
   width: 1920
   height: 1080
-  marginTopPercent: 0
-  marginLeftPercent: 0
   marginTop: 0
   marginLeft: 0
 --- !u!114 &1903609402

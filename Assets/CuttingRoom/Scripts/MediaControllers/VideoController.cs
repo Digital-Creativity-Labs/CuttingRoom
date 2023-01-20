@@ -31,23 +31,15 @@ namespace CuttingRoom
 
         public VideoClip Video = null;
 
-        [SerializeField]
-        private bool fullscreen = true;
+        public bool fullscreen = true;
+
+        // Options for non-fullscreen video
+        public int width = 1920;
+        public int height = 1080;
+        public int marginTop = 0;
+        public int marginLeft = 0;
+
         private UIDocument uiDocument;
-
-        [SerializeField]
-        private int width = 1920;
-        [SerializeField]
-        private int height = 1080;
-        [SerializeField]
-        private int marginTopPercent = 0;
-        [SerializeField]
-        private int marginLeftPercent = 0;
-        [SerializeField]
-        private int marginTop = 0;
-        [SerializeField]
-        private int marginLeft = 0;
-
         private VisualElement rootVisualElement = null;
 
         private VideoPlayer videoPlayer = null;
@@ -117,7 +109,6 @@ namespace CuttingRoom
                             rootVisualElement.style.width = Screen.width;
                             rootVisualElement.style.height = Screen.height;
                             rootVisualElement.style.flexDirection = FlexDirection.Row;
-                            rootVisualElement.style.alignContent = Align.Center;
 
 
                             VisualElement videoImage = new VisualElement();
@@ -127,7 +118,6 @@ namespace CuttingRoom
                             videoImage.style.width = width;
                             videoImage.style.height = height;
                             videoImage.style.position = Position.Relative;
-                            videoImage.style.alignSelf = Align.Center;
                             videoImage.style.marginTop = marginTop; // Screen.height * ((float)marginTopPercent / 100);
                             videoImage.style.marginLeft = marginLeft; // Screen.width * ((float)marginLeftPercent / 100);
 

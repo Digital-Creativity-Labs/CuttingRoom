@@ -44,13 +44,13 @@ MonoBehaviour:
   - narrativeObjectGuid: 987d59ef-3147-4239-8db7-c7623ceb119b
     position: {x: 807, y: 24}
   - narrativeObjectGuid: 02139cb5-d6c6-4d11-a399-c7a87e7cdb77
-    position: {x: 807, y: 242}
+    position: {x: 807, y: 156}
   - narrativeObjectGuid: d8330dc0-f0cc-4248-9657-710d353fa062
-    position: {x: 807, y: 420}
+    position: {x: 807, y: 337}
   - narrativeObjectGuid: c943b498-e451-4f70-88be-3c621505595e
-    position: {x: 807, y: 597}
+    position: {x: 807, y: 471}
   - narrativeObjectGuid: cd14e75f-d2e6-4cb4-93dd-7bb54243f6c5
-    position: {x: 807, y: 759}
+    position: {x: 807, y: 597}
   viewContainerStates:
   - narrativeObjectGuid: 0
     narrativeObjectNodeGuids:
