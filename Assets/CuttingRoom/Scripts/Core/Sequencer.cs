@@ -22,7 +22,7 @@ namespace CuttingRoom
         /// Whether processing should start automatically when object is created.
         /// </summary>
         [SerializeField]
-        private bool autoStartProcessing = false;
+        private bool autoStartProcessing = true;
 
         public bool SequenceComplete { get; private set; }
 
