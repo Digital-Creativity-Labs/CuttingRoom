@@ -125,6 +125,7 @@ namespace CuttingRoom.Editor
                 VideoController videoController = AtomicNarrativeObject.MediaController as VideoController;
                 if (videoController != null)
                 {
+                    // Set video clip
                     VisualElement videoPicker = UIElementsUtils.CreateObjectFieldRow("Video", videoController.Video, (newValue) =>
                     {
                         Undo.RecordObject(videoController, "Set Video Content");
@@ -134,6 +135,55 @@ namespace CuttingRoom.Editor
                         AtomicNarrativeObject.OnValidate();
                     });
                     mediaSourceRow.Add(videoPicker);
+
+                    // Fullscreen video toggle
+                    VisualElement videoFullscreenToggle = UIElementsUtils.CreateBoolFieldRow("Fullscreen", videoController.fullscreen, (newValue) =>
+                    {
+                        Undo.RecordObject(videoController, "Set Video Fullscreen");
+                        videoController.fullscreen = newValue;
+                        AtomicNarrativeObject.MediaController = videoController;
+                        // Flag that the object has changed.
+                        AtomicNarrativeObject.OnValidate();
+                    });
+                    mediaSourceRow.Add(videoFullscreenToggle);
+
+                    // Non-fullscreen video settings
+                    if (!videoController.fullscreen)
+                    {
+                        // Width
+                        VisualElement videoWidth = UIElementsUtils.CreateIntegerFieldRow("Width", videoController.width, (newValue) =>
+                        {
+                            Undo.RecordObject(videoController, "Set Video Width");
+                            videoController.width = newValue;
+                            AtomicNarrativeObject.MediaController = videoController;
+                        });
+                        // Height
+                        VisualElement videoHeight = UIElementsUtils.CreateIntegerFieldRow("Height", videoController.height, (newValue) =>
+                        {
+                            Undo.RecordObject(videoController, "Set Video Height");
+                            videoController.height = newValue;
+                            AtomicNarrativeObject.MediaController = videoController;
+                        });
+                        // Left Margin
+                        VisualElement videoLeftMargin = UIElementsUtils.CreateIntegerFieldRow("Margin Left", videoController.marginLeft, (newValue) =>
+                        {
+                            Undo.RecordObject(videoController, "Set Video Margin - Left");
+                            videoController.marginLeft = newValue;
+                            AtomicNarrativeObject.MediaController = videoController;
+                        });
+                        // Top Margin
+                        VisualElement videoTopMargin = UIElementsUtils.CreateIntegerFieldRow("Margin Top", videoController.marginTop, (newValue) =>
+                        {
+                            Undo.RecordObject(videoController, "Set Video Margin - Top");
+                            videoController.marginTop = newValue;
+                            AtomicNarrativeObject.MediaController = videoController;
+                        });
+
+                        mediaSourceRow.Add(videoWidth);
+                        mediaSourceRow.Add(videoHeight);
+                        mediaSourceRow.Add(videoLeftMargin);
+                        mediaSourceRow.Add(videoTopMargin);
+                    }
                 }
             }
             else if (contentType == MediaController.ContentTypeEnum.Audio)
