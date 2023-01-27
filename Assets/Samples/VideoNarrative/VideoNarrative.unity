@@ -640,7 +640,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   candidates:
-  - {fileID: 10034512}
+  - {fileID: 1131606589}
   constraints: []
   methodContainer:
     methodClass: 
@@ -1439,7 +1439,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   candidates:
-  - {fileID: 10034512}
+  - {fileID: 1131606589}
   constraints: []
   methodContainer:
     methodClass: 
@@ -2229,7 +2229,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   candidates:
-  - {fileID: 10034512}
+  - {fileID: 1131606589}
   constraints: []
   methodContainer:
     methodClass: 
@@ -2248,8 +2248,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   candidates:
   - {fileID: 1903609400}
-  - {fileID: 882382002}
   - {fileID: 505902127}
+  - {fileID: 882382002}
   constraints: []
 --- !u!4 &1076746256
 Transform:
@@ -2405,6 +2405,121 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   triggered: 0
+--- !u!1 &1131606586
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1131606592}
+  - component: {fileID: 1131606591}
+  - component: {fileID: 1131606590}
+  - component: {fileID: 1131606589}
+  - component: {fileID: 1131606588}
+  - component: {fileID: 1131606587}
+  m_Layer: 0
+  m_Name: EndVideo
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1131606587
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1131606586}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 441dd36b3b6ab5042a5abbb3173fdebe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Video: {fileID: 32900000, guid: 2464734817119de4e9a5376740567d96, type: 3}
+--- !u!114 &1131606588
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1131606586}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: acbb6697a9bfee74d9ea18c0171f1cca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  triggered: 0
+--- !u!114 &1131606589
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1131606586}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb76aed733bdbcd43a727bf81355ac8c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  guid: 0c505729-d03a-459a-b7c4-4e23b2810b1f
+  outputSelectionDecisionPoint: {fileID: 1131606591}
+  variableStore: {fileID: 1131606590}
+  endTriggers:
+  - {fileID: 1131606588}
+  constraints: []
+  mediaController: {fileID: 1131606587}
+  mediaParent: {fileID: 0}
+  mediaSourceUnloadEvent: 1
+--- !u!114 &1131606590
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1131606586}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d8fecdd77e447674585a2d837954a306, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  autoAddVariablesOnGameObject: 1
+  variableList: []
+--- !u!114 &1131606591
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1131606586}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b33dbf477cd3f6409b204de1b971a43, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  candidates:
+  - {fileID: 871223308}
+  constraints: []
+  methodContainer:
+    methodClass: 
+    methodName: First
+--- !u!4 &1131606592
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1131606586}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 11
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1148296021
 GameObject:
   m_ObjectHideFlags: 0
@@ -2859,7 +2974,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   candidates:
-  - {fileID: 10034512}
+  - {fileID: 1131606589}
   constraints: []
   methodContainer:
     methodClass: 

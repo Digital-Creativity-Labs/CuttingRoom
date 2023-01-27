@@ -116,7 +116,10 @@ namespace CuttingRoom.Editor
 
                     NarrativeObject narrativeObject = narrativeObjects.Where(narrativeObject => narrativeObject.guid == viewContainer.narrativeObjectGuid).FirstOrDefault();
 
-                    button.text = narrativeObject.gameObject.name;
+                    if (narrativeObject != null)
+                    {
+                        button.text = narrativeObject.gameObject.name;
+                    }
                 }
 
                 if (StyleSheet != null)
