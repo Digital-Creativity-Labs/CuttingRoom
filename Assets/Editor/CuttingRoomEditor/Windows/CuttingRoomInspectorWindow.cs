@@ -179,7 +179,16 @@ namespace CuttingRoom.Editor
             {
                 if (crEditorOpen)
                 {
-                    CuttingRoomEditorWindow cuttingRoomEditorWindow = EditorWindowUtils.GetWindowIfOpen<CuttingRoomEditorWindow>();
+                    CuttingRoomEditorWindow cuttingRoomEditorWindow;
+                    if (EditorApplication.isPlaying)
+                    {
+                        cuttingRoomEditorWindow = EditorWindowUtils.GetWindowIfOpen<CuttingRoomEditorWindow>(focus: false);
+                    }
+                    else
+                    {
+                        cuttingRoomEditorWindow = EditorWindowUtils.GetWindowIfOpen<CuttingRoomEditorWindow>(focus: true);
+                    }
+
                     if (cuttingRoomEditorWindow != null)
                     {
                         ConnectEditorWindow(cuttingRoomEditorWindow);
