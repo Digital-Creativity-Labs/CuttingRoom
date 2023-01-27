@@ -4,9 +4,6 @@ using UnityEngine;
 using System;
 using UnityEngine.Video;
 using UnityEngine.UIElements;
-using UnityEditor.SceneManagement;
-using UnityEngine.Assertions;
-using UnityEditor.VersionControl;
 
 namespace CuttingRoom
 {
