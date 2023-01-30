@@ -109,16 +109,13 @@ namespace CuttingRoom
                         rootVisualElement.style.height = Screen.height;
                         rootVisualElement.style.flexDirection = FlexDirection.Row;
 
-
                         VisualElement videoImage = new VisualElement();
-
                         videoImage.style.backgroundImage = new Background() { renderTexture = videoRenderTex } ;
-
                         videoImage.style.width = width;
                         videoImage.style.height = height;
                         videoImage.style.position = Position.Relative;
-                        videoImage.style.marginTop = marginTop; // Screen.height * ((float)marginTopPercent / 100);
-                        videoImage.style.marginLeft = marginLeft; // Screen.width * ((float)marginLeftPercent / 100);
+                        videoImage.style.marginTop = marginTop;
+                        videoImage.style.marginLeft = marginLeft;
 
                         rootVisualElement.Add(videoImage);
                     }
