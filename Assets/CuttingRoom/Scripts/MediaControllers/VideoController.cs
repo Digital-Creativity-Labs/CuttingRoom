@@ -17,18 +17,21 @@ namespace CuttingRoom
         public enum SourceLocation
         {
             VideoClip,
-            Resources,
-            StreamingAssets
+            Url,
+            //Resources,
+            //StreamingAssets
         }
 
         /// <summary>
         /// Where the video clip source is loaded from for this controller.
         /// </summary>
-        private SourceLocation sourceLocation = SourceLocation.VideoClip;
+        public SourceLocation sourceLocation = SourceLocation.VideoClip;
 
         public VideoClip Video = null;
 
         public bool fullscreen = true;
+
+        public string url = string.Empty;
 
         // Options for non-fullscreen video
         public int width = 1920;
@@ -48,88 +51,96 @@ namespace CuttingRoom
         public override void Init()
         {
             contentEnded = false;
-            if (sourceLocation == SourceLocation.VideoClip)
+
+            // Get or Add video player
+            if (!gameObject.TryGetComponent(out videoPlayer))
             {
-                // Get or Add video player
-                if (!gameObject.TryGetComponent(out videoPlayer))
-                {
-                    videoPlayer = gameObject.AddComponent<VideoPlayer>();
-                }
+                videoPlayer = gameObject.AddComponent<VideoPlayer>();
+            }
 
-                if (videoPlayer != null)
-                {
-                    videoPlayer.playOnAwake = false;
-                    videoPlayer.aspectRatio = VideoAspectRatio.FitHorizontally;
+            if (videoPlayer != null)
+            {
+                videoPlayer.playOnAwake = false;
+                videoPlayer.aspectRatio = VideoAspectRatio.FitHorizontally;
 
-                    if (fullscreen)
+                if (fullscreen)
+                {
+                    // We are rendering to the near plane (for now...)
+                    videoPlayer.renderMode = VideoRenderMode.CameraNearPlane;
+                    // Get or Add a camera for rendering.
+                    if (!gameObject.TryGetComponent(out videoPlayerCamera))
                     {
-                        // We are rendering to the near plane (for now...)
-                        videoPlayer.renderMode = VideoRenderMode.CameraNearPlane;
-                        // Get or Add a camera for rendering.
-                        if (!gameObject.TryGetComponent(out videoPlayerCamera))
-                        {
-                            videoPlayerCamera = gameObject.AddComponent<Camera>();
-                        }
-                        if (videoPlayerCamera != null)
-                        {
-                            videoPlayerCamera.clearFlags = CameraClearFlags.SolidColor;
-                            videoPlayerCamera.backgroundColor = Color.black;
-
-                            // Hide the camera.
-                            videoPlayerCamera.enabled = false;
-
-                            // Set the render depth of the camera. This comes from the layer that this video controller is sequenced onto.
-                            //videoPlayer.targetCamera.depth = renderDepth - 1;
-                            videoPlayer.targetCamera = videoPlayerCamera;
-                        }
+                        videoPlayerCamera = gameObject.AddComponent<Camera>();
                     }
-                    else
+                    if (videoPlayerCamera != null)
                     {
-                        videoPlayer.renderMode = VideoRenderMode.RenderTexture;
+                        videoPlayerCamera.clearFlags = CameraClearFlags.SolidColor;
+                        videoPlayerCamera.backgroundColor = Color.black;
 
-                        RenderTexture videoRenderTex = new RenderTexture(width, height, 0);
-                        videoPlayer.targetTexture = videoRenderTex;
+                        // Hide the camera.
+                        videoPlayerCamera.enabled = false;
 
-                        if (!gameObject.TryGetComponent(out uiDocument))
-                        {
-                            uiDocument = gameObject.AddComponent<UIDocument>();
-                        }
+                        // Set the render depth of the camera. This comes from the layer that this video controller is sequenced onto.
+                        //videoPlayer.targetCamera.depth = renderDepth - 1;
+                        videoPlayer.targetCamera = videoPlayerCamera;
+                    }
+                }
+                else
+                {
+                    videoPlayer.renderMode = VideoRenderMode.RenderTexture;
 
-                        if (uiDocument != null)
-                        {
-                            if (uiDocument.panelSettings == null)
-                            {
-                                uiDocument.panelSettings = Resources.Load<PanelSettings>("CuttingRoom/UI/UIVideoPanelSettings");
-                            }
-                            rootVisualElement = uiDocument.rootVisualElement;
+                    RenderTexture videoRenderTex = new RenderTexture(width, height, 0);
+                    videoPlayer.targetTexture = videoRenderTex;
 
-                            rootVisualElement.style.width = Screen.width;
-                            rootVisualElement.style.height = Screen.height;
-                            rootVisualElement.style.flexDirection = FlexDirection.Row;
-
-
-                            VisualElement videoImage = new VisualElement();
-
-                            videoImage.style.backgroundImage = new Background() { renderTexture = videoRenderTex } ;
-
-                            videoImage.style.width = width;
-                            videoImage.style.height = height;
-                            videoImage.style.position = Position.Relative;
-                            videoImage.style.marginTop = marginTop; // Screen.height * ((float)marginTopPercent / 100);
-                            videoImage.style.marginLeft = marginLeft; // Screen.width * ((float)marginLeftPercent / 100);
-
-                            rootVisualElement.Add(videoImage);
-                        }
+                    if (!gameObject.TryGetComponent(out uiDocument))
+                    {
+                        uiDocument = gameObject.AddComponent<UIDocument>();
                     }
 
-                    videoPlayer.Pause();
+                    if (uiDocument != null)
+                    {
+                        if (uiDocument.panelSettings == null)
+                        {
+                            uiDocument.panelSettings = Resources.Load<PanelSettings>("CuttingRoom/UI/UIVideoPanelSettings");
+                        }
+                        rootVisualElement = uiDocument.rootVisualElement;
 
-                    // Preload the video player content.
-                    videoPlayer.Prepare();
+                        rootVisualElement.style.width = Screen.width;
+                        rootVisualElement.style.height = Screen.height;
+                        rootVisualElement.style.flexDirection = FlexDirection.Row;
 
+                        VisualElement videoImage = new VisualElement();
+                        videoImage.style.backgroundImage = new Background() { renderTexture = videoRenderTex } ;
+                        videoImage.style.width = width;
+                        videoImage.style.height = height;
+                        videoImage.style.position = Position.Relative;
+                        videoImage.style.marginTop = marginTop;
+                        videoImage.style.marginLeft = marginLeft;
 
-                    Initialised = true;
+                        rootVisualElement.Add(videoImage);
+                    }
                 }
+
+                if (sourceLocation == SourceLocation.VideoClip && Video != null)
+                {
+                    videoPlayer.clip = Video;
+                }
+                else if (sourceLocation == SourceLocation.Url && !string.IsNullOrEmpty(url))
+                {
+                    videoPlayer.url = url;
+                }
+                else
+                {
+                    // Not supported or not configured correctly
+                }
+
+                videoPlayer.Pause();
+
+                // Preload the video player content.
+                videoPlayer.Prepare();
+
+
+                Initialised = true;
             }
         }
 
@@ -139,10 +150,8 @@ namespace CuttingRoom
         /// <param name="atomicNarrativeObject"></param>
         public override void Load(AtomicNarrativeObject atomicNarrativeObject)
         {
-            if (Video != null)
+            if (videoPlayer != null)
             {
-                videoPlayer.clip = Video;
-
                 if (videoPlayerCamera != null)
                 {
                     videoPlayerCamera.enabled = true;
