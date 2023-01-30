@@ -122,19 +122,50 @@ namespace CuttingRoom.Editor
 
             if (contentType == MediaController.ContentTypeEnum.Video)
             {
+                // Find the sequencer.
+                Sequencer sequencer = UnityEngine.Object.FindObjectOfType<Sequencer>();
+
                 VideoController videoController = AtomicNarrativeObject.MediaController as VideoController;
                 if (videoController != null)
                 {
-                    // Set video clip
-                    VisualElement videoPicker = UIElementsUtils.CreateObjectFieldRow("Video", videoController.Video, (newValue) =>
+                    if (sequencer != null && (sequencer.NarrativeSpace.UnlockAdvancedFeatures || videoController.sourceLocation != VideoController.SourceLocation.VideoClip))
                     {
-                        Undo.RecordObject(videoController, "Set Video Content");
-                        videoController.Video = newValue;
-                        AtomicNarrativeObject.MediaController = videoController;
-                        // Flag that the object has changed.
-                        AtomicNarrativeObject.OnValidate();
-                    });
-                    mediaSourceRow.Add(videoPicker);
+                        // Set video source type
+                        VisualElement videoSourcePicker = UIElementsUtils.CreateEnumFieldRow("Video Source Type", videoController.sourceLocation, (newValue) =>
+                        {
+                            Undo.RecordObject(videoController, "Set Video Source Type");
+                            videoController.sourceLocation = (VideoController.SourceLocation)newValue;
+                            AtomicNarrativeObject.MediaController = videoController;
+                            // Flag that the object has changed.
+                            AtomicNarrativeObject.OnValidate();
+                        });
+                        mediaSourceRow.Add(videoSourcePicker);
+                    }
+
+                    if (videoController.sourceLocation == VideoController.SourceLocation.VideoClip)
+                    {
+                        // Set video clip
+                        VisualElement videoPicker = UIElementsUtils.CreateObjectFieldRow("Video", videoController.Video, (newValue) =>
+                        {
+                            Undo.RecordObject(videoController, "Set Video Content");
+                            videoController.Video = newValue;
+                            AtomicNarrativeObject.MediaController = videoController;
+                            // Flag that the object has changed.
+                            AtomicNarrativeObject.OnValidate();
+                        });
+                        mediaSourceRow.Add(videoPicker);
+                    }
+                    else if (videoController.sourceLocation == VideoController.SourceLocation.Url)
+                    {
+                        // Set video url
+                        VisualElement videoUrl = UIElementsUtils.CreateTextFieldRow("Video", videoController.url, (newValue) =>
+                        {
+                            Undo.RecordObject(videoController, "Set Video URL");
+                            videoController.url = newValue;
+                            AtomicNarrativeObject.MediaController = videoController;
+                        });
+                        mediaSourceRow.Add(videoUrl);
+                    }
 
                     // Fullscreen video toggle
                     VisualElement videoFullscreenToggle = UIElementsUtils.CreateBoolFieldRow("Fullscreen", videoController.fullscreen, (newValue) =>
