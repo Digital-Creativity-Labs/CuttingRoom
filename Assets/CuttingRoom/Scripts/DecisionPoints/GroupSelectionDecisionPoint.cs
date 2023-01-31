@@ -11,13 +11,13 @@ namespace CuttingRoom
 		/// Method container for the group selection method for this decision point.
 		/// </summary>
 		[SerializeField]
-		public MethodContainer selectionMethodContainer = null;
+		public MethodContainer selectionMethodContainer = new();
 
 		/// <summary>
 		/// Method container for the group termination method for this decision point.
 		/// </summary>
 		[SerializeField]
-        public MethodContainer terminationMethodContainer = null;
+        public MethodContainer terminationMethodContainer = new();
 
 		/// <summary>
 		/// List of selections made by this object.
@@ -30,10 +30,21 @@ namespace CuttingRoom
 		/// </summary>
 		private new OnSelectionCallback onSelection = null;
 
-		/// <summary>
-		/// Unity event invoked by engine.
-		/// </summary>
-		private void Awake()
+#if UNITY_EDITOR
+		// Set default group termination method
+        public void Reset()
+        {
+			if (string.IsNullOrEmpty(terminationMethodContainer.methodName))
+			{
+				terminationMethodContainer.methodName = nameof(HasMadeSelection);
+            }
+        }
+#endif
+
+        /// <summary>
+        /// Unity event invoked by engine.
+        /// </summary>
+        private void Awake()
 		{
 			selectionMethodContainer.methodClass = typeof(GroupSelectionDecisionPoint).AssemblyQualifiedName;
 

@@ -11,7 +11,7 @@ namespace CuttingRoom
         /// Method container for the output selection method for this decision point.
         /// </summary>
         [SerializeField]
-        public MethodContainer methodContainer = new MethodContainer();
+        public MethodContainer methodContainer = new();
 
         /// <summary>
         /// Unity event invoked by engine.
