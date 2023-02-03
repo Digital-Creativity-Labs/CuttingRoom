@@ -20,7 +20,10 @@ namespace CuttingRoom
         public override IEnumerator Process(Sequencer sequencer, OnMultiSelectionCallback onSelection)
         {
             var validCandidates = ProcessConstraints(sequencer, constraints);
-            yield return onSelection.Invoke(validCandidates);
+            if (validCandidates != null)
+            {
+                yield return onSelection.Invoke(validCandidates);
+            }
         }
     }
 }

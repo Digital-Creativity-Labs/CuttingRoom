@@ -21,7 +21,10 @@ namespace CuttingRoom
         /// <returns></returns>
         private IEnumerator First(MethodContainer.Args args)
         {
-            yield return StartCoroutine(args.onSelection(args.candidates.First()));
+            if (args.candidates != null && args.candidates.Count > 0)
+            {
+                yield return StartCoroutine(args.onSelection(args.candidates.First()));
+            }
         }
 
         /// <summary>
@@ -31,7 +34,10 @@ namespace CuttingRoom
         /// <returns></returns>
         private IEnumerator Random(MethodContainer.Args args)
         {
-            yield return StartCoroutine(args.onSelection(args.candidates[UnityEngine.Random.Range(0, args.candidates.Count)]));
+            if (args.candidates != null && args.candidates.Count > 0)
+            {
+                yield return StartCoroutine(args.onSelection(args.candidates[UnityEngine.Random.Range(0, args.candidates.Count)]));
+            }
         }
     }
 }
