@@ -13,6 +13,17 @@ namespace CuttingRoom
         [SerializeField]
         public MethodContainer methodContainer = new();
 
+#if UNITY_EDITOR
+        // Set default output decision method
+        public void Reset()
+        {
+            if (string.IsNullOrEmpty(methodContainer.methodName))
+            {
+                methodContainer.methodName = nameof(Random);
+            }
+        }
+#endif
+
         /// <summary>
         /// Unity event invoked by engine.
         /// </summary>

@@ -31,10 +31,15 @@ namespace CuttingRoom
 		private new OnSelectionCallback onSelection = null;
 
 #if UNITY_EDITOR
-		// Set default group termination method
+		// Set default group selection and termination methods
         public void Reset()
         {
-			if (string.IsNullOrEmpty(terminationMethodContainer.methodName))
+            if (string.IsNullOrEmpty(selectionMethodContainer.methodName))
+            {
+                selectionMethodContainer.methodName = nameof(Random);
+            }
+
+            if (string.IsNullOrEmpty(terminationMethodContainer.methodName))
 			{
 				terminationMethodContainer.methodName = nameof(HasMadeSelection);
             }
