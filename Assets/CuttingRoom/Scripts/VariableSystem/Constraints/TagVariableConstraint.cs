@@ -25,7 +25,7 @@ namespace CuttingRoom.VariableSystem.Constraints
 			get => typeof(Variable);
         }
 
-        public override string Value => tagVariable != null ? tagVariable.GetValueAsString() : string.Empty;
+        public override string Value => value;
 
 		public override bool Evaluate(Sequencer sequencer, NarrativeSpace narrativeSpace, NarrativeObject narrativeObject)
 		{
