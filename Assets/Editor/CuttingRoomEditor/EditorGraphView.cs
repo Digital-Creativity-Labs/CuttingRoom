@@ -390,11 +390,15 @@ namespace CuttingRoom.Editor
         /// </summary>
         private void OnNarrativeObjectCreated(NarrativeObject narrativeObject)
         {
+            ViewContainer visibleViewContainer = viewContainerStack.Peek();
+
             // If the current view container has no root object, then set it.
-            if (!ViewContainerHasRootNarrativeObject(viewContainerStack.Peek()))
+            if (!ViewContainerHasRootNarrativeObject(visibleViewContainer))
             {
-                SetNarrativeObjectAsRootOfViewContainer(viewContainerStack.Peek(), narrativeObject);
+                SetNarrativeObjectAsRootOfViewContainer(visibleViewContainer, narrativeObject);
             }
+
+            AddNarrativeObjectAsCandidateOfViewContainer(visibleViewContainer, narrativeObject);
         }
 
         /// <summary>
@@ -428,6 +432,10 @@ namespace CuttingRoom.Editor
                     else if (graphElement is NarrativeObjectNode)
                     {
                         NarrativeObjectNode narrativeObjectNode = graphElement as NarrativeObjectNode;
+
+                        // The view container being rendered.
+                        ViewContainer visibleViewContainer = viewContainerStack.Peek();
+                        RemoveNarrativeObjectAsCandidateOfViewContainer(visibleViewContainer, narrativeObjectNode.NarrativeObject);
 
                         // Destroy the object in the hierarchy that the node being deleted represents.
                         UnityEngine.Object.DestroyImmediate(narrativeObjectNode.NarrativeObject.gameObject);
@@ -1255,74 +1263,74 @@ namespace CuttingRoom.Editor
             return true;
         }
 
-        //private bool AddNarrativeObjectAsCandidateOfViewContainer(ViewContainer viewContainer, NarrativeObject narrativeObject)
-        //{
-        //    // Find the narrative object which has the same guid as the current view container.
-        //    NarrativeObject viewContainerNarrativeObject = GetNarrativeObject(viewContainer.narrativeObjectGuid);
+        private bool AddNarrativeObjectAsCandidateOfViewContainer(ViewContainer viewContainer, NarrativeObject narrativeObject)
+        {
+            // Find the narrative object which has the same guid as the current view container.
+            NarrativeObject viewContainerNarrativeObject = GetNarrativeObject(viewContainer.narrativeObjectGuid);
 
-        //    if (viewContainerNarrativeObject == null)
-        //    {
-        //        Debug.LogError($"Narrative Object with guid {narrativeObject.guid} does not exist.");
+            if (viewContainerNarrativeObject == null)
+            {
+                Debug.LogError($"Narrative Object with guid {narrativeObject.guid} does not exist.");
 
-        //        return false;
-        //    }
+                return false;
+            }
 
-        //    if (viewContainerNarrativeObject is GroupNarrativeObject)
-        //    {
-        //        GroupNarrativeObject groupNarrativeObject = viewContainerNarrativeObject.GetComponent<GroupNarrativeObject>();
+            if (viewContainerNarrativeObject is GroupNarrativeObject)
+            {
+                GroupNarrativeObject groupNarrativeObject = viewContainerNarrativeObject.GetComponent<GroupNarrativeObject>();
 
-        //        groupNarrativeObject.GroupSelectionDecisionPoint.AddCandidate(narrativeObject);
-        //    }
-        //    else if (viewContainerNarrativeObject is LayerNarrativeObject)
-        //    {
-        //        LayerNarrativeObject layerNarrativeObject = viewContainerNarrativeObject.GetComponent<LayerNarrativeObject>();
+                groupNarrativeObject.GroupSelectionDecisionPoint.AddCandidate(narrativeObject);
+            }
+            else if (viewContainerNarrativeObject is LayerNarrativeObject)
+            {
+                LayerNarrativeObject layerNarrativeObject = viewContainerNarrativeObject.GetComponent<LayerNarrativeObject>();
 
-        //        layerNarrativeObject.LayerSelectionDecisionPoint.AddCandidate(narrativeObject);
-        //    }
-        //    else
-        //    {
-        //        Debug.LogError("Cannot add candidate as narrative object has no candidates.");
+                layerNarrativeObject.LayerSelectionDecisionPoint.AddCandidate(narrativeObject);
+            }
+            else
+            {
+                Debug.LogError("Cannot add candidate as narrative object has no candidates.");
 
-        //        return false;
-        //    }
+                return false;
+            }
 
-        //    return true;
-        //}
+            return true;
+        }
 
-        //private bool RemoveNarrativeObjectAsCandidateOfViewContainer(ViewContainer viewContainer, NarrativeObject narrativeObject)
-        //{
-        //    // Find the narrative object which has the same guid as the current view container.
-        //    NarrativeObject viewContainerNarrativeObject = GetNarrativeObject(viewContainer.narrativeObjectGuid);
+        private bool RemoveNarrativeObjectAsCandidateOfViewContainer(ViewContainer viewContainer, NarrativeObject narrativeObject)
+        {
+            // Find the narrative object which has the same guid as the current view container.
+            NarrativeObject viewContainerNarrativeObject = GetNarrativeObject(viewContainer.narrativeObjectGuid);
 
-        //    if (viewContainerNarrativeObject == null)
-        //    {
-        //        Debug.LogError($"Narrative Object with guid {narrativeObject.guid} does not exist.");
+            if (viewContainerNarrativeObject == null)
+            {
+                Debug.LogError($"Narrative Object with guid {narrativeObject.guid} does not exist.");
 
-        //        return false;
-        //    }
+                return false;
+            }
 
-        //    if (viewContainerNarrativeObject is GroupNarrativeObject)
-        //    {
-        //        GroupNarrativeObject groupNarrativeObject = viewContainerNarrativeObject.GetComponent<GroupNarrativeObject>();
+            if (viewContainerNarrativeObject is GroupNarrativeObject)
+            {
+                GroupNarrativeObject groupNarrativeObject = viewContainerNarrativeObject.GetComponent<GroupNarrativeObject>();
 
-        //        groupNarrativeObject.GroupSelectionDecisionPoint.RemoveCandidate(narrativeObject);
-        //    }
-        //    else if (viewContainerNarrativeObject is LayerNarrativeObject)
-        //    {
-        //        LayerNarrativeObject layerNarrativeObject = viewContainerNarrativeObject.GetComponent<LayerNarrativeObject>();
+                groupNarrativeObject.GroupSelectionDecisionPoint.RemoveCandidate(narrativeObject);
+            }
+            else if (viewContainerNarrativeObject is LayerNarrativeObject)
+            {
+                LayerNarrativeObject layerNarrativeObject = viewContainerNarrativeObject.GetComponent<LayerNarrativeObject>();
 
-        //        layerNarrativeObject.LayerSelectionDecisionPoint.RemoveCandidate(narrativeObject);
-        //    }
-        //    else
-        //    {
-        //        Debug.LogError("Cannot add candidate as narrative object has no candidates.");
+                layerNarrativeObject.LayerSelectionDecisionPoint.RemoveCandidate(narrativeObject);
+            }
+            else
+            {
+                Debug.LogError("Cannot add candidate as narrative object has no candidates.");
 
-        //        return false;
-        //    }
+                return false;
+            }
 
-        //    return true;
+            return true;
 
-        //}
+        }
 
         /// <summary>
         /// Query whether a view container has a root narrative object set.
