@@ -290,7 +290,10 @@ namespace CuttingRoom.Editor
                         variableNames.Add("Undefined");
                         foreach (Variable v in targetVariableStore.variableList)
                         {
-                            variableNames.Add(v.Name);
+                            if (v != null)
+                            {
+                                variableNames.Add(v.Name);
+                            }
                         }
 
                         if (string.IsNullOrEmpty(variableSetter.variableName))
