@@ -1265,6 +1265,12 @@ namespace CuttingRoom.Editor
 
         private bool AddNarrativeObjectAsCandidateOfViewContainer(ViewContainer viewContainer, NarrativeObject narrativeObject)
         {
+            if (viewContainer == null || viewContainer.narrativeObjectGuid == rootViewContainerGuid)
+            {
+                // View container is null or is root so just return.
+                return false;
+            }
+
             // Find the narrative object which has the same guid as the current view container.
             NarrativeObject viewContainerNarrativeObject = GetNarrativeObject(viewContainer.narrativeObjectGuid);
 
@@ -1299,6 +1305,12 @@ namespace CuttingRoom.Editor
 
         private bool RemoveNarrativeObjectAsCandidateOfViewContainer(ViewContainer viewContainer, NarrativeObject narrativeObject)
         {
+            if (viewContainer == null || viewContainer.narrativeObjectGuid == rootViewContainerGuid)
+            {
+                // View container is null or is root so just return.
+                return false;
+            }
+
             // Find the narrative object which has the same guid as the current view container.
             NarrativeObject viewContainerNarrativeObject = GetNarrativeObject(viewContainer.narrativeObjectGuid);
 
