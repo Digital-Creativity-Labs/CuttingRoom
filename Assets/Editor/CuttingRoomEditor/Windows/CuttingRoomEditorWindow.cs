@@ -425,6 +425,49 @@ namespace CuttingRoom.Editor
                             OnHierarchyChanged();
                             break;
                         }
+                    //case ObjectChangeKind.ChangeGameObjectParent:
+                    //    {
+                    //        stream.GetChangeGameObjectParentEvent(i, out var changeGameObjectParent);
+                    //        var gameObjectChanged = EditorUtility.InstanceIDToObject(changeGameObjectParent.instanceId) as GameObject;
+                    //        var newParentGameObject = EditorUtility.InstanceIDToObject(changeGameObjectParent.newParentInstanceId) as GameObject;
+                    //        var previousParentGameObject = EditorUtility.InstanceIDToObject(changeGameObjectParent.previousParentInstanceId) as GameObject;
+                    //        NarrativeObject parentNarrativeObject = null;
+                    //        NarrativeObject previousParentNarrativeObject = null;
+                    //        if (gameObjectChanged.TryGetComponent(out NarrativeObject childNarrativeObject) &&
+                    //            (newParentGameObject.TryGetComponent(out parentNarrativeObject) ||
+                    //            previousParentGameObject.TryGetComponent(out previousParentNarrativeObject)))
+                    //        {
+                    //            if (parentNarrativeObject != null)
+                    //            {
+                    //                if (parentNarrativeObject is GroupNarrativeObject)
+                    //                {
+                    //                    GroupNarrativeObject parentGroup = parentNarrativeObject as GroupNarrativeObject;
+                    //                    parentGroup.GroupSelectionDecisionPoint.AddCandidate(childNarrativeObject);
+                    //                }
+                    //                else if (parentNarrativeObject is LayerNarrativeObject)
+                    //                {
+                    //                    LayerNarrativeObject parentLayer = parentNarrativeObject as LayerNarrativeObject;
+                    //                    parentLayer.LayerSelectionDecisionPoint.AddCandidate(childNarrativeObject);
+                    //                }
+                    //            }
+
+                    //            if (previousParentNarrativeObject != null)
+                    //            {
+                    //                if (previousParentNarrativeObject is GroupNarrativeObject)
+                    //                {
+                    //                    GroupNarrativeObject parentGroup = parentNarrativeObject as GroupNarrativeObject;
+                    //                    parentGroup.GroupSelectionDecisionPoint.RemoveCandidate(childNarrativeObject);
+                    //                }
+                    //                else if (previousParentNarrativeObject is LayerNarrativeObject)
+                    //                {
+                    //                    LayerNarrativeObject parentLayer = parentNarrativeObject as LayerNarrativeObject;
+                    //                    parentLayer.LayerSelectionDecisionPoint.RemoveCandidate(childNarrativeObject);
+                    //                }
+                    //            }
+                    //        }
+                    //        OnHierarchyChanged();
+                    //        break;
+                    //    }
                     default:
                         break;
                 }
