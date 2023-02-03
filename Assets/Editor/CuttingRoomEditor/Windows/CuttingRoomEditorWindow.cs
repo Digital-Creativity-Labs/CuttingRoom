@@ -95,6 +95,8 @@ namespace CuttingRoom.Editor
         /// </summary>
         public void CreateGUI()
         {
+            ObjectChangeEvents.changesPublished -= OnCreateGameObjectHierarchy;
+            ObjectChangeEvents.changesPublished += OnCreateGameObjectHierarchy;
             EditorApplication.hierarchyChanged -= OnHierarchyChanged;
             EditorApplication.hierarchyChanged += OnHierarchyChanged;
             RegenerateContents(true);
@@ -400,7 +402,33 @@ namespace CuttingRoom.Editor
         /// </summary>
         private void OnDisable()
         {
+            ObjectChangeEvents.changesPublished -= OnCreateGameObjectHierarchy;
             EditorApplication.hierarchyChanged -= OnHierarchyChanged;
+        }
+
+
+        private void OnCreateGameObjectHierarchy(ref ObjectChangeEventStream stream)
+        {
+            for (int i = 0; i<stream.length; ++i)
+            {
+                switch (stream.GetEventType(i))
+                {
+                    case ObjectChangeKind.CreateGameObjectHierarchy:
+                        {
+                            stream.GetCreateGameObjectHierarchyEvent(i, out var createGameObjectHierarchyEvent);
+                            var newGameObject = EditorUtility.InstanceIDToObject(createGameObjectHierarchyEvent.instanceId) as GameObject;
+                            if (newGameObject.TryGetComponent(out NarrativeObject narrativeObject))
+                            {
+                                // Force new guid
+                                narrativeObject.guid = Guid.NewGuid().ToString();
+                            }
+                            OnHierarchyChanged();
+                            break;
+                        }
+                    default:
+                        break;
+                }
+            }
         }
 
         /// <summary>
