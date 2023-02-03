@@ -5,6 +5,7 @@ using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using System;
 using System.Linq;
+using UnityEngine.SceneManagement;
 
 namespace CuttingRoom.Editor
 {
@@ -721,6 +722,15 @@ namespace CuttingRoom.Editor
         {
             // Returned populate result.
             PopulateResult populateResult = new PopulateResult();
+
+            // Get List of root narrative objects
+            // TODO: Base graph structure off of hierarchy
+            Scene scene = SceneManager.GetActiveScene();
+            var rootGameObjects = scene.GetRootGameObjects();
+            List<NarrativeObject> rootNarrativeObjects = rootGameObjects.Where(go => go.TryGetComponent<NarrativeObject>(out _))
+                .Select(ngo => ngo.GetComponent<NarrativeObject>())
+                .ToList();
+
 
             if (graphViewState != null)
             {
