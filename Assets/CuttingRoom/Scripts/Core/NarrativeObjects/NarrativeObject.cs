@@ -3,7 +3,11 @@ using CuttingRoom.VariableSystem.Constraints;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Collections;
 using UnityEngine;
+#if UNITY_EDITOR
+using CuttingRoom.Editor;
+#endif
 
 namespace CuttingRoom
 {
@@ -13,7 +17,7 @@ namespace CuttingRoom
         /// <summary>
         /// The guid for this narrative object.
         /// </summary>
-        [HideInInspector]
+        [InspectorVisible]
         public string guid = Guid.NewGuid().ToString();
 
         /// <summary>
