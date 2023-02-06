@@ -11,12 +11,22 @@ namespace CuttingRoom.Editor
         /// <summary>
         /// The states of the narrative object nodes making up the graph.
         /// </summary>
-        public List<NarrativeObjectNodeState> narrativeObjectNodeStates = new List<NarrativeObjectNodeState>();
+        public List<NarrativeObjectNodeState> narrativeObjectNodeStates = new();
+
+        /// <summary>
+        /// The states of the narrative object nodes making up the graph.
+        /// </summary>
+        public Dictionary<string, NarrativeObjectNodeState> narrativeObjectNodeStateLookup = new();
 
         /// <summary>
         /// The states of the view containers in the graph.
         /// </summary>
-        public List<ViewContainerState> viewContainerStates = new List<ViewContainerState>();
+        public List<ViewContainerState> viewContainerStates = new();
+
+        /// <summary>
+        /// The states of the view containers in the graph.
+        /// </summary>
+        public Dictionary<string, ViewContainerState> viewContainerStateLookup = new();
 
         /// <summary>
         /// The guids of the view containers making up the view stack.

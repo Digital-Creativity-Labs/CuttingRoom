@@ -714,6 +714,72 @@ namespace CuttingRoom.Editor
             public List<Tuple<string, Vector2>> CreatedNodes { get; set; } = new List<Tuple<string, Vector2>>();
         }
 
+        private void UpdateViewContainer(CuttingRoomEditorGraphViewState graphViewState, string viewContainerNarrativeObjectGuid, List<NarrativeObject> viewContainerNarrativeObjects, ref HashSet<string> currentViewContainers)
+        {
+            if (currentViewContainers == null)
+            {
+                currentViewContainers = new();
+            }
+            // Record View Container as current
+            currentViewContainers.Add(viewContainerNarrativeObjectGuid);
+
+
+            //var viewContainerState = graphViewState.viewContainerStates.Where(state => state.narrativeObjectGuid == viewContainerNarrativeObjectGuid).FirstOrDefault();
+            var viewContainerState = graphViewState.viewContainerStateLookup.ContainsKey(viewContainerNarrativeObjectGuid) ?
+                graphViewState.viewContainerStateLookup[viewContainerNarrativeObjectGuid] : null;
+
+            // If View Container has no recorded state
+            if (viewContainerState == null)
+            {
+                viewContainerState = new();
+                viewContainerState.narrativeObjectGuid = viewContainerNarrativeObjectGuid;
+            }
+
+            // Have starting position for new nodes
+            Vector2 startingNodePosition = new();
+            foreach (var narrativeObject in viewContainerNarrativeObjects)
+            {
+                // Add narrative object guid to view container state if not present
+                if (!viewContainerState.narrativeObjectNodeGuids.Contains(narrativeObject.guid))
+                {
+                    viewContainerState.narrativeObjectNodeGuids.Add(narrativeObject.guid);
+                }
+
+                var narrativeObjectNodeState = graphViewState.narrativeObjectNodeStateLookup.ContainsKey(narrativeObject.guid) ?
+                    graphViewState.narrativeObjectNodeStateLookup[narrativeObject.guid] : null;
+
+                if (narrativeObjectNodeState == null)
+                {
+                    narrativeObjectNodeState = new();
+                    narrativeObjectNodeState.narrativeObjectGuid = narrativeObject.guid;
+                    narrativeObjectNodeState.position = startingNodePosition;
+                    // Shift starting position to avoid overlapping.
+                    ++startingNodePosition.x;
+                    --startingNodePosition.y;
+
+                    graphViewState.narrativeObjectNodeStateLookup[narrativeObject.guid] = narrativeObjectNodeState;
+
+                    // Check if narrative object may container child nodes
+                    if (narrativeObject is GraphNarrativeObject ||
+                        narrativeObject is LayerNarrativeObject ||
+                        narrativeObject is GraphNarrativeObject)
+                    {
+                        // Check for child narrative objects
+                        var childNarrativeObjects = narrativeObject.GetComponentsInChildren<NarrativeObject>().ToList();
+                        if (childNarrativeObjects != null && childNarrativeObjects.Count > 0)
+                        {
+                            // Update view container for container node
+                            UpdateViewContainer(graphViewState, narrativeObject.guid, childNarrativeObjects, ref currentViewContainers);
+                        }
+                    }
+                }
+                else
+                {
+
+                }
+            }
+        }
+
         /// <summary>
         /// Populate the graph view based on the contents of the scene currently open.
         /// </summary>
@@ -730,6 +796,7 @@ namespace CuttingRoom.Editor
             List<NarrativeObject> rootNarrativeObjects = rootGameObjects.Where(go => go.TryGetComponent<NarrativeObject>(out _))
                 .Select(ngo => ngo.GetComponent<NarrativeObject>())
                 .ToList();
+
 
 
             if (graphViewState != null)
