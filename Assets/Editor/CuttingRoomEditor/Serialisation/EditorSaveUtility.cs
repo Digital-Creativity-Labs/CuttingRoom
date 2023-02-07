@@ -41,7 +41,7 @@ namespace CuttingRoom.Editor
         /// <summary>
         /// The narrative object nodes which currently exist on the graph view.
         /// </summary>
-        private List<NarrativeObjectNode> NarrativeObjectNodes => CuttingRoomEditorGraphView.NarrativeObjectNodes;
+        private Dictionary<string, NarrativeObjectNode> NarrativeObjectNodes => CuttingRoomEditorGraphView.NarrativeObjectNodes;
 
         /// <summary>
         /// The view containers which currently exist within the graph view.
@@ -112,11 +112,8 @@ namespace CuttingRoom.Editor
                     // The object exists.
                     if (narrativeObjectExists)
                     {
-                        // Check if it has a live node on the screen (so must be part of the visible view container)
-                        NarrativeObjectNode narrativeObjectNode = NarrativeObjectNodes.Where(narrativeObjectNode => narrativeObjectNode.NarrativeObject.guid == narrativeObjectGuid).FirstOrDefault();
-
                         // If there is a node currently visible, save that.
-                        if (narrativeObjectNode != null)
+                        if (NarrativeObjectNodes.TryGetValue(narrativeObjectGuid, out NarrativeObjectNode narrativeObjectNode))
                         {
                             Rect rect = narrativeObjectNode.GetPosition();
 
