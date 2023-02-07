@@ -6,6 +6,7 @@ using UnityEditor.Experimental.GraphView;
 using System;
 using System.Linq;
 using UnityEngine.SceneManagement;
+using UnityEditor.SceneManagement;
 
 namespace CuttingRoom.Editor
 {
@@ -87,6 +88,8 @@ namespace CuttingRoom.Editor
             Input,
             Output,
         }
+
+        private Scene? ActiveScene = null;
 
         /// <summary>
         /// The guid representing the container which is the narrative space.
@@ -741,7 +744,7 @@ namespace CuttingRoom.Editor
             HashSet<string> removedNarrativeObjectGuids = viewContainerState.narrativeObjectNodeGuids.ToHashSet();
 
             // Have starting position for new nodes
-            Vector2 startingNodePosition = new();
+            Vector2 startingNodePosition = contentViewContainer.WorldToLocal(layout.center);
             foreach (var narrativeObject in viewContainerNarrativeObjects)
             {
                 // Add narrative object guid to view container state if not present
@@ -806,21 +809,9 @@ namespace CuttingRoom.Editor
                     if (viewContainerStack.Contains(deletedViewContainer))
                     {
                         PopViewContainersToViewContainer(deletedViewContainer);
+                        PopViewContainer();
                     }
                     viewContainers.Remove(deletedViewContainer);
-                }
-            }
-
-            foreach (string guid in graphViewState.viewContainerStackGuids)
-            {
-                ViewContainer viewContainer = viewContainers.Where(viewContainer => viewContainer.narrativeObjectGuid == guid).FirstOrDefault();
-
-                if (viewContainer != null)
-                {
-                    if (!viewContainerStack.Contains(viewContainer))
-                    {
-                        PushViewContainer(viewContainer);
-                    }
                 }
             }
         }
@@ -834,15 +825,48 @@ namespace CuttingRoom.Editor
             // Returned populate result.
             PopulateResult populateResult = new PopulateResult();
 
-            // Get List of root narrative objects
-            // TODO: Base graph structure off of hierarchy
             Scene scene = SceneManager.GetActiveScene();
+            if (scene != ActiveScene)
+            {
+                // Clear view stack if scene has changed
+                viewContainerStack.Clear();
+                ActiveScene = scene;
+            }
+
+            // Get List of root narrative objects
             var rootGameObjects = scene.GetRootGameObjects();
             HashSet<NarrativeObject> rootNarrativeObjects = rootGameObjects.Where(go => go.TryGetComponent<NarrativeObject>(out _))
                 .Select(ngo => ngo.GetComponent<NarrativeObject>())
                 .ToHashSet();
 
             UpdateViewContainer(graphViewState, rootViewContainerGuid, rootNarrativeObjects);
+
+            populateResult.GraphViewChanged = true;
+
+            // Ensure root breadcrumb is present
+            if (graphViewState.viewContainerStackGuids.Count == 0 || graphViewState.viewContainerStackGuids[0] != rootViewContainerGuid)
+            {
+                List<string> newViewStack = new();
+                newViewStack.Add(rootViewContainerGuid);
+                foreach(var guid in graphViewState.viewContainerStackGuids)
+                {
+                    newViewStack.Add(guid);
+                }
+                graphViewState.viewContainerStackGuids = newViewStack;
+            }
+            // Update ViewStack
+            foreach (string guid in graphViewState.viewContainerStackGuids)
+            {
+                ViewContainer viewContainer = viewContainers.Where(viewContainer => viewContainer.narrativeObjectGuid == guid).FirstOrDefault();
+
+                if (viewContainer != null)
+                {
+                    if (!viewContainerStack.Contains(viewContainer))
+                    {
+                        PushViewContainer(viewContainer);
+                    }
+                }
+            }
 
             // The view container being rendered.
             ViewContainer visibleViewContainer = viewContainerStack.Peek();
@@ -955,7 +979,7 @@ namespace CuttingRoom.Editor
                         populateResult.CreatedNodes.Add(new Tuple<string, Vector2>(narrativeObjectNode.NarrativeObject.guid, graphViewCenter));
 
                         // Make invisible to avoid popping onto screen at 0,0 before appearing at the centre of the graph view.
-                        narrativeObjectNode.visible = false;
+                        narrativeObjectNode.visible = true;
 
                         // Node state for this node doesn't exist. Graph view is different from it's save state.
                         populateResult.GraphViewChanged = true;
