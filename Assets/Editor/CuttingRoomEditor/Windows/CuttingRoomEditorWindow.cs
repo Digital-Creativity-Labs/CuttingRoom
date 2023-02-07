@@ -357,7 +357,7 @@ namespace CuttingRoom.Editor
         private void PopulateGraphView()
         {
             // Find Narrative Objects in the scene. These will be displayed on the Graph View as nodes.
-            NarrativeObject[] narrativeObjects = FindObjectsOfType<NarrativeObject>();
+            var narrativeObjects = FindObjectsOfType<NarrativeObject>().ToHashSet();
 
             foreach (NarrativeObject narrativeObject in narrativeObjects)
             {
@@ -425,49 +425,47 @@ namespace CuttingRoom.Editor
                             OnHierarchyChanged();
                             break;
                         }
-                    //case ObjectChangeKind.ChangeGameObjectParent:
-                    //    {
-                    //        stream.GetChangeGameObjectParentEvent(i, out var changeGameObjectParent);
-                    //        var gameObjectChanged = EditorUtility.InstanceIDToObject(changeGameObjectParent.instanceId) as GameObject;
-                    //        var newParentGameObject = EditorUtility.InstanceIDToObject(changeGameObjectParent.newParentInstanceId) as GameObject;
-                    //        var previousParentGameObject = EditorUtility.InstanceIDToObject(changeGameObjectParent.previousParentInstanceId) as GameObject;
-                    //        NarrativeObject parentNarrativeObject = null;
-                    //        NarrativeObject previousParentNarrativeObject = null;
-                    //        if (gameObjectChanged.TryGetComponent(out NarrativeObject childNarrativeObject) &&
-                    //            (newParentGameObject.TryGetComponent(out parentNarrativeObject) ||
-                    //            previousParentGameObject.TryGetComponent(out previousParentNarrativeObject)))
-                    //        {
-                    //            if (parentNarrativeObject != null)
-                    //            {
-                    //                if (parentNarrativeObject is GroupNarrativeObject)
-                    //                {
-                    //                    GroupNarrativeObject parentGroup = parentNarrativeObject as GroupNarrativeObject;
-                    //                    parentGroup.GroupSelectionDecisionPoint.AddCandidate(childNarrativeObject);
-                    //                }
-                    //                else if (parentNarrativeObject is LayerNarrativeObject)
-                    //                {
-                    //                    LayerNarrativeObject parentLayer = parentNarrativeObject as LayerNarrativeObject;
-                    //                    parentLayer.LayerSelectionDecisionPoint.AddCandidate(childNarrativeObject);
-                    //                }
-                    //            }
+                    case ObjectChangeKind.ChangeGameObjectParent:
+                        {
+                            stream.GetChangeGameObjectParentEvent(i, out var changeGameObjectParent);
+                            var gameObjectChanged = EditorUtility.InstanceIDToObject(changeGameObjectParent.instanceId) as GameObject;
+                            var newParentGameObject = EditorUtility.InstanceIDToObject(changeGameObjectParent.newParentInstanceId) as GameObject;
+                            var previousParentGameObject = EditorUtility.InstanceIDToObject(changeGameObjectParent.previousParentInstanceId) as GameObject;
+                            NarrativeObject parentNarrativeObject = newParentGameObject?.GetComponent<NarrativeObject>();
+                            NarrativeObject previousParentNarrativeObject = previousParentGameObject?.GetComponent<NarrativeObject>();
+                            if (gameObjectChanged.TryGetComponent(out NarrativeObject childNarrativeObject))
+                            {
+                                if (parentNarrativeObject != null)
+                                {
+                                    if (parentNarrativeObject is GroupNarrativeObject)
+                                    {
+                                        GroupNarrativeObject parentGroup = parentNarrativeObject as GroupNarrativeObject;
+                                        parentGroup.GroupSelectionDecisionPoint.AddCandidate(childNarrativeObject);
+                                    }
+                                    else if (parentNarrativeObject is LayerNarrativeObject)
+                                    {
+                                        LayerNarrativeObject parentLayer = parentNarrativeObject as LayerNarrativeObject;
+                                        parentLayer.LayerSelectionDecisionPoint.AddCandidate(childNarrativeObject);
+                                    }
+                                }
 
-                    //            if (previousParentNarrativeObject != null)
-                    //            {
-                    //                if (previousParentNarrativeObject is GroupNarrativeObject)
-                    //                {
-                    //                    GroupNarrativeObject parentGroup = parentNarrativeObject as GroupNarrativeObject;
-                    //                    parentGroup.GroupSelectionDecisionPoint.RemoveCandidate(childNarrativeObject);
-                    //                }
-                    //                else if (previousParentNarrativeObject is LayerNarrativeObject)
-                    //                {
-                    //                    LayerNarrativeObject parentLayer = parentNarrativeObject as LayerNarrativeObject;
-                    //                    parentLayer.LayerSelectionDecisionPoint.RemoveCandidate(childNarrativeObject);
-                    //                }
-                    //            }
-                    //        }
-                    //        OnHierarchyChanged();
-                    //        break;
-                    //    }
+                                if (previousParentNarrativeObject != null)
+                                {
+                                    if (previousParentNarrativeObject is GroupNarrativeObject)
+                                    {
+                                        GroupNarrativeObject previousParentGroup = previousParentNarrativeObject as GroupNarrativeObject;
+                                        previousParentGroup.GroupSelectionDecisionPoint.RemoveCandidate(childNarrativeObject);
+                                    }
+                                    else if (previousParentNarrativeObject is LayerNarrativeObject)
+                                    {
+                                        LayerNarrativeObject previousParentLayer = previousParentNarrativeObject as LayerNarrativeObject;
+                                        previousParentLayer.LayerSelectionDecisionPoint.RemoveCandidate(childNarrativeObject);
+                                    }
+                                }
+                            }
+                            OnHierarchyChanged();
+                            break;
+                        }
                     default:
                         break;
                 }

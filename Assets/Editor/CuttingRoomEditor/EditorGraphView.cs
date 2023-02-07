@@ -714,15 +714,18 @@ namespace CuttingRoom.Editor
             public List<Tuple<string, Vector2>> CreatedNodes { get; set; } = new List<Tuple<string, Vector2>>();
         }
 
-        private void UpdateViewContainer(CuttingRoomEditorGraphViewState graphViewState, string viewContainerNarrativeObjectGuid, List<NarrativeObject> viewContainerNarrativeObjects, ref HashSet<string> currentViewContainers)
+        private void UpdateViewContainer(CuttingRoomEditorGraphViewState graphViewState, string viewContainerNarrativeObjectGuid,
+            HashSet<NarrativeObject> viewContainerNarrativeObjects)
         {
-            if (currentViewContainers == null)
+            if (!viewContainers.Any(vc => vc.narrativeObjectGuid == viewContainerNarrativeObjectGuid))
             {
-                currentViewContainers = new();
+                viewContainers.Add(new(viewContainerNarrativeObjectGuid));
             }
-            // Record View Container as current
-            currentViewContainers.Add(viewContainerNarrativeObjectGuid);
 
+            if (graphViewState == null)
+            {
+                graphViewState = ScriptableObject.CreateInstance<CuttingRoomEditorGraphViewState>();
+            }
 
             //var viewContainerState = graphViewState.viewContainerStates.Where(state => state.narrativeObjectGuid == viewContainerNarrativeObjectGuid).FirstOrDefault();
             var viewContainerState = graphViewState.viewContainerStateLookup.ContainsKey(viewContainerNarrativeObjectGuid) ?
@@ -735,6 +738,8 @@ namespace CuttingRoom.Editor
                 viewContainerState.narrativeObjectGuid = viewContainerNarrativeObjectGuid;
             }
 
+            HashSet<string> removedNarrativeObjectGuids = viewContainerState.narrativeObjectNodeGuids.ToHashSet();
+
             // Have starting position for new nodes
             Vector2 startingNodePosition = new();
             foreach (var narrativeObject in viewContainerNarrativeObjects)
@@ -743,6 +748,11 @@ namespace CuttingRoom.Editor
                 if (!viewContainerState.narrativeObjectNodeGuids.Contains(narrativeObject.guid))
                 {
                     viewContainerState.narrativeObjectNodeGuids.Add(narrativeObject.guid);
+                }
+                else
+                {
+                    // Trim existing nodes from removed list
+                    removedNarrativeObjectGuids.Remove(narrativeObject.guid);
                 }
 
                 var narrativeObjectNodeState = graphViewState.narrativeObjectNodeStateLookup.ContainsKey(narrativeObject.guid) ?
@@ -756,26 +766,52 @@ namespace CuttingRoom.Editor
                     // Shift starting position to avoid overlapping.
                     ++startingNodePosition.x;
                     --startingNodePosition.y;
+                }
+                graphViewState.narrativeObjectNodeStateLookup[narrativeObject.guid] = narrativeObjectNodeState;
 
-                    graphViewState.narrativeObjectNodeStateLookup[narrativeObject.guid] = narrativeObjectNodeState;
-
-                    // Check if narrative object may container child nodes
-                    if (narrativeObject is GraphNarrativeObject ||
-                        narrativeObject is LayerNarrativeObject ||
-                        narrativeObject is GraphNarrativeObject)
+                // Check if narrative object may container child nodes
+                if (narrativeObject is GraphNarrativeObject ||
+                    narrativeObject is LayerNarrativeObject ||
+                    narrativeObject is GraphNarrativeObject)
+                {
+                    // Check for child narrative objects
+                    var childNarrativeObjects = narrativeObject.GetComponentsInChildren<NarrativeObject>().ToHashSet();
+                    childNarrativeObjects.Remove(narrativeObject);
+                    if (childNarrativeObjects != null && childNarrativeObjects.Count > 0)
                     {
-                        // Check for child narrative objects
-                        var childNarrativeObjects = narrativeObject.GetComponentsInChildren<NarrativeObject>().ToList();
-                        if (childNarrativeObjects != null && childNarrativeObjects.Count > 0)
-                        {
-                            // Update view container for container node
-                            UpdateViewContainer(graphViewState, narrativeObject.guid, childNarrativeObjects, ref currentViewContainers);
-                        }
+                        // Update view container for container node
+                        UpdateViewContainer(graphViewState, narrativeObject.guid, childNarrativeObjects);
                     }
                 }
-                else
-                {
+            }
+            graphViewState.viewContainerStateLookup[viewContainerNarrativeObjectGuid] = viewContainerState;
 
+            foreach (var removedNodeGuid in removedNarrativeObjectGuids)
+            {
+                viewContainerState.narrativeObjectNodeGuids.Remove(removedNodeGuid);
+
+                ViewContainer deletedViewContainer = viewContainers.Where(vc => vc.narrativeObjectGuid == removedNodeGuid).FirstOrDefault();
+                // The container should not exist. Remove it if it exists.
+                if (deletedViewContainer != null)
+                {
+                    if (viewContainerStack.Contains(deletedViewContainer))
+                    {
+                        PopViewContainersToViewContainer(deletedViewContainer);
+                    }
+                    viewContainers.Remove(deletedViewContainer);
+                }
+            }
+
+            foreach (string guid in graphViewState.viewContainerStackGuids)
+            {
+                ViewContainer viewContainer = viewContainers.Where(viewContainer => viewContainer.narrativeObjectGuid == guid).FirstOrDefault();
+
+                if (viewContainer != null)
+                {
+                    if (!viewContainerStack.Contains(viewContainer))
+                    {
+                        PushViewContainer(viewContainer);
+                    }
                 }
             }
         }
@@ -784,7 +820,7 @@ namespace CuttingRoom.Editor
         /// Populate the graph view based on the contents of the scene currently open.
         /// </summary>
         /// <returns>Whether the graph view contents have been changed.</returns>
-        public PopulateResult Populate(CuttingRoomEditorGraphViewState graphViewState, NarrativeObject[] narrativeObjects)
+        public PopulateResult Populate(CuttingRoomEditorGraphViewState graphViewState, HashSet<NarrativeObject> narrativeObjects)
         {
             // Returned populate result.
             PopulateResult populateResult = new PopulateResult();
@@ -793,142 +829,150 @@ namespace CuttingRoom.Editor
             // TODO: Base graph structure off of hierarchy
             Scene scene = SceneManager.GetActiveScene();
             var rootGameObjects = scene.GetRootGameObjects();
-            List<NarrativeObject> rootNarrativeObjects = rootGameObjects.Where(go => go.TryGetComponent<NarrativeObject>(out _))
+            HashSet<NarrativeObject> rootNarrativeObjects = rootGameObjects.Where(go => go.TryGetComponent<NarrativeObject>(out _))
                 .Select(ngo => ngo.GetComponent<NarrativeObject>())
-                .ToList();
+                .ToHashSet();
 
+            UpdateViewContainer(graphViewState, rootViewContainerGuid, rootNarrativeObjects);
 
+            //if (graphViewState != null)
+            //{
+            //    // If the number of view containers is different to the save, then a view container has been added or removed
+            //    // or if there view stack has been pushed/popped.
+            //    // This change must be saved.
+            //    if (viewContainers.Count != graphViewState.viewContainerStates.Count ||
+            //        viewContainerStack.Count != graphViewState.viewContainerStackGuids.Count)
+            //    {
+            //        populateResult.GraphViewChanged = true;
+            //    }
 
-            if (graphViewState != null)
-            {
-                // If the number of view containers is different to the save, then a view container has been added or removed
-                // or if there view stack has been pushed/popped.
-                // This change must be saved.
-                if (viewContainers.Count != graphViewState.viewContainerStates.Count ||
-                    viewContainerStack.Count != graphViewState.viewContainerStackGuids.Count)
-                {
-                    populateResult.GraphViewChanged = true;
-                }
+            //    // If a narrative object has been added or removed since the last state, then save.
+            //    if (narrativeObjects.Length != graphViewState.narrativeObjectNodeStates.Count)
+            //    {
+            //        populateResult.GraphViewChanged = true;
+            //    }
 
-                // If a narrative object has been added or removed since the last state, then save.
-                if (narrativeObjects.Length != graphViewState.narrativeObjectNodeStates.Count)
-                {
-                    populateResult.GraphViewChanged = true;
-                }
+            //    // Ensure all view containers exist.
+            //    foreach (ViewContainerState viewContainerState in graphViewState.viewContainerStates)
+            //    {
+            //        bool viewContainerShouldExist = viewContainerState.narrativeObjectGuid == rootViewContainerGuid || narrativeObjects.Where(narrativeObject => narrativeObject.guid == viewContainerState.narrativeObjectGuid).FirstOrDefault() != null;
 
-                // Ensure all view containers exist.
-                foreach (ViewContainerState viewContainerState in graphViewState.viewContainerStates)
-                {
-                    bool viewContainerShouldExist = viewContainerState.narrativeObjectGuid == rootViewContainerGuid || narrativeObjects.Where(narrativeObject => narrativeObject.guid == viewContainerState.narrativeObjectGuid).FirstOrDefault() != null;
+            //        // The view container (if it exists).
+            //        ViewContainer viewContainer = viewContainers.Where(viewContainer => viewContainer.narrativeObjectGuid == viewContainerState.narrativeObjectGuid).FirstOrDefault();
 
-                    // The view container (if it exists).
-                    ViewContainer viewContainer = viewContainers.Where(viewContainer => viewContainer.narrativeObjectGuid == viewContainerState.narrativeObjectGuid).FirstOrDefault();
+            //        // Ensure that the narrative object which the view container state represents still exists or check if the container is the root before restoring.
+            //        if (viewContainerShouldExist)
+            //        {
+            //            // If the view container doesnt exist.
+            //            if (viewContainer == null)
+            //            {
+            //                viewContainer = new ViewContainer(viewContainerState.narrativeObjectGuid);
 
-                    // Ensure that the narrative object which the view container state represents still exists or check if the container is the root before restoring.
-                    if (viewContainerShouldExist)
-                    {
-                        // If the view container doesnt exist.
-                        if (viewContainer == null)
-                        {
-                            viewContainer = new ViewContainer(viewContainerState.narrativeObjectGuid);
+            //                viewContainers.Add(viewContainer);
+            //            }
 
-                            viewContainers.Add(viewContainer);
-                        }
+            //            // Find which guids inside the view container still exist.
+            //            List<string> narrativeObjectNodeGuids = new List<string>();
 
-                        // Find which guids inside the view container still exist.
-                        List<string> narrativeObjectNodeGuids = new List<string>();
+            //            foreach (string guid in viewContainerState.narrativeObjectNodeGuids)
+            //            {
+            //                // Get the narrative object which has the guid.
+            //                NarrativeObject existingNarrativeObject = narrativeObjects.Where(narrativeObject => narrativeObject.guid == guid).FirstOrDefault();
 
-                        foreach (string guid in viewContainerState.narrativeObjectNodeGuids)
-                        {
-                            // Get the narrative object which has the guid.
-                            NarrativeObject existingNarrativeObject = narrativeObjects.Where(narrativeObject => narrativeObject.guid == guid).FirstOrDefault();
+            //                // If the narrative object exists, then it's guid is still valid, else the narrative object has been removed so don't add the guid again.
+            //                if (existingNarrativeObject != null)
+            //                {
+            //                    narrativeObjectNodeGuids.Add(existingNarrativeObject.guid);
+            //                }
+            //            }
 
-                            // If the narrative object exists, then it's guid is still valid, else the narrative object has been removed so don't add the guid again.
-                            if (existingNarrativeObject != null)
-                            {
-                                narrativeObjectNodeGuids.Add(existingNarrativeObject.guid);
-                            }
-                        }
+            //            // Restore the guids of the container.
+            //            viewContainer.narrativeObjectNodeGuids = narrativeObjectNodeGuids;
+            //        }
+            //        else
+            //        {
+            //            // The container should not exist. Remove it if it exists.
+            //            if (viewContainers.Contains(viewContainer))
+            //            {
+            //                if (viewContainerStack.Contains(viewContainer))
+            //                {
+            //                    PopViewContainersToViewContainer(viewContainer);
+            //                }
 
-                        // Restore the guids of the container.
-                        viewContainer.narrativeObjectNodeGuids = narrativeObjectNodeGuids;
-                    }
-                    else
-                    {
-                        // The container should not exist. Remove it if it exists.
-                        if (viewContainers.Contains(viewContainer))
-                        {
-                            if (viewContainerStack.Contains(viewContainer))
-                            {
-                                PopViewContainersToViewContainer(viewContainer);
-                            }
+            //                List<ViewContainer> deletedViewContainers = new List<ViewContainer>();
 
-                            List<ViewContainer> deletedViewContainers = new List<ViewContainer>();
+            //                List<string> deletedNarrativeObjectGuids = new List<string>();
 
-                            List<string> deletedNarrativeObjectGuids = new List<string>();
+            //                // Find the view containers and narrative objects which must be removed (self and children of view container which should not exist).
+            //                GetDeletedViewContainersAndNarrativeObjectGuids(viewContainer, ref deletedViewContainers, ref deletedNarrativeObjectGuids);
 
-                            // Find the view containers and narrative objects which must be removed (self and children of view container which should not exist).
-                            GetDeletedViewContainersAndNarrativeObjectGuids(viewContainer, ref deletedViewContainers, ref deletedNarrativeObjectGuids);
+            //                foreach (string guid in deletedNarrativeObjectGuids)
+            //                {
+            //                    NarrativeObject deletedNarrativeObject = narrativeObjects.Where(narrativeObject => narrativeObject.guid == guid).FirstOrDefault();
 
-                            foreach (string guid in deletedNarrativeObjectGuids)
-                            {
-                                NarrativeObject deletedNarrativeObject = narrativeObjects.Where(narrativeObject => narrativeObject.guid == guid).FirstOrDefault();
+            //                    // Delete narrative object if it exists in the scene.
+            //                    if (deletedNarrativeObject != null)
+            //                    {
+            //                        UnityEngine.Object.DestroyImmediate(deletedNarrativeObject.gameObject);
+            //                    }
+            //                }
 
-                                // Delete narrative object if it exists in the scene.
-                                if (deletedNarrativeObject != null)
-                                {
-                                    UnityEngine.Object.DestroyImmediate(deletedNarrativeObject.gameObject);
-                                }
-                            }
+            //                foreach (ViewContainer deletedViewContainer in deletedViewContainers)
+            //                {
+            //                    // Pop view to be deleted if its on the stack at the moment.
+            //                    if (viewContainerStack.Contains(deletedViewContainer))
+            //                    {
+            //                        PopViewContainersToViewContainer(deletedViewContainer);
+            //                    }
 
-                            foreach (ViewContainer deletedViewContainer in deletedViewContainers)
-                            {
-                                // Pop view to be deleted if its on the stack at the moment.
-                                if (viewContainerStack.Contains(deletedViewContainer))
-                                {
-                                    PopViewContainersToViewContainer(deletedViewContainer);
-                                }
+            //                    // Remove the view containers which have to be deleted.
+            //                    if (viewContainers.Contains(deletedViewContainer))
+            //                    {
+            //                        viewContainers.Remove(deletedViewContainer);
+            //                    }
+            //                }
+            //            }
+            //        }
+            //    }
 
-                                // Remove the view containers which have to be deleted.
-                                if (viewContainers.Contains(deletedViewContainer))
-                                {
-                                    viewContainers.Remove(deletedViewContainer);
-                                }
-                            }
-                        }
-                    }
-                }
+            //    foreach (string guid in graphViewState.viewContainerStackGuids)
+            //    {
+            //        ViewContainer viewContainer = viewContainers.Where(viewContainer => viewContainer.narrativeObjectGuid == guid).FirstOrDefault();
 
-                foreach (string guid in graphViewState.viewContainerStackGuids)
-                {
-                    ViewContainer viewContainer = viewContainers.Where(viewContainer => viewContainer.narrativeObjectGuid == guid).FirstOrDefault();
-
-                    if (viewContainer != null)
-                    {
-                        if (!viewContainerStack.Contains(viewContainer))
-                        {
-                            PushViewContainer(viewContainer);
-                        }
-                    }
-                }
-            }
-
-            // Remove any objects which have been deleted due to their view container being deleted or recursively as part of the parent view container being deleted.
-            narrativeObjects = narrativeObjects.Where(narrativeObject => narrativeObject != null).ToArray();
+            //        if (viewContainer != null)
+            //        {
+            //            if (!viewContainerStack.Contains(viewContainer))
+            //            {
+            //                PushViewContainer(viewContainer);
+            //            }
+            //        }
+            //    }
+            //}
 
             // The view container being rendered.
             ViewContainer visibleViewContainer = viewContainerStack.Peek();
-
             // Get the narrative object represented by the visible view container.
             NarrativeObject visibleViewContainerNarrativeObject = GetNarrativeObject(visibleViewContainer.narrativeObjectGuid);
 
+            if (visibleViewContainer.narrativeObjectGuid == rootViewContainerGuid)
+            {
+                narrativeObjects = rootNarrativeObjects;
+            }
+            else
+            {
+                var viewContainerNarrativeObject = narrativeObjects.Where(narrativeObject => narrativeObject.guid == visibleViewContainer.narrativeObjectGuid).First();
+                narrativeObjects = viewContainerNarrativeObject.gameObject.GetComponentsInChildren<NarrativeObject>().ToHashSet();
+                narrativeObjects.Remove(viewContainerNarrativeObject);
+            }
+
+
             foreach (NarrativeObject narrativeObject in narrativeObjects)
             {
-                // If the narrative object is not visible, then continue onto the next and create no node.
-                if (!IsVisible(narrativeObject))
-                {
-                    continue;
-                }
+                //// If the narrative object is not visible, then continue onto the next and create no node.
+                //if (!IsVisible(narrativeObject))
+                //{
+                //    continue;
+                //}
 
                 // Find any nodes which already exist in the graph view for the specified narrative object.
                 IEnumerable<NarrativeObjectNode> existingNodesForNarrativeObject = NarrativeObjectNodes.Where((node) => node.NarrativeObject.guid == narrativeObject.guid);
