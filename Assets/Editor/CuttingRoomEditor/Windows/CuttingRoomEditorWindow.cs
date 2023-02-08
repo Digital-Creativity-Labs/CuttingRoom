@@ -524,8 +524,6 @@ namespace CuttingRoom.Editor
             AddToolbar();
             AddNavigationToolbar();
 
-            NavigationToolbar.GenerateContents(GraphView.ViewContainerStack);
-
             if (DevToolbarEnabled)
             {
                 AddDevToolbar();
@@ -539,6 +537,8 @@ namespace CuttingRoom.Editor
             SaveUtility = new EditorSaveUtility(GraphView);
 
             PopulateGraphView();
+
+            NavigationToolbar.GenerateContents(GraphView.ViewContainerStack);
         }
 
         /// <summary>

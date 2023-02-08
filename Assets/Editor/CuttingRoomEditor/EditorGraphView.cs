@@ -113,7 +113,12 @@ namespace CuttingRoom.Editor
         public NarrativeObject VisibleViewContainerNarrativeObject 
         { 
             get 
-            { 
+            {
+                if (viewContainerStack == null || viewContainerStack.Count == 0)
+                {
+                    return null;
+                }
+
                 ViewContainer viewContainer = viewContainerStack.Peek();
 
                 // If the root view container, return null.
@@ -402,7 +407,11 @@ namespace CuttingRoom.Editor
                 SetNarrativeObjectAsRootOfViewContainer(visibleViewContainer, narrativeObject);
             }
 
-            AddNarrativeObjectAsCandidateOfViewContainer(visibleViewContainer, narrativeObject);
+            if (narrativeObject is GroupNarrativeObject
+                || narrativeObject is LayerNarrativeObject)
+            {
+                AddNarrativeObjectAsCandidateOfViewContainer(visibleViewContainer, narrativeObject);
+            }
         }
 
         /// <summary>
@@ -717,22 +726,26 @@ namespace CuttingRoom.Editor
             public List<Tuple<string, Vector2>> CreatedNodes { get; set; } = new List<Tuple<string, Vector2>>();
         }
 
-        private void UpdateViewContainer(CuttingRoomEditorGraphViewState graphViewState, string viewContainerNarrativeObjectGuid,
+        private void UpdateViewContainer(ref CuttingRoomEditorGraphViewState graphViewState, string viewContainerNarrativeObjectGuid,
             HashSet<NarrativeObject> viewContainerNarrativeObjects)
         {
-            if (!viewContainers.Any(vc => vc.narrativeObjectGuid == viewContainerNarrativeObjectGuid))
+            ViewContainer viewContainer = viewContainers.Where(viewContainer => viewContainer.narrativeObjectGuid == viewContainerNarrativeObjectGuid).FirstOrDefault();
+
+            if (viewContainer == null)
             {
-                viewContainers.Add(new(viewContainerNarrativeObjectGuid));
+                viewContainer = new ViewContainer(viewContainerNarrativeObjectGuid);
+
+                viewContainers.Add(viewContainer);
             }
 
             if (graphViewState == null)
             {
-                graphViewState = ScriptableObject.CreateInstance<CuttingRoomEditorGraphViewState>();
+                return;
             }
 
             //var viewContainerState = graphViewState.viewContainerStates.Where(state => state.narrativeObjectGuid == viewContainerNarrativeObjectGuid).FirstOrDefault();
-            var viewContainerState = graphViewState.viewContainerStateLookup.ContainsKey(viewContainerNarrativeObjectGuid) ?
-                graphViewState.viewContainerStateLookup[viewContainerNarrativeObjectGuid] : null;
+            var viewContainerState = graphViewState.ViewContainerStateLookup.ContainsKey(viewContainerNarrativeObjectGuid) ?
+                graphViewState.ViewContainerStateLookup[viewContainerNarrativeObjectGuid] : null;
 
             // If View Container has no recorded state
             if (viewContainerState == null)
@@ -747,6 +760,10 @@ namespace CuttingRoom.Editor
             Vector2 startingNodePosition = contentViewContainer.WorldToLocal(layout.center);
             foreach (var narrativeObject in viewContainerNarrativeObjects)
             {
+                if (!viewContainer.narrativeObjectNodeGuids.Contains(narrativeObject.guid))
+                {
+                    viewContainer.narrativeObjectNodeGuids.Add(narrativeObject.guid);
+                }
                 // Add narrative object guid to view container state if not present
                 if (!viewContainerState.narrativeObjectNodeGuids.Contains(narrativeObject.guid))
                 {
@@ -758,8 +775,8 @@ namespace CuttingRoom.Editor
                     removedNarrativeObjectGuids.Remove(narrativeObject.guid);
                 }
 
-                var narrativeObjectNodeState = graphViewState.narrativeObjectNodeStateLookup.ContainsKey(narrativeObject.guid) ?
-                    graphViewState.narrativeObjectNodeStateLookup[narrativeObject.guid] : null;
+                var narrativeObjectNodeState = graphViewState.NarrativeObjectNodeStateLookup.ContainsKey(narrativeObject.guid) ?
+                    graphViewState.NarrativeObjectNodeStateLookup[narrativeObject.guid] : null;
 
                 if (narrativeObjectNodeState == null)
                 {
@@ -770,7 +787,7 @@ namespace CuttingRoom.Editor
                     ++startingNodePosition.x;
                     --startingNodePosition.y;
                 }
-                graphViewState.narrativeObjectNodeStateLookup[narrativeObject.guid] = narrativeObjectNodeState;
+                graphViewState.UpdateState(narrativeObject.guid, narrativeObjectNodeState);
 
                 // Check if narrative object may container child nodes
                 if (narrativeObject is GraphNarrativeObject ||
@@ -792,26 +809,29 @@ namespace CuttingRoom.Editor
                     if (childNarrativeObjects != null && childNarrativeObjects.Count > 0)
                     {
                         // Update view container for container node
-                        UpdateViewContainer(graphViewState, narrativeObject.guid, childNarrativeObjects);
+                        UpdateViewContainer(ref graphViewState, narrativeObject.guid, childNarrativeObjects);
                     }
                 }
             }
-            graphViewState.viewContainerStateLookup[viewContainerNarrativeObjectGuid] = viewContainerState;
+            graphViewState.UpdateState(viewContainerNarrativeObjectGuid, viewContainerState);
 
             foreach (var removedNodeGuid in removedNarrativeObjectGuids)
             {
-                viewContainerState.narrativeObjectNodeGuids.Remove(removedNodeGuid);
-
-                ViewContainer deletedViewContainer = viewContainers.Where(vc => vc.narrativeObjectGuid == removedNodeGuid).FirstOrDefault();
-                // The container should not exist. Remove it if it exists.
-                if (deletedViewContainer != null)
+                if (removedNodeGuid != rootViewContainerGuid)
                 {
-                    if (viewContainerStack.Contains(deletedViewContainer))
+                    viewContainerState.narrativeObjectNodeGuids.Remove(removedNodeGuid);
+
+                    ViewContainer deletedViewContainer = viewContainers.Where(vc => vc.narrativeObjectGuid == removedNodeGuid).FirstOrDefault();
+                    // The container should not exist. Remove it if it exists.
+                    if (deletedViewContainer != null)
                     {
-                        PopViewContainersToViewContainer(deletedViewContainer);
-                        PopViewContainer();
+                        if (viewContainerStack.Contains(deletedViewContainer))
+                        {
+                            PopViewContainersToViewContainer(deletedViewContainer);
+                            PopViewContainer();
+                        }
+                        viewContainers.Remove(deletedViewContainer);
                     }
-                    viewContainers.Remove(deletedViewContainer);
                 }
             }
         }
@@ -825,12 +845,37 @@ namespace CuttingRoom.Editor
             // Returned populate result.
             PopulateResult populateResult = new PopulateResult();
 
+            if (graphViewState == null)
+            {
+                return populateResult;
+            }
+
+            // Ensure root breadcrumb is present
+            if (graphViewState.viewContainerStackGuids.Count == 0 || graphViewState.viewContainerStackGuids[0] != rootViewContainerGuid)
+            {
+                List<string> newViewStack = new() { rootViewContainerGuid };
+                foreach(var guid in graphViewState.viewContainerStackGuids)
+                {
+                    newViewStack.Add(guid);
+                }
+                graphViewState.UpdateViewStackGuids(newViewStack);
+            }
+
             Scene scene = SceneManager.GetActiveScene();
             if (scene != ActiveScene)
             {
-                // Clear view stack if scene has changed
+                // Refresh view stack if scene has changed
                 viewContainerStack.Clear();
+                viewContainerStack.Push(viewContainers[0]);
                 ActiveScene = scene;
+                populateResult.GraphViewChanged = true;
+            }
+
+            if (graphViewState.viewContainerStackGuids.Count != viewContainerStack.Count
+                || graphViewState.ViewContainerStateLookup.Count != viewContainers.Count
+                || graphViewState.NarrativeObjectNodeStateLookup.Count != narrativeObjects.Count)
+            {
+                populateResult.GraphViewChanged = true;
             }
 
             // Get List of root narrative objects
@@ -839,21 +884,10 @@ namespace CuttingRoom.Editor
                 .Select(ngo => ngo.GetComponent<NarrativeObject>())
                 .ToHashSet();
 
-            UpdateViewContainer(graphViewState, rootViewContainerGuid, rootNarrativeObjects);
+            UpdateViewContainer(ref graphViewState, rootViewContainerGuid, rootNarrativeObjects);
 
             populateResult.GraphViewChanged = true;
 
-            // Ensure root breadcrumb is present
-            if (graphViewState.viewContainerStackGuids.Count == 0 || graphViewState.viewContainerStackGuids[0] != rootViewContainerGuid)
-            {
-                List<string> newViewStack = new();
-                newViewStack.Add(rootViewContainerGuid);
-                foreach(var guid in graphViewState.viewContainerStackGuids)
-                {
-                    newViewStack.Add(guid);
-                }
-                graphViewState.viewContainerStackGuids = newViewStack;
-            }
             // Update ViewStack
             foreach (string guid in graphViewState.viewContainerStackGuids)
             {
@@ -963,7 +997,7 @@ namespace CuttingRoom.Editor
                 // If a save graph view exists, try to find the properties for this node.
                 if (graphViewState != null)
                 {
-                    NarrativeObjectNodeState nodeState = graphViewState.narrativeObjectNodeStates.FirstOrDefault((nodeState) => nodeState.narrativeObjectGuid == narrativeObject.guid);
+                    NarrativeObjectNodeState nodeState = graphViewState.NarrativeObjectNodeStateLookup.GetValueOrDefault(narrativeObject.guid);
 
                     // If a node state exists then restore the node with the correct values.
                     if (nodeState != null)
