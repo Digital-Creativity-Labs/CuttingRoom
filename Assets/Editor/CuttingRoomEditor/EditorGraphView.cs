@@ -884,6 +884,25 @@ namespace CuttingRoom.Editor
                 .Select(ngo => ngo.GetComponent<NarrativeObject>())
                 .ToHashSet();
 
+            if (rootNarrativeObjects == null || rootNarrativeObjects.Count == 0)
+            {
+                NarrativeSpace narrativeSpace = UnityEngine.Object.FindObjectOfType<NarrativeSpace>();
+                if (narrativeSpace != null)
+                {
+                    // Check for root narrative objects under the narrative space
+                    rootNarrativeObjects = new();
+
+                    for (int i = 0; i < narrativeSpace.gameObject.transform.childCount; ++i)
+                    {
+                        GameObject child = narrativeSpace.gameObject.transform.GetChild(i).gameObject;
+                        if (child.TryGetComponent(out NarrativeObject childNarrativeObject))
+                        {
+                            rootNarrativeObjects.Add(childNarrativeObject);
+                        }
+                    }
+                }
+            }
+
             UpdateViewContainer(ref graphViewState, rootViewContainerGuid, rootNarrativeObjects);
 
             populateResult.GraphViewChanged = true;
