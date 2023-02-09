@@ -291,50 +291,126 @@ namespace CuttingRoom.Editor
 
             if (narrativeObjectTransports != null && narrativeObjectTransports.Count > 0)
             {
-                Dictionary<string, NarrativeObject> allNarrativeObjects = UnityEngine.Object.FindObjectsOfType<NarrativeObject>().ToDictionary(e => e.guid);
+                Dictionary<string, NarrativeObject> allNarrativeObjects = FindObjectsOfType<NarrativeObject>().ToDictionary(e => e.guid);
+                ViewContainer visibleViewContainer = GraphView.ViewContainerStack.Peek();
+                List<NarrativeObject> narrativeObjectsToPaste = new();
+
                 foreach (var narrativeObjectTransport in narrativeObjectTransports)
                 {
                     if (allNarrativeObjects.ContainsKey(narrativeObjectTransport.narrativeObjectGuid))
                     {
-                        NarrativeObject narrativeObject = allNarrativeObjects[narrativeObjectTransport.narrativeObjectGuid];
-                        GameObject duplicate = Instantiate(narrativeObject.gameObject);
+                        narrativeObjectsToPaste.Add(allNarrativeObjects[narrativeObjectTransport.narrativeObjectGuid]);
+                    }
+                }
 
-                        if (duplicate != null && duplicate.TryGetComponent(out NarrativeObject newNarrativeObject))
+                DuplicateNarrativeObjectsIntoViewContainer(narrativeObjectsToPaste, visibleViewContainer.narrativeObjectGuid);
+            }
+            SaveUtility.Save();
+        }
+
+        private void DuplicateNarrativeObjectsIntoViewContainer(List<NarrativeObject> narrativeObjects, string viewContainerID)
+        {
+            Dictionary<string, NarrativeObject> allNarrativeObjects = FindObjectsOfType<NarrativeObject>().ToDictionary(e => e.guid);
+
+            // Are we pasting into a different view container
+            Transform parent = null;
+            NarrativeObject newParentNarrativeObject = null;
+            NarrativeObject oldParentNarrativeObject = null;
+            if (viewContainerID != EditorGraphView.rootViewContainerGuid && allNarrativeObjects.ContainsKey(viewContainerID))
+            {
+                newParentNarrativeObject = allNarrativeObjects[viewContainerID];
+                parent = newParentNarrativeObject.gameObject?.transform;
+            }
+            else
+            {
+
+            }
+
+            List<NarrativeObject> newNarrativeObjects = new();
+
+            foreach (var narrativeObject in narrativeObjects)
+            {
+                if (narrativeObject.gameObject.transform.parent != null)
+                {
+                    narrativeObject.gameObject.transform.parent.gameObject.TryGetComponent(out oldParentNarrativeObject);
+                }
+
+                GameObject duplicate = Instantiate(narrativeObject.gameObject, parent);
+
+                if (duplicate != null && duplicate.TryGetComponent(out NarrativeObject duplicateNarrativeObject))
+                {
+                    newNarrativeObjects.Add(duplicateNarrativeObject);
+                    if (oldParentNarrativeObject != newParentNarrativeObject)
+                    {
+                        ProcessNarrativeObjectReparent(duplicateNarrativeObject, oldParentNarrativeObject, newParentNarrativeObject);
+                    }
+                }
+            }
+
+            RefreshNarrativeObjectLinks(newNarrativeObjects, viewContainerID, ref allNarrativeObjects);
+        }
+
+
+        private void RefreshNarrativeObjectLinks(List<NarrativeObject> narrativeObjects, string viewContainerID, ref Dictionary<string, NarrativeObject> allNarrativeObjects)
+        {
+            Dictionary<string, NarrativeObject> changedGuidNarrativeObjectLookup = new();
+            foreach (var narrativeObject in narrativeObjects)
+            {
+                ProcessNarrativeObjectDuplication(narrativeObject, out string oldGuid, out string newGuid);
+                allNarrativeObjects.Add(newGuid, narrativeObject);
+
+                changedGuidNarrativeObjectLookup.Add(oldGuid, narrativeObject);
+
+                NarrativeObjectNodeState existingNodeState = SaveUtility.loadedGraphViewState.NarrativeObjectNodeStateLookup.ContainsKey(oldGuid) ?
+                    SaveUtility.loadedGraphViewState.NarrativeObjectNodeStateLookup[oldGuid] : new();
+
+                SaveUtility.loadedGraphViewState.UpdateState(newGuid, new NarrativeObjectNodeState()
+                {
+                    narrativeObjectGuid = newGuid,
+                    position = new Vector2(existingNodeState.position.x, existingNodeState.position.y)
+                });
+
+                if (narrativeObject is GraphNarrativeObject
+                    || narrativeObject is GroupNarrativeObject
+                    || narrativeObject is LayerNarrativeObject)
+                {
+                    // Check for child narrative objects
+                    List<NarrativeObject> childNarrativeObjects = new();
+
+                    for (int i = 0; i < narrativeObject.gameObject.transform.childCount; ++i)
+                    {
+                        GameObject child = narrativeObject.gameObject.transform.GetChild(i).gameObject;
+                        if (child.TryGetComponent(out NarrativeObject childNarrativeObject))
                         {
-                            ProcessNarrativeObjectDuplication(newNarrativeObject);
-                            // Are we pasting into a different view container
-                            ViewContainer visibleViewContainer = GraphView.ViewContainerStack.Peek();
-                            Transform parent = null;
-                            NarrativeObject newParentNarrativeObject = null;
-                            NarrativeObject oldParentNarrativeObject = null;
-                            if (visibleViewContainer.narrativeObjectGuid != EditorGraphView.rootViewContainerGuid && allNarrativeObjects.ContainsKey(visibleViewContainer.narrativeObjectGuid))
-                            {
-                                newParentNarrativeObject = allNarrativeObjects[visibleViewContainer.narrativeObjectGuid];
-                                parent = newParentNarrativeObject.gameObject?.transform;
-                            }
-                            if (newNarrativeObject.gameObject.transform.parent != parent)
-                            {
-                                if (newNarrativeObject.gameObject.transform.parent != null)
-                                {
-                                    newNarrativeObject.gameObject.transform.parent.gameObject.TryGetComponent(out oldParentNarrativeObject);
-                                }
-                                newNarrativeObject.gameObject.transform.SetParent(parent);
-                                ProcessNarrativeObjectReparent(newNarrativeObject, oldParentNarrativeObject, newParentNarrativeObject);
-                            }
-                            if (SaveUtility.loadedGraphViewState == null)
-                            {
-                                SaveUtility.Load();
-                            }
-                            SaveUtility.loadedGraphViewState.UpdateState(newNarrativeObject.guid, new NarrativeObjectNodeState()
-                            {
-                                narrativeObjectGuid = newNarrativeObject.guid,
-                                position = new Vector2(narrativeObjectTransport.positionX, narrativeObjectTransport.positionY)
-                            });
+                            childNarrativeObjects.Add(childNarrativeObject);
+                        }
+                    }
+
+                    if (childNarrativeObjects != null && childNarrativeObjects.Count > 0)
+                    {
+                        // Duplicate Children
+                        RefreshNarrativeObjectLinks(childNarrativeObjects, narrativeObject.guid, ref allNarrativeObjects);
+                    }
+                }
+            }
+
+            // Refresh Candidates
+            foreach (var narrativeObject in narrativeObjects)
+            {
+                if (narrativeObject != null && narrativeObject.OutputSelectionDecisionPoint != null
+                    && narrativeObject.OutputSelectionDecisionPoint.Candidates != null
+                    && narrativeObject.OutputSelectionDecisionPoint.Candidates.Count > 0)
+                {
+                    for (int i = 0; i < narrativeObject.OutputSelectionDecisionPoint.Candidates.Count; ++i)
+                    {
+                        var candidate = narrativeObject.OutputSelectionDecisionPoint.Candidates[i];
+                        if (changedGuidNarrativeObjectLookup.ContainsKey(candidate.guid))
+                        {
+                            narrativeObject.OutputSelectionDecisionPoint.Candidates[i] = changedGuidNarrativeObjectLookup[candidate.guid];
                         }
                     }
                 }
             }
-            SaveUtility.Save();
         }
 
         /// <summary>
@@ -508,7 +584,28 @@ namespace CuttingRoom.Editor
                             var newGameObject = EditorUtility.InstanceIDToObject(createGameObjectHierarchyEvent.instanceId) as GameObject;
                             if (newGameObject.TryGetComponent(out NarrativeObject narrativeObject))
                             {
-                                ProcessNarrativeObjectDuplication(narrativeObject);
+                                HashSet<NarrativeObject> allDuplicates = newGameObject.GetComponentsInChildren<NarrativeObject>().ToHashSet();
+
+                                // Ensure it includes root object
+                                if (!allDuplicates.Contains(narrativeObject))
+                                {
+                                    allDuplicates.Add(narrativeObject);
+                                }
+
+                                foreach (var duplicateNarrativeObject in allDuplicates)
+                                {
+                                    NarrativeObjectNodeState existingNodeState = SaveUtility.loadedGraphViewState.NarrativeObjectNodeStateLookup.ContainsKey(duplicateNarrativeObject.guid) ?
+                                        SaveUtility.loadedGraphViewState.NarrativeObjectNodeStateLookup[duplicateNarrativeObject.guid] : new();
+                                    ProcessNarrativeObjectDuplication(duplicateNarrativeObject, out string oldGuid, out string newGuid);
+
+                                    existingNodeState.narrativeObjectGuid = duplicateNarrativeObject.guid;
+
+                                    SaveUtility.loadedGraphViewState.UpdateState(duplicateNarrativeObject.guid, new NarrativeObjectNodeState()
+                                    {
+                                        narrativeObjectGuid = duplicateNarrativeObject.guid,
+                                        position = new Vector2(existingNodeState.position.x, existingNodeState.position.y)
+                                    });
+                                }
                             }
                             break;
                         }
@@ -523,6 +620,8 @@ namespace CuttingRoom.Editor
                             if (gameObjectChanged.TryGetComponent(out NarrativeObject childNarrativeObject))
                             {
                                 ProcessNarrativeObjectReparent(childNarrativeObject, previousParentNarrativeObject, parentNarrativeObject);
+                                var narrativeObjects = FindObjectsOfType<NarrativeObject>().ToDictionary(e => e.guid);
+                                RefreshNarrativeObjectLinks(new List<NarrativeObject>() { childNarrativeObject }, parentNarrativeObject.guid, ref narrativeObjects);
                             }
                             break;
                         }
@@ -532,22 +631,19 @@ namespace CuttingRoom.Editor
             }
         }
 
-        private void ProcessNarrativeObjectDuplication(NarrativeObject narrativeObject, bool recusively = true)
+        private void ProcessNarrativeObjectDuplication(NarrativeObject narrativeObject, out string oldGuid, out string newGuid)
         {
+            oldGuid = string.Empty;
+            newGuid = string.Empty;
             if (narrativeObject != null)
             {
+                oldGuid = narrativeObject.guid;
+                newGuid = Guid.NewGuid().ToString();
                 // Force new guid
-                narrativeObject.guid = Guid.NewGuid().ToString();
-                // Clear output links as can't rely on being present
-                narrativeObject.OutputSelectionDecisionPoint.Candidates.Clear();
+                narrativeObject.guid = newGuid;
 
-                if (recusively)
-                {
-                    foreach (var childNarrativeObject in narrativeObject.gameObject.GetComponentsInChildren<NarrativeObject>())
-                    {
-                        ProcessNarrativeObjectDuplication(childNarrativeObject, false);
-                    }
-                }
+                // Clear output links as can't rely on being present
+                //narrativeObject.OutputSelectionDecisionPoint.Candidates.Clear();
 
                 OnHierarchyChanged();
             }
@@ -585,7 +681,7 @@ namespace CuttingRoom.Editor
                 }
 
                 // Clear output links as can't rely on being present
-                narrativeObject.OutputSelectionDecisionPoint.Candidates.Clear();
+                //narrativeObject.OutputSelectionDecisionPoint.Candidates.Clear();
                 OnHierarchyChanged();
             }
         }

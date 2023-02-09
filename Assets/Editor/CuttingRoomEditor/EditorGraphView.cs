@@ -1138,10 +1138,10 @@ namespace CuttingRoom.Editor
                         }
                     }
 
-                    foreach (var candidate in candidatesToRemove)
-                    {
-                        narrativeObjectNode.NarrativeObject.OutputSelectionDecisionPoint.RemoveCandidate(candidate);
-                    }
+                    //foreach (var candidate in candidatesToRemove)
+                    //{
+                    //    narrativeObjectNode.NarrativeObject.OutputSelectionDecisionPoint.RemoveCandidate(candidate);
+                    //}
                 }
             }
 
