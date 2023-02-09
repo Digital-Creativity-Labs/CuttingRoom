@@ -421,6 +421,8 @@ namespace CuttingRoom.Editor
                             {
                                 // Force new guid
                                 narrativeObject.guid = Guid.NewGuid().ToString();
+                                // Clear output links as can't rely on being present
+                                narrativeObject.OutputSelectionDecisionPoint.Candidates.Clear();
                             }
                             OnHierarchyChanged();
                             break;
@@ -462,6 +464,9 @@ namespace CuttingRoom.Editor
                                         previousParentLayer.LayerSelectionDecisionPoint.RemoveCandidate(childNarrativeObject);
                                     }
                                 }
+
+                                // Clear output links as can't rely on being present
+                                childNarrativeObject.OutputSelectionDecisionPoint.Candidates.Clear();
                             }
                             OnHierarchyChanged();
                             break;

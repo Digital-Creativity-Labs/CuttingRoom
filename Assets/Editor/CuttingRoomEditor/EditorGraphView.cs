@@ -407,11 +407,7 @@ namespace CuttingRoom.Editor
                 SetNarrativeObjectAsRootOfViewContainer(visibleViewContainer, narrativeObject);
             }
 
-            if (narrativeObject is GroupNarrativeObject
-                || narrativeObject is LayerNarrativeObject)
-            {
-                AddNarrativeObjectAsCandidateOfViewContainer(visibleViewContainer, narrativeObject);
-            }
+            AddNarrativeObjectAsCandidateOfViewContainer(visibleViewContainer, narrativeObject);
         }
 
         /// <summary>
@@ -1097,6 +1093,7 @@ namespace CuttingRoom.Editor
                 // If output connections are populated
                 if (narrativeObjectNode.NarrativeObject.OutputSelectionDecisionPoint != null)
                 {
+                    List<NarrativeObject> candidatesToRemove = new();
                     // For each connection from the nodes outputs.
                     foreach (NarrativeObject candidateNarrativeObject in narrativeObjectNode.NarrativeObject.OutputSelectionDecisionPoint.Candidates)
                     {
@@ -1109,11 +1106,11 @@ namespace CuttingRoom.Editor
                             // Get the node representing the input narrative object.
                             NarrativeObjectNode inputNarrativeObjectNode = null;
 
-                            // If the input node doesn't exist, something very wrong has happened somewhere!
+                            // If the input node doesn't exist, the narrative object has moved so delete edge state
                             if (!NarrativeObjectNodes.TryGetValue(candidateNarrativeObject.guid, out inputNarrativeObjectNode))
                             {
-                                Debug.LogError($"Narrative Object Node not found for guid: {candidateNarrativeObject.guid}");
-
+                                EdgeStates.Remove(edgeState);
+                                candidatesToRemove.Add(candidateNarrativeObject);
                                 continue;
                             }
 
@@ -1140,6 +1137,11 @@ namespace CuttingRoom.Editor
                                 AddElement(edgeState.Edge);
                             }
                         }
+                    }
+
+                    foreach (var candidate in candidatesToRemove)
+                    {
+                        narrativeObjectNode.NarrativeObject.OutputSelectionDecisionPoint.RemoveCandidate(candidate);
                     }
                 }
             }
@@ -1387,8 +1389,7 @@ namespace CuttingRoom.Editor
             }
             else
             {
-                Debug.LogError("Cannot add candidate as narrative object has no candidates.");
-
+                // View container type does not have candidates
                 return false;
             }
 
@@ -1427,8 +1428,7 @@ namespace CuttingRoom.Editor
             }
             else
             {
-                Debug.LogError("Cannot add candidate as narrative object has no candidates.");
-
+                // View container type does not have candidates
                 return false;
             }
 
