@@ -9,6 +9,7 @@ using UnityEditor.Experimental.GraphView;
 using System.Linq;
 using UnityEditor.SceneManagement;
 using UnityEngine.SceneManagement;
+using Newtonsoft.Json;
 
 namespace CuttingRoom.Editor
 {
@@ -165,6 +166,9 @@ namespace CuttingRoom.Editor
                 GraphView.OnEdgeSelected += OnGraphViewEdgeSelected;
                 GraphView.OnEdgeDeselected += OnGraphViewEdgeDeselected;
                 GraphView.OnClearSelection += OnGraphViewClearSelection;
+
+                GraphView.serializeGraphElements += CutCopyOperation;
+                GraphView.unserializeAndPaste += PasteOperation;
             }
 
             if (Toolbar == null)
@@ -256,6 +260,81 @@ namespace CuttingRoom.Editor
             {
                 DevToolbar = new EditorDevToolbar();
             }
+        }
+
+        private string CutCopyOperation(IEnumerable<GraphElement> elements)
+        {
+            SaveUtility.Save();
+            List <NarrativeObjectNode> narrativeObjectNodes = elements.Where(e => e is NarrativeObjectNode).Select(e => e as NarrativeObjectNode).ToList();
+
+            List<NarrativeObjectNodeTransport> transports = new();
+
+            foreach (var narrativeObjectNode in narrativeObjectNodes)
+            {
+                if (narrativeObjectNode != null && narrativeObjectNode.NarrativeObject != null)
+                {
+                    transports.Add(new NarrativeObjectNodeTransport()
+                    {
+                        narrativeObjectGuid = narrativeObjectNode.NarrativeObject.guid,
+                        positionX = narrativeObjectNode.GetPosition().position.x,
+                        positionY = narrativeObjectNode.GetPosition().position.y,
+                    });
+                }
+            }
+
+            return JsonConvert.SerializeObject(transports);
+        }
+
+        private void PasteOperation(string operationName, string data)
+        {
+            var narrativeObjectTransports = JsonConvert.DeserializeObject<List<NarrativeObjectNodeTransport>>(data); ;
+
+            if (narrativeObjectTransports != null && narrativeObjectTransports.Count > 0)
+            {
+                Dictionary<string, NarrativeObject> allNarrativeObjects = UnityEngine.Object.FindObjectsOfType<NarrativeObject>().ToDictionary(e => e.guid);
+                foreach (var narrativeObjectTransport in narrativeObjectTransports)
+                {
+                    if (allNarrativeObjects.ContainsKey(narrativeObjectTransport.narrativeObjectGuid))
+                    {
+                        NarrativeObject narrativeObject = allNarrativeObjects[narrativeObjectTransport.narrativeObjectGuid];
+                        GameObject duplicate = Instantiate(narrativeObject.gameObject);
+
+                        if (duplicate != null && duplicate.TryGetComponent(out NarrativeObject newNarrativeObject))
+                        {
+                            ProcessNarrativeObjectDuplication(newNarrativeObject);
+                            // Are we pasting into a different view container
+                            ViewContainer visibleViewContainer = GraphView.ViewContainerStack.Peek();
+                            Transform parent = null;
+                            NarrativeObject newParentNarrativeObject = null;
+                            NarrativeObject oldParentNarrativeObject = null;
+                            if (visibleViewContainer.narrativeObjectGuid != EditorGraphView.rootViewContainerGuid && allNarrativeObjects.ContainsKey(visibleViewContainer.narrativeObjectGuid))
+                            {
+                                newParentNarrativeObject = allNarrativeObjects[visibleViewContainer.narrativeObjectGuid];
+                                parent = newParentNarrativeObject.gameObject?.transform;
+                            }
+                            if (newNarrativeObject.gameObject.transform.parent != parent)
+                            {
+                                if (newNarrativeObject.gameObject.transform.parent != null)
+                                {
+                                    newNarrativeObject.gameObject.transform.parent.gameObject.TryGetComponent(out oldParentNarrativeObject);
+                                }
+                                newNarrativeObject.gameObject.transform.SetParent(parent);
+                                ProcessNarrativeObjectReparent(newNarrativeObject, oldParentNarrativeObject, newParentNarrativeObject);
+                            }
+                            if (SaveUtility.loadedGraphViewState == null)
+                            {
+                                SaveUtility.Load();
+                            }
+                            SaveUtility.loadedGraphViewState.UpdateState(newNarrativeObject.guid, new NarrativeObjectNodeState()
+                            {
+                                narrativeObjectGuid = newNarrativeObject.guid,
+                                position = new Vector2(narrativeObjectTransport.positionX, narrativeObjectTransport.positionY)
+                            });
+                        }
+                    }
+                }
+            }
+            SaveUtility.Save();
         }
 
         /// <summary>
@@ -389,7 +468,17 @@ namespace CuttingRoom.Editor
                 }
             }
 
-            EditorGraphView.PopulateResult populateResult = GraphView.Populate(SaveUtility.Load(), narrativeObjects);
+            CuttingRoomEditorGraphViewState cuttingRoomEditorGraphViewState = null;
+            if (SaveUtility.loadedGraphViewState == null)
+            {
+                cuttingRoomEditorGraphViewState = SaveUtility.Load();
+            }
+            else
+            {
+                cuttingRoomEditorGraphViewState = SaveUtility.loadedGraphViewState;
+            }
+
+            EditorGraphView.PopulateResult populateResult = GraphView.Populate(cuttingRoomEditorGraphViewState, narrativeObjects);
 
             if (populateResult.GraphViewChanged)
             {
@@ -419,12 +508,8 @@ namespace CuttingRoom.Editor
                             var newGameObject = EditorUtility.InstanceIDToObject(createGameObjectHierarchyEvent.instanceId) as GameObject;
                             if (newGameObject.TryGetComponent(out NarrativeObject narrativeObject))
                             {
-                                // Force new guid
-                                narrativeObject.guid = Guid.NewGuid().ToString();
-                                // Clear output links as can't rely on being present
-                                narrativeObject.OutputSelectionDecisionPoint.Candidates.Clear();
+                                ProcessNarrativeObjectDuplication(narrativeObject);
                             }
-                            OnHierarchyChanged();
                             break;
                         }
                     case ObjectChangeKind.ChangeGameObjectParent:
@@ -437,43 +522,71 @@ namespace CuttingRoom.Editor
                             NarrativeObject previousParentNarrativeObject = previousParentGameObject?.GetComponent<NarrativeObject>();
                             if (gameObjectChanged.TryGetComponent(out NarrativeObject childNarrativeObject))
                             {
-                                if (parentNarrativeObject != null)
-                                {
-                                    if (parentNarrativeObject is GroupNarrativeObject)
-                                    {
-                                        GroupNarrativeObject parentGroup = parentNarrativeObject as GroupNarrativeObject;
-                                        parentGroup.GroupSelectionDecisionPoint.AddCandidate(childNarrativeObject);
-                                    }
-                                    else if (parentNarrativeObject is LayerNarrativeObject)
-                                    {
-                                        LayerNarrativeObject parentLayer = parentNarrativeObject as LayerNarrativeObject;
-                                        parentLayer.LayerSelectionDecisionPoint.AddCandidate(childNarrativeObject);
-                                    }
-                                }
-
-                                if (previousParentNarrativeObject != null)
-                                {
-                                    if (previousParentNarrativeObject is GroupNarrativeObject)
-                                    {
-                                        GroupNarrativeObject previousParentGroup = previousParentNarrativeObject as GroupNarrativeObject;
-                                        previousParentGroup.GroupSelectionDecisionPoint.RemoveCandidate(childNarrativeObject);
-                                    }
-                                    else if (previousParentNarrativeObject is LayerNarrativeObject)
-                                    {
-                                        LayerNarrativeObject previousParentLayer = previousParentNarrativeObject as LayerNarrativeObject;
-                                        previousParentLayer.LayerSelectionDecisionPoint.RemoveCandidate(childNarrativeObject);
-                                    }
-                                }
-
-                                // Clear output links as can't rely on being present
-                                childNarrativeObject.OutputSelectionDecisionPoint.Candidates.Clear();
+                                ProcessNarrativeObjectReparent(childNarrativeObject, previousParentNarrativeObject, parentNarrativeObject);
                             }
-                            OnHierarchyChanged();
                             break;
                         }
                     default:
                         break;
                 }
+            }
+        }
+
+        private void ProcessNarrativeObjectDuplication(NarrativeObject narrativeObject, bool recusively = true)
+        {
+            if (narrativeObject != null)
+            {
+                // Force new guid
+                narrativeObject.guid = Guid.NewGuid().ToString();
+                // Clear output links as can't rely on being present
+                narrativeObject.OutputSelectionDecisionPoint.Candidates.Clear();
+
+                if (recusively)
+                {
+                    foreach (var childNarrativeObject in narrativeObject.gameObject.GetComponentsInChildren<NarrativeObject>())
+                    {
+                        ProcessNarrativeObjectDuplication(childNarrativeObject, false);
+                    }
+                }
+
+                OnHierarchyChanged();
+            }
+        }
+        private void ProcessNarrativeObjectReparent(NarrativeObject narrativeObject, NarrativeObject oldParent, NarrativeObject newParent)
+        {
+            if (narrativeObject != null)
+            {
+                if (newParent != null)
+                {
+                    if (newParent is GroupNarrativeObject)
+                    {
+                        GroupNarrativeObject parentGroup = newParent as GroupNarrativeObject;
+                        parentGroup.GroupSelectionDecisionPoint.AddCandidate(narrativeObject);
+                    }
+                    else if (newParent is LayerNarrativeObject)
+                    {
+                        LayerNarrativeObject parentLayer = newParent as LayerNarrativeObject;
+                        parentLayer.LayerSelectionDecisionPoint.AddCandidate(narrativeObject);
+                    }
+                }
+
+                if (oldParent != null)
+                {
+                    if (oldParent is GroupNarrativeObject)
+                    {
+                        GroupNarrativeObject previousParentGroup = oldParent as GroupNarrativeObject;
+                        previousParentGroup.GroupSelectionDecisionPoint.RemoveCandidate(narrativeObject);
+                    }
+                    else if (oldParent is LayerNarrativeObject)
+                    {
+                        LayerNarrativeObject previousParentLayer = oldParent as LayerNarrativeObject;
+                        previousParentLayer.LayerSelectionDecisionPoint.RemoveCandidate(narrativeObject);
+                    }
+                }
+
+                // Clear output links as can't rely on being present
+                narrativeObject.OutputSelectionDecisionPoint.Candidates.Clear();
+                OnHierarchyChanged();
             }
         }
 

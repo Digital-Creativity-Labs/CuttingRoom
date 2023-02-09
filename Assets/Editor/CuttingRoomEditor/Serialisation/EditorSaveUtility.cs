@@ -38,6 +38,8 @@ namespace CuttingRoom.Editor
         /// </summary>
         private EditorGraphView CuttingRoomEditorGraphView = null;
 
+        public CuttingRoomEditorGraphViewState loadedGraphViewState = null;
+
         /// <summary>
         /// The narrative object nodes which currently exist on the graph view.
         /// </summary>
@@ -85,16 +87,23 @@ namespace CuttingRoom.Editor
         /// </summary>
         public void Save(List<Tuple<string, Vector2>> createdNodes = null)
         {
-             CuttingRoomEditorGraphViewState graphViewState = ScriptableObject.CreateInstance<CuttingRoomEditorGraphViewState>();
-
-            // Load the existing save state as a reference.
-            CuttingRoomEditorGraphViewState loadedGraphViewState = Load();
+            CuttingRoomEditorGraphViewState graphViewState = ScriptableObject.CreateInstance<CuttingRoomEditorGraphViewState>();
 
             // If there was no existing state for the scene being saved, then perhaps this is it's first save,
             // so load the untitled scenes data (which will contain the current layout of the graph).
             if (loadedGraphViewState == null)
             {
-                loadedGraphViewState = Load(untitledSceneName);
+                // Load the existing save state as a reference.
+                loadedGraphViewState = Load();
+                if (loadedGraphViewState == null)
+                {
+                    loadedGraphViewState = Load(untitledSceneName);
+                }
+            }
+
+            if(loadedGraphViewState != null)
+            {
+                graphViewState = loadedGraphViewState;
             }
 
             foreach (ViewContainer viewContainer in ViewContainers)
@@ -199,18 +208,13 @@ namespace CuttingRoom.Editor
             CuttingRoomEditorGraphViewState existingGraphViewState = Load();
 
             // If a saved asset doesn't exist, create a new one, otherwise overwrite the values in the old saved asset.
-            if (existingGraphViewState == null)
-            {
-                AssetDatabase.CreateAsset(graphViewState, SavePath);
-            }
-            else
+            if (existingGraphViewState != null)
             {
                 existingGraphViewState.UpdateState(graphViewState);
 
                 EditorUtility.SetDirty(existingGraphViewState);
+                AssetDatabase.SaveAssets();
             }
-
-            AssetDatabase.SaveAssets();
         }
 
         /// <summary>
@@ -240,10 +244,14 @@ namespace CuttingRoom.Editor
 
             if (existingGraphViewState == null)
             {
-                return ScriptableObject.CreateInstance<CuttingRoomEditorGraphViewState>();
+                CuttingRoomEditorGraphViewState graphViewState = ScriptableObject.CreateInstance<CuttingRoomEditorGraphViewState>();
+                AssetDatabase.CreateAsset(graphViewState, SavePath);
+                return graphViewState;
             }
 
-            return existingGraphViewState as CuttingRoomEditorGraphViewState;
+            loadedGraphViewState = existingGraphViewState as CuttingRoomEditorGraphViewState;
+
+            return loadedGraphViewState;
         }
     }
 }

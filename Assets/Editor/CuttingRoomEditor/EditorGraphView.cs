@@ -6,7 +6,6 @@ using UnityEditor.Experimental.GraphView;
 using System;
 using System.Linq;
 using UnityEngine.SceneManagement;
-using UnityEditor.SceneManagement;
 
 namespace CuttingRoom.Editor
 {
@@ -1028,7 +1027,7 @@ namespace CuttingRoom.Editor
                         populateResult.CreatedNodes.Add(new Tuple<string, Vector2>(narrativeObjectNode.NarrativeObject.guid, graphViewCenter));
 
                         // Make invisible to avoid popping onto screen at 0,0 before appearing at the centre of the graph view.
-                        narrativeObjectNode.visible = true;
+                        narrativeObjectNode.visible = false;
 
                         // Node state for this node doesn't exist. Graph view is different from it's save state.
                         populateResult.GraphViewChanged = true;
