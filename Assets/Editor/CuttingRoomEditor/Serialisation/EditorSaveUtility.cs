@@ -38,10 +38,12 @@ namespace CuttingRoom.Editor
         /// </summary>
         private EditorGraphView CuttingRoomEditorGraphView = null;
 
+        public CuttingRoomEditorGraphViewState loadedGraphViewState = null;
+
         /// <summary>
         /// The narrative object nodes which currently exist on the graph view.
         /// </summary>
-        private List<NarrativeObjectNode> NarrativeObjectNodes => CuttingRoomEditorGraphView.NarrativeObjectNodes;
+        private Dictionary<string, NarrativeObjectNode> NarrativeObjectNodes => CuttingRoomEditorGraphView.NarrativeObjectNodes;
 
         /// <summary>
         /// The view containers which currently exist within the graph view.
@@ -85,22 +87,29 @@ namespace CuttingRoom.Editor
         /// </summary>
         public void Save(List<Tuple<string, Vector2>> createdNodes = null)
         {
-             CuttingRoomEditorGraphViewState graphViewState = ScriptableObject.CreateInstance<CuttingRoomEditorGraphViewState>();
-
-            // Load the existing save state as a reference.
-            CuttingRoomEditorGraphViewState loadedGraphViewState = Load();
+            CuttingRoomEditorGraphViewState graphViewState = ScriptableObject.CreateInstance<CuttingRoomEditorGraphViewState>();
 
             // If there was no existing state for the scene being saved, then perhaps this is it's first save,
             // so load the untitled scenes data (which will contain the current layout of the graph).
             if (loadedGraphViewState == null)
             {
-                loadedGraphViewState = Load(untitledSceneName);
+                // Load the existing save state as a reference.
+                loadedGraphViewState = Load();
+                if (loadedGraphViewState == null)
+                {
+                    loadedGraphViewState = Load(untitledSceneName);
+                }
+            }
+
+            if(loadedGraphViewState != null)
+            {
+                graphViewState = loadedGraphViewState;
             }
 
             foreach (ViewContainer viewContainer in ViewContainers)
             {
                 ViewContainerState viewContainerState = new ViewContainerState { narrativeObjectGuid = viewContainer.narrativeObjectGuid, narrativeObjectNodeGuids = viewContainer.narrativeObjectNodeGuids };
-                graphViewState.viewContainerStates.Add(viewContainerState);
+                graphViewState.UpdateState(viewContainer.narrativeObjectGuid, viewContainerState);
 
                 NarrativeObject[] narrativeObjects = UnityEngine.Object.FindObjectsOfType<NarrativeObject>();
 
@@ -112,11 +121,8 @@ namespace CuttingRoom.Editor
                     // The object exists.
                     if (narrativeObjectExists)
                     {
-                        // Check if it has a live node on the screen (so must be part of the visible view container)
-                        NarrativeObjectNode narrativeObjectNode = NarrativeObjectNodes.Where(narrativeObjectNode => narrativeObjectNode.NarrativeObject.guid == narrativeObjectGuid).FirstOrDefault();
-
                         // If there is a node currently visible, save that.
-                        if (narrativeObjectNode != null)
+                        if (NarrativeObjectNodes.TryGetValue(narrativeObjectGuid, out NarrativeObjectNode narrativeObjectNode))
                         {
                             Rect rect = narrativeObjectNode.GetPosition();
 
@@ -130,14 +136,14 @@ namespace CuttingRoom.Editor
                                 if (loadedGraphViewState != null)
                                 {
                                     // Check the loaded save file for existing saved state for the narrative object.
-                                    NarrativeObjectNodeState existingNodeState = loadedGraphViewState.narrativeObjectNodeStates.Where(narrativeObjectNodeState => narrativeObjectNodeState.narrativeObjectGuid == narrativeObjectGuid).FirstOrDefault();
+                                    NarrativeObjectNodeState existingNodeState = loadedGraphViewState.NarrativeObjectNodeStateLookup.GetValueOrDefault(narrativeObjectGuid);
 
                                     // If there is an existing state, then it persists onto the new save rather than saving the invalid rects position.
                                     if (existingNodeState != null)
                                     {
                                         nodeStateAdded = true;
 
-                                        graphViewState.narrativeObjectNodeStates.Add(existingNodeState);
+                                        graphViewState.UpdateState(narrativeObjectGuid, existingNodeState);
                                     }
                                 }
                             }
@@ -159,7 +165,7 @@ namespace CuttingRoom.Editor
                                 }
 
                                 // The nodes rect is valid, so save it with whatever its values are.
-                                graphViewState.narrativeObjectNodeStates.Add(new NarrativeObjectNodeState { narrativeObjectGuid = narrativeObjectGuid, position = nodePosition });
+                                graphViewState.UpdateState(narrativeObjectGuid, new NarrativeObjectNodeState { narrativeObjectGuid = narrativeObjectGuid, position = nodePosition });
                             }
                         }
                         else
@@ -167,12 +173,12 @@ namespace CuttingRoom.Editor
                             if (loadedGraphViewState != null)
                             {
                                 // Check the loaded save file for existing saved state for the narrative object.
-                                NarrativeObjectNodeState existingNodeState = loadedGraphViewState.narrativeObjectNodeStates.Where(narrativeObjectNodeState => narrativeObjectNodeState.narrativeObjectGuid == narrativeObjectGuid).FirstOrDefault();
+                                NarrativeObjectNodeState existingNodeState = loadedGraphViewState.NarrativeObjectNodeStateLookup.GetValueOrDefault(narrativeObjectGuid);
 
                                 // If there is an existing state, then it persists onto the new save.
                                 if (existingNodeState != null)
                                 {
-                                    graphViewState.narrativeObjectNodeStates.Add(existingNodeState);
+                                    graphViewState.UpdateState(narrativeObjectGuid, existingNodeState);
                                 }
                             }
                         }
@@ -181,7 +187,7 @@ namespace CuttingRoom.Editor
             }
 
             // Save the view stack.
-            graphViewState.viewContainerStackGuids = ViewContainerStackGuids;
+            graphViewState.UpdateViewStackGuids(ViewContainerStackGuids);
 
             // Create resources folder if it doesn't exist.
             if (!AssetDatabase.IsValidFolder("Assets/Resources"))
@@ -202,20 +208,13 @@ namespace CuttingRoom.Editor
             CuttingRoomEditorGraphViewState existingGraphViewState = Load();
 
             // If a saved asset doesn't exist, create a new one, otherwise overwrite the values in the old saved asset.
-            if (existingGraphViewState == null)
+            if (existingGraphViewState != null)
             {
-                AssetDatabase.CreateAsset(graphViewState, SavePath);
-            }
-            else
-            {
-                existingGraphViewState.narrativeObjectNodeStates = graphViewState.narrativeObjectNodeStates;
-                existingGraphViewState.viewContainerStates = graphViewState.viewContainerStates;
-                existingGraphViewState.viewContainerStackGuids = graphViewState.viewContainerStackGuids;
+                existingGraphViewState.UpdateState(graphViewState);
 
                 EditorUtility.SetDirty(existingGraphViewState);
+                AssetDatabase.SaveAssets();
             }
-
-            AssetDatabase.SaveAssets();
         }
 
         /// <summary>
@@ -245,10 +244,14 @@ namespace CuttingRoom.Editor
 
             if (existingGraphViewState == null)
             {
-                return null;
+                CuttingRoomEditorGraphViewState graphViewState = ScriptableObject.CreateInstance<CuttingRoomEditorGraphViewState>();
+                AssetDatabase.CreateAsset(graphViewState, SavePath);
+                return graphViewState;
             }
 
-            return existingGraphViewState as CuttingRoomEditorGraphViewState;
+            loadedGraphViewState = existingGraphViewState as CuttingRoomEditorGraphViewState;
+
+            return loadedGraphViewState;
         }
     }
 }

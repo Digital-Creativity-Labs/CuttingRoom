@@ -9,6 +9,7 @@ using UnityEditor.Experimental.GraphView;
 using System.Linq;
 using UnityEditor.SceneManagement;
 using UnityEngine.SceneManagement;
+using Newtonsoft.Json;
 
 namespace CuttingRoom.Editor
 {
@@ -82,6 +83,11 @@ namespace CuttingRoom.Editor
         public bool NarrativeObjectConstraintsModified { get; set; } = false;
 
         /// <summary>
+        /// Cache of all Narrative Objects
+        /// </summary>
+        private Dictionary<string, NarrativeObject> allNarrativeObjects = new();
+
+        /// <summary>
         /// Menu option to open editor window.
         /// </summary>
         [MenuItem("Cutting Room/Editor")]
@@ -95,6 +101,10 @@ namespace CuttingRoom.Editor
         /// </summary>
         public void CreateGUI()
         {
+            allNarrativeObjects = FindObjectsOfType<NarrativeObject>().ToDictionary(e => e.guid);
+
+            ObjectChangeEvents.changesPublished -= OnCreateGameObjectHierarchy;
+            ObjectChangeEvents.changesPublished += OnCreateGameObjectHierarchy;
             EditorApplication.hierarchyChanged -= OnHierarchyChanged;
             EditorApplication.hierarchyChanged += OnHierarchyChanged;
             RegenerateContents(true);
@@ -163,6 +173,9 @@ namespace CuttingRoom.Editor
                 GraphView.OnEdgeSelected += OnGraphViewEdgeSelected;
                 GraphView.OnEdgeDeselected += OnGraphViewEdgeDeselected;
                 GraphView.OnClearSelection += OnGraphViewClearSelection;
+
+                GraphView.serializeGraphElements += CutCopyOperation;
+                GraphView.unserializeAndPaste += PasteOperation;
             }
 
             if (Toolbar == null)
@@ -253,6 +266,160 @@ namespace CuttingRoom.Editor
             if (DevToolbar == null)
             {
                 DevToolbar = new EditorDevToolbar();
+            }
+        }
+
+        private string CutCopyOperation(IEnumerable<GraphElement> elements)
+        {
+            SaveUtility.Save();
+            List <NarrativeObjectNode> narrativeObjectNodes = elements.Where(e => e is NarrativeObjectNode).Select(e => e as NarrativeObjectNode).ToList();
+
+            List<string> narrativeObjectGuids = new();
+
+            foreach (var narrativeObjectNode in narrativeObjectNodes)
+            {
+                if (narrativeObjectNode != null && narrativeObjectNode.NarrativeObject != null)
+                {
+                    narrativeObjectGuids.Add(narrativeObjectNode.NarrativeObject.guid);
+                }
+            }
+
+            return JsonConvert.SerializeObject(narrativeObjectGuids);
+        }
+
+        private void PasteOperation(string operationName, string data)
+        {
+            var narrativeObjectGuids = JsonConvert.DeserializeObject<List<string>>(data); ;
+
+            if (narrativeObjectGuids != null && narrativeObjectGuids.Count > 0)
+            {
+                Dictionary<string, NarrativeObject> allNarrativeObjects = FindObjectsOfType<NarrativeObject>().ToDictionary(e => e.guid);
+                ViewContainer visibleViewContainer = GraphView.ViewContainerStack.Peek();
+                List<NarrativeObject> narrativeObjectsToPaste = new();
+
+                foreach (var narrativeObjectGuid in narrativeObjectGuids)
+                {
+                    if (allNarrativeObjects.ContainsKey(narrativeObjectGuid))
+                    {
+                        narrativeObjectsToPaste.Add(allNarrativeObjects[narrativeObjectGuid]);
+                    }
+                }
+
+                DuplicateNarrativeObjectsIntoViewContainer(narrativeObjectsToPaste, visibleViewContainer.narrativeObjectGuid);
+            }
+            SaveUtility.Save();
+        }
+
+        private void DuplicateNarrativeObjectsIntoViewContainer(List<NarrativeObject> narrativeObjects, string viewContainerID)
+        {
+            // Are we pasting into a different view container
+            Transform parent = null;
+            NarrativeObject newParentNarrativeObject = null;
+            NarrativeObject oldParentNarrativeObject = null;
+            if (viewContainerID != EditorGraphView.rootViewContainerGuid && allNarrativeObjects.ContainsKey(viewContainerID))
+            {
+                newParentNarrativeObject = allNarrativeObjects[viewContainerID];
+                parent = newParentNarrativeObject.gameObject?.transform;
+            }
+            else
+            {
+
+            }
+
+            List<NarrativeObject> newNarrativeObjects = new();
+
+            foreach (var narrativeObject in narrativeObjects)
+            {
+                if (narrativeObject.gameObject.transform.parent != null)
+                {
+                    narrativeObject.gameObject.transform.parent.gameObject.TryGetComponent(out oldParentNarrativeObject);
+                }
+
+                GameObject duplicate = Instantiate(narrativeObject.gameObject, parent);
+
+                if (duplicate != null && duplicate.TryGetComponent(out NarrativeObject duplicateNarrativeObject))
+                {
+                    newNarrativeObjects.Add(duplicateNarrativeObject);
+                    if (oldParentNarrativeObject != newParentNarrativeObject)
+                    {
+                        ProcessNarrativeObjectReparent(duplicateNarrativeObject, oldParentNarrativeObject, newParentNarrativeObject);
+                    }
+                }
+            }
+
+            RefreshNarrativeObjectLinks(newNarrativeObjects, viewContainerID, ref allNarrativeObjects);
+        }
+
+
+        private void RefreshNarrativeObjectLinks(List<NarrativeObject> narrativeObjects, string viewContainerID, ref Dictionary<string, NarrativeObject> allNarrativeObjects)
+        {
+            Dictionary<string, NarrativeObject> changedGuidNarrativeObjectLookup = new();
+            foreach (var narrativeObject in narrativeObjects)
+            {
+                ProcessNarrativeObjectDuplication(narrativeObject, out string oldGuid, out string newGuid);
+                allNarrativeObjects.Add(newGuid, narrativeObject);
+
+                changedGuidNarrativeObjectLookup.Add(oldGuid, narrativeObject);
+
+                NarrativeObjectNodeState existingNodeState = SaveUtility.loadedGraphViewState.NarrativeObjectNodeStateLookup.ContainsKey(oldGuid) ?
+                    SaveUtility.loadedGraphViewState.NarrativeObjectNodeStateLookup[oldGuid] : new();
+
+                SaveUtility.loadedGraphViewState.UpdateState(newGuid, new NarrativeObjectNodeState()
+                {
+                    narrativeObjectGuid = newGuid,
+                    position = new Vector2(existingNodeState.position.x + 10, existingNodeState.position.y + 10)
+                });
+
+                if (narrativeObject is GraphNarrativeObject
+                    || narrativeObject is GroupNarrativeObject
+                    || narrativeObject is LayerNarrativeObject)
+                {
+                    // Check for child narrative objects
+                    List<NarrativeObject> childNarrativeObjects = new();
+
+                    for (int i = 0; i < narrativeObject.gameObject.transform.childCount; ++i)
+                    {
+                        GameObject child = narrativeObject.gameObject.transform.GetChild(i).gameObject;
+                        if (child.TryGetComponent(out NarrativeObject childNarrativeObject))
+                        {
+                            childNarrativeObjects.Add(childNarrativeObject);
+                        }
+                    }
+
+                    if (childNarrativeObjects != null && childNarrativeObjects.Count > 0)
+                    {
+                        // Duplicate Children
+                        RefreshNarrativeObjectLinks(childNarrativeObjects, narrativeObject.guid, ref allNarrativeObjects);
+                    }
+                }
+            }
+
+            // Refresh Candidates
+            foreach (var narrativeObject in narrativeObjects)
+            {
+                if (narrativeObject != null && narrativeObject.OutputSelectionDecisionPoint != null
+                    && narrativeObject.OutputSelectionDecisionPoint.Candidates != null
+                    && narrativeObject.OutputSelectionDecisionPoint.Candidates.Count > 0)
+                {
+                    List<NarrativeObject> candidatesToRemove = new();
+                    for (int i = 0; i < narrativeObject.OutputSelectionDecisionPoint.Candidates.Count; ++i)
+                    {
+                        var candidate = narrativeObject.OutputSelectionDecisionPoint.Candidates[i];
+                        if (changedGuidNarrativeObjectLookup.ContainsKey(candidate.guid))
+                        {
+                            narrativeObject.OutputSelectionDecisionPoint.Candidates[i] = changedGuidNarrativeObjectLookup[candidate.guid];
+                        }
+                        else if (!changedGuidNarrativeObjectLookup.ContainsValue(candidate))
+                        {
+                            candidatesToRemove.Add(candidate);
+                        }
+                    }
+
+                    foreach (var candidate in candidatesToRemove)
+                    {
+                        narrativeObject.OutputSelectionDecisionPoint.RemoveCandidate(candidate);
+                    }
+                }
             }
         }
 
@@ -355,7 +522,7 @@ namespace CuttingRoom.Editor
         private void PopulateGraphView()
         {
             // Find Narrative Objects in the scene. These will be displayed on the Graph View as nodes.
-            NarrativeObject[] narrativeObjects = FindObjectsOfType<NarrativeObject>();
+            var narrativeObjects = FindObjectsOfType<NarrativeObject>().ToHashSet();
 
             foreach (NarrativeObject narrativeObject in narrativeObjects)
             {
@@ -387,7 +554,17 @@ namespace CuttingRoom.Editor
                 }
             }
 
-            EditorGraphView.PopulateResult populateResult = GraphView.Populate(SaveUtility.Load(), narrativeObjects);
+            CuttingRoomEditorGraphViewState cuttingRoomEditorGraphViewState = null;
+            if (SaveUtility.loadedGraphViewState == null)
+            {
+                cuttingRoomEditorGraphViewState = SaveUtility.Load();
+            }
+            else
+            {
+                cuttingRoomEditorGraphViewState = SaveUtility.loadedGraphViewState;
+            }
+
+            EditorGraphView.PopulateResult populateResult = GraphView.Populate(cuttingRoomEditorGraphViewState, narrativeObjects);
 
             if (populateResult.GraphViewChanged)
             {
@@ -400,7 +577,118 @@ namespace CuttingRoom.Editor
         /// </summary>
         private void OnDisable()
         {
+            ObjectChangeEvents.changesPublished -= OnCreateGameObjectHierarchy;
             EditorApplication.hierarchyChanged -= OnHierarchyChanged;
+        }
+
+
+        private void OnCreateGameObjectHierarchy(ref ObjectChangeEventStream stream)
+        {
+            List<NarrativeObject> copiedNarrativeObjects = new();
+            for (int i = 0; i<stream.length; ++i)
+            {
+                ObjectChangeKind objectChangeKind = stream.GetEventType(i);
+                switch (objectChangeKind)
+                {
+                    case ObjectChangeKind.CreateGameObjectHierarchy:
+                        {
+                            stream.GetCreateGameObjectHierarchyEvent(i, out var createGameObjectHierarchyEvent);
+                            var newGameObject = EditorUtility.InstanceIDToObject(createGameObjectHierarchyEvent.instanceId) as GameObject;
+                            if (newGameObject.TryGetComponent(out NarrativeObject narrativeObject))
+                            {
+                                if (allNarrativeObjects.ContainsKey(narrativeObject.guid))
+                                {
+                                    copiedNarrativeObjects.Add(narrativeObject);
+                                }
+                            }
+                            break;
+                        }
+                    case ObjectChangeKind.ChangeGameObjectParent:
+                        {
+                            stream.GetChangeGameObjectParentEvent(i, out var changeGameObjectParent);
+                            var gameObjectChanged = EditorUtility.InstanceIDToObject(changeGameObjectParent.instanceId) as GameObject;
+                            var newParentGameObject = EditorUtility.InstanceIDToObject(changeGameObjectParent.newParentInstanceId) as GameObject;
+                            var previousParentGameObject = EditorUtility.InstanceIDToObject(changeGameObjectParent.previousParentInstanceId) as GameObject;
+                            NarrativeObject parentNarrativeObject = newParentGameObject?.GetComponent<NarrativeObject>();
+                            NarrativeObject previousParentNarrativeObject = previousParentGameObject?.GetComponent<NarrativeObject>();
+                            if (gameObjectChanged.TryGetComponent(out NarrativeObject childNarrativeObject))
+                            {
+                                string viewContainerID = EditorGraphView.rootViewContainerGuid;
+                                if (parentNarrativeObject != null)
+                                {
+                                    viewContainerID = parentNarrativeObject.guid;
+                                }
+                                ProcessNarrativeObjectReparent(childNarrativeObject, previousParentNarrativeObject, parentNarrativeObject);
+                                RefreshNarrativeObjectLinks(new List<NarrativeObject>() { childNarrativeObject }, viewContainerID, ref allNarrativeObjects);
+                            }
+                            break;
+                        }
+                    default:
+                        break;
+                }
+            }
+
+            if (copiedNarrativeObjects != null && copiedNarrativeObjects.Count > 0)
+            {
+                Transform parent = copiedNarrativeObjects.First().gameObject.transform.parent;
+                NarrativeObject newParentNarrativeObject = null;
+                string viewContainerID = EditorGraphView.rootViewContainerGuid;
+
+                if (copiedNarrativeObjects.First().gameObject.transform.parent != null
+                    && copiedNarrativeObjects.First().gameObject.transform.parent.gameObject.TryGetComponent(out newParentNarrativeObject))
+                {
+                    viewContainerID = newParentNarrativeObject.guid;
+                }
+                RefreshNarrativeObjectLinks(copiedNarrativeObjects, viewContainerID, ref allNarrativeObjects);
+            }
+
+            allNarrativeObjects = FindObjectsOfType<NarrativeObject>().ToDictionary(e => e.guid);
+        }
+
+        private void ProcessNarrativeObjectDuplication(NarrativeObject narrativeObject, out string oldGuid, out string newGuid)
+        {
+            oldGuid = string.Empty;
+            newGuid = string.Empty;
+            if (narrativeObject != null)
+            {
+                oldGuid = narrativeObject.guid;
+                newGuid = Guid.NewGuid().ToString();
+                // Force new guid
+                narrativeObject.guid = newGuid;
+            }
+        }
+        private void ProcessNarrativeObjectReparent(NarrativeObject narrativeObject, NarrativeObject oldParent, NarrativeObject newParent)
+        {
+            if (narrativeObject != null)
+            {
+                if (newParent != null)
+                {
+                    if (newParent is GroupNarrativeObject)
+                    {
+                        GroupNarrativeObject parentGroup = newParent as GroupNarrativeObject;
+                        parentGroup.GroupSelectionDecisionPoint.AddCandidate(narrativeObject);
+                    }
+                    else if (newParent is LayerNarrativeObject)
+                    {
+                        LayerNarrativeObject parentLayer = newParent as LayerNarrativeObject;
+                        parentLayer.LayerSelectionDecisionPoint.AddCandidate(narrativeObject);
+                    }
+                }
+
+                if (oldParent != null)
+                {
+                    if (oldParent is GroupNarrativeObject)
+                    {
+                        GroupNarrativeObject previousParentGroup = oldParent as GroupNarrativeObject;
+                        previousParentGroup.GroupSelectionDecisionPoint.RemoveCandidate(narrativeObject);
+                    }
+                    else if (oldParent is LayerNarrativeObject)
+                    {
+                        LayerNarrativeObject previousParentLayer = oldParent as LayerNarrativeObject;
+                        previousParentLayer.LayerSelectionDecisionPoint.RemoveCandidate(narrativeObject);
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -455,8 +743,6 @@ namespace CuttingRoom.Editor
             AddToolbar();
             AddNavigationToolbar();
 
-            NavigationToolbar.GenerateContents(GraphView.ViewContainerStack);
-
             if (DevToolbarEnabled)
             {
                 AddDevToolbar();
@@ -470,6 +756,8 @@ namespace CuttingRoom.Editor
             SaveUtility = new EditorSaveUtility(GraphView);
 
             PopulateGraphView();
+
+            NavigationToolbar.GenerateContents(GraphView.ViewContainerStack);
         }
 
         /// <summary>
