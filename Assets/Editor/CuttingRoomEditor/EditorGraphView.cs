@@ -779,8 +779,8 @@ namespace CuttingRoom.Editor
                     narrativeObjectNodeState.narrativeObjectGuid = narrativeObject.guid;
                     narrativeObjectNodeState.position = startingNodePosition;
                     // Shift starting position to avoid overlapping.
-                    ++startingNodePosition.x;
-                    --startingNodePosition.y;
+                    startingNodePosition.x += 10;
+                    startingNodePosition.y += 10;
                 }
                 graphViewState.UpdateState(narrativeObject.guid, narrativeObjectNodeState);
 
