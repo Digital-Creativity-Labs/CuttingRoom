@@ -1092,7 +1092,6 @@ namespace CuttingRoom.Editor
                 // If output connections are populated
                 if (narrativeObjectNode.NarrativeObject.OutputSelectionDecisionPoint != null)
                 {
-                    List<NarrativeObject> candidatesToRemove = new();
                     // For each connection from the nodes outputs.
                     foreach (NarrativeObject candidateNarrativeObject in narrativeObjectNode.NarrativeObject.OutputSelectionDecisionPoint.Candidates)
                     {
@@ -1109,7 +1108,6 @@ namespace CuttingRoom.Editor
                             if (!NarrativeObjectNodes.TryGetValue(candidateNarrativeObject.guid, out inputNarrativeObjectNode))
                             {
                                 EdgeStates.Remove(edgeState);
-                                candidatesToRemove.Add(candidateNarrativeObject);
                                 continue;
                             }
 
@@ -1137,11 +1135,6 @@ namespace CuttingRoom.Editor
                             }
                         }
                     }
-
-                    //foreach (var candidate in candidatesToRemove)
-                    //{
-                    //    narrativeObjectNode.NarrativeObject.OutputSelectionDecisionPoint.RemoveCandidate(candidate);
-                    //}
                 }
             }
 
