@@ -942,6 +942,9 @@ namespace CuttingRoom.Editor
                 }
             }
 
+            // Check if window has been fully cleared
+            bool windowCleared = (NarrativeObjectNodes != null && NarrativeObjectNodes.Count == 0);
+
             foreach (NarrativeObject narrativeObject in narrativeObjects)
             {
                 // Find any nodes which already exist in the graph view for the specified narrative object.
@@ -1001,6 +1004,12 @@ namespace CuttingRoom.Editor
                     narrativeObjectNode.OnRemoveAsCandidate += OnNarrativeObjectNodeRemoveAsCandidate;
 
                     AddElement(narrativeObjectNode);
+
+                    // If window hasn't been cleared, add new nodes to selection. This allows pasted nodes to become selected upon paste.
+                    if (!windowCleared)
+                    {
+                        AddToSelection(narrativeObjectNode);
+                    }
                 }
                 else
                 {

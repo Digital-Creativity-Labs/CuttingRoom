@@ -159,7 +159,7 @@ namespace CuttingRoom.Editor
                     {
                         OnDelete?.Invoke();
 
-                        RegenerateContents(true);
+                        RegenerateContents(false);
                     }
                 };
 
@@ -191,6 +191,7 @@ namespace CuttingRoom.Editor
 
                 Toolbar.OnClickAddAtomicNarrativeObjectNode += () =>
                 {
+                    GraphView.ClearSelection();
                     AtomicNarrativeObject atomicNarrativeObject = CuttingRoomContextMenus.CreateAtomicNarrativeObject();
 
                     atomicNarrativeObject.transform.parent = GraphView.VisibleViewContainerNarrativeObject?.transform;
@@ -202,6 +203,7 @@ namespace CuttingRoom.Editor
 
                 Toolbar.OnClickAddGraphNarrativeObjectNode += () =>
                 {
+                    GraphView.ClearSelection();
                     GraphNarrativeObject graphNarrativeObject = CuttingRoomContextMenus.CreateGraphNarrativeObject();
 
                     graphNarrativeObject.transform.parent = GraphView.VisibleViewContainerNarrativeObject?.transform;
@@ -213,6 +215,7 @@ namespace CuttingRoom.Editor
 
                 Toolbar.OnClickAddGroupNarrativeObjectNode += () =>
                 {
+                    GraphView.ClearSelection();
                     GroupNarrativeObject groupNarrativeObject = CuttingRoomContextMenus.CreateGroupNarrativeObject();
 
                     groupNarrativeObject.transform.parent = GraphView.VisibleViewContainerNarrativeObject?.transform;
@@ -224,6 +227,7 @@ namespace CuttingRoom.Editor
 
                 Toolbar.OnClickAddLayerNarrativeObjectNode += () =>
                 {
+                    GraphView.ClearSelection();
                     LayerNarrativeObject layerNarrativeObject = CuttingRoomContextMenus.CreateLayerNarrativeObject();
 
                     layerNarrativeObject.transform.parent = GraphView.VisibleViewContainerNarrativeObject?.transform;
@@ -698,7 +702,7 @@ namespace CuttingRoom.Editor
         {
             // Whenever the hierarchy changes, regenerate as narrative
             // objects might have been destroyed.
-            RegenerateContents(true);
+            RegenerateContents(false);
         }
 
         /// <summary>
