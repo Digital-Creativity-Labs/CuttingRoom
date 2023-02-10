@@ -628,8 +628,13 @@ namespace CuttingRoom.Editor
                             NarrativeObject previousParentNarrativeObject = previousParentGameObject?.GetComponent<NarrativeObject>();
                             if (gameObjectChanged.TryGetComponent(out NarrativeObject childNarrativeObject))
                             {
+                                string viewContainerID = EditorGraphView.rootViewContainerGuid;
+                                if (parentNarrativeObject != null)
+                                {
+                                    viewContainerID = parentNarrativeObject.guid;
+                                }
                                 ProcessNarrativeObjectReparent(childNarrativeObject, previousParentNarrativeObject, parentNarrativeObject);
-                                RefreshNarrativeObjectLinks(new List<NarrativeObject>() { childNarrativeObject }, parentNarrativeObject.guid, ref allNarrativeObjects);
+                                RefreshNarrativeObjectLinks(new List<NarrativeObject>() { childNarrativeObject }, viewContainerID, ref allNarrativeObjects);
                             }
                             break;
                         }
@@ -665,11 +670,6 @@ namespace CuttingRoom.Editor
                 newGuid = Guid.NewGuid().ToString();
                 // Force new guid
                 narrativeObject.guid = newGuid;
-
-                // Clear output links as can't rely on being present
-                //narrativeObject.OutputSelectionDecisionPoint.Candidates.Clear();
-
-                OnHierarchyChanged();
             }
         }
         private void ProcessNarrativeObjectReparent(NarrativeObject narrativeObject, NarrativeObject oldParent, NarrativeObject newParent)
@@ -703,10 +703,6 @@ namespace CuttingRoom.Editor
                         previousParentLayer.LayerSelectionDecisionPoint.RemoveCandidate(narrativeObject);
                     }
                 }
-
-                // Clear output links as can't rely on being present
-                //narrativeObject.OutputSelectionDecisionPoint.Candidates.Clear();
-                OnHierarchyChanged();
             }
         }
 
