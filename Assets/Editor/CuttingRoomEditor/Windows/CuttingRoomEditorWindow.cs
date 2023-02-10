@@ -600,21 +600,6 @@ namespace CuttingRoom.Editor
                                 {
                                     copiedNarrativeObjects.Add(narrativeObject);
                                 }
-
-                                //foreach (var duplicateNarrativeObject in allDuplicates)
-                                //{
-                                //    NarrativeObjectNodeState existingNodeState = SaveUtility.loadedGraphViewState.NarrativeObjectNodeStateLookup.ContainsKey(duplicateNarrativeObject.guid) ?
-                                //        SaveUtility.loadedGraphViewState.NarrativeObjectNodeStateLookup[duplicateNarrativeObject.guid] : new();
-                                //    ProcessNarrativeObjectDuplication(duplicateNarrativeObject, out string oldGuid, out string newGuid);
-
-                                //    existingNodeState.narrativeObjectGuid = duplicateNarrativeObject.guid;
-
-                                //    SaveUtility.loadedGraphViewState.UpdateState(duplicateNarrativeObject.guid, new NarrativeObjectNodeState()
-                                //    {
-                                //        narrativeObjectGuid = duplicateNarrativeObject.guid,
-                                //        position = new Vector2(existingNodeState.position.x, existingNodeState.position.y)
-                                //    });
-                                //}
                             }
                             break;
                         }
