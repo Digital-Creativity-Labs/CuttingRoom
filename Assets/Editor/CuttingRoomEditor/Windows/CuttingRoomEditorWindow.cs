@@ -325,10 +325,6 @@ namespace CuttingRoom.Editor
                 newParentNarrativeObject = allNarrativeObjects[viewContainerID];
                 parent = newParentNarrativeObject.gameObject?.transform;
             }
-            else
-            {
-
-            }
 
             List<NarrativeObject> newNarrativeObjects = new();
 
@@ -424,6 +420,8 @@ namespace CuttingRoom.Editor
                         narrativeObject.OutputSelectionDecisionPoint.RemoveCandidate(candidate);
                     }
                 }
+
+                narrativeObject.VariableStore.RefreshDictionary();
             }
         }
 
@@ -530,6 +528,9 @@ namespace CuttingRoom.Editor
 
             foreach (NarrativeObject narrativeObject in narrativeObjects)
             {
+                // Ensure variable store is initialised
+                narrativeObject.InitialiseVariableStore();
+
                 if (narrativeObject.OutputSelectionDecisionPoint != null)
                 {
                     narrativeObject.OutputSelectionDecisionPoint.OnCandidatesChanged -= OnNarrativeObjectOutputCandidatesChanged;

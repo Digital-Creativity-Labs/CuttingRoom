@@ -5,6 +5,8 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Collections;
 using UnityEngine;
+using CuttingRoom.VariableSystem.Variables;
+using System.Linq;
 #if UNITY_EDITOR
 using CuttingRoom.Editor;
 #endif
@@ -14,6 +16,8 @@ namespace CuttingRoom
     [RequireComponent(typeof(OutputSelectionDecisionPoint), typeof(VariableStore))]
     public class NarrativeObject : MonoBehaviour
     {
+        public static string hasPlayedTagName = "hasPlayed";
+
         /// <summary>
         /// The guid for this narrative object.
         /// </summary>
@@ -37,6 +41,8 @@ namespace CuttingRoom
         [SerializeField]
         private VariableStore variableStore = null;
 
+
+
         /// <summary>
         /// Get accessor for the variable store on this narrative object.
         /// </summary>
@@ -58,11 +64,36 @@ namespace CuttingRoom
         /// </summary>
         public List<Constraint> constraints = new List<Constraint>();
 
+        public void Awake()
+        {
+            VariableStore = GetComponent<VariableStore>();
+#if UNITY_EDITOR
+            InitialiseVariableStore();
+#endif
+        }
+
+
 #if UNITY_EDITOR
         public void Reset()
         {
             ProcessingEndTrigger defaultEndOfContentTrigger = ProcessingEndTriggerFactory.AddProcessingTriggerToNarrativeObject(this, ProcessingEndTriggerFactory.TriggerType.EndOfContent);
+            InitialiseVariableStore();
         }
+
+        public void InitialiseVariableStore()
+        {
+            if (VariableStore == null)
+            {
+                VariableStore = GetComponent<VariableStore>();
+            }
+            if (!VariableStore.Variables.ContainsKey(hasPlayedTagName))
+            {
+                BoolVariable hasPlayedVariable = VariableStore.GetOrAddVariable<BoolVariable>(hasPlayedTagName, Variable.VariableCategory.SystemDefined) as BoolVariable;
+                hasPlayedVariable.Name = hasPlayedTagName;
+                hasPlayedVariable.SetValue(false);
+            }
+        }
+
 #endif
 
         /// <summary>
@@ -84,6 +115,12 @@ namespace CuttingRoom
         /// </summary>
         public virtual void PostProcess()
         {
+            if (VariableStore != null)
+            {
+                BoolVariable hasPlayed = VariableStore.GetVariable(hasPlayedTagName) as BoolVariable;
+                hasPlayed.Set(true);
+            }
+
             foreach (var trigger in endTriggers)
             {
                 if (trigger != null)
@@ -111,6 +148,22 @@ namespace CuttingRoom
                     }
                 }
             }
+            if (VariableStore != null)
+            {
+                foreach (var variable in VariableStore.variableList)
+                {
+                    if (variable != null)
+                    {
+                        variable.OnVariableSet -= OnVariableChange;
+                        variable.OnVariableSet += OnVariableChange;
+                    }
+                }
+            }
+            OnChanged?.Invoke();
+        }
+
+        private void OnVariableChange(Variable variable)
+        {
             OnChanged?.Invoke();
         }
 

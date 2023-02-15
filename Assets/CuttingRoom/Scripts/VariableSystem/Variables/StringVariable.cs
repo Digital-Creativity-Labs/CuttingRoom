@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CuttingRoom.Editor;
+using System;
 using UnityEngine;
 
 namespace CuttingRoom.VariableSystem.Variables
@@ -6,10 +7,18 @@ namespace CuttingRoom.VariableSystem.Variables
 	public class StringVariable : Variable
 	{
 		public string Value { get => value; }
+        public string defaultValue = string.Empty;
+
+        [InspectorVisible]
         [SerializeField]
         private string value = string.Empty;
 
-		public void Set(string newValue)
+        public void Start()
+        {
+            value = defaultValue;
+        }
+
+        public void Set(string newValue)
 		{
 			value = newValue;
 

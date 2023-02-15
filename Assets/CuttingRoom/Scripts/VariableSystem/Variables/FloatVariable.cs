@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CuttingRoom.Editor;
+using System;
 using UnityEngine;
 
 namespace CuttingRoom.VariableSystem.Variables
@@ -6,10 +7,18 @@ namespace CuttingRoom.VariableSystem.Variables
 	public class FloatVariable : Variable
 	{
 		public float Value { get => value; }
+        public float defaultValue = 0.0f;
+
+        [InspectorVisible]
         [SerializeField]
         private float value = 0.0f;
 
-		public void Increment()
+        public void Start()
+        {
+            value = defaultValue;
+        }
+
+        public void Increment()
 		{
 			value++;
 		}

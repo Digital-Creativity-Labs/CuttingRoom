@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using CuttingRoom.VariableSystem;
+using CuttingRoom.VariableSystem.Variables;
+using System;
 
 namespace CuttingRoom
 {
@@ -36,5 +38,40 @@ namespace CuttingRoom
         /// Get accessor for the global variable store.
         /// </summary>
         public VariableStore GlobalVariableStore { get { return globalVariableStore; } set { globalVariableStore = value; } }
+
+#if UNITY_EDITOR
+        public void Reset()
+        {
+            BoolVariable trueVariable = VariableFactory.AddVariableToVariableStore(globalVariableStore, VariableFactory.VariableType.Bool, Variable.VariableCategory.SystemDefined) as BoolVariable;
+            trueVariable.Name = "true";
+            trueVariable.SetValue(true);
+            BoolVariable falseVariable = VariableFactory.AddVariableToVariableStore(globalVariableStore, VariableFactory.VariableType.Bool, Variable.VariableCategory.SystemDefined) as BoolVariable;
+            falseVariable.Name = "false";
+            falseVariable.SetValue(false);
+        }
+
+        public event Action OnChanged;
+
+        public virtual void OnValidate()
+        {
+            if (globalVariableStore != null)
+            {
+                foreach (var variable in globalVariableStore.variableList)
+                {
+                    if (variable != null)
+                    {
+                        variable.OnVariableSet -= OnVariableChange;
+                        variable.OnVariableSet += OnVariableChange;
+                    }
+                }
+            }
+            OnChanged?.Invoke();
+        }
+
+        private void OnVariableChange(Variable variable)
+        {
+            OnChanged?.Invoke();
+        }
+#endif
     }
 }

@@ -1,3 +1,4 @@
+using Codice.Client.BaseCommands;
 using CuttingRoom.VariableSystem;
 using CuttingRoom.VariableSystem.Constraints;
 using CuttingRoom.VariableSystem.Variables;
@@ -46,6 +47,11 @@ namespace CuttingRoom.Editor
         public event Action OnNarrativeObjectRemovedVariable;
 
         /// <summary>
+        /// Invoked whenever a variable is edited on a narrative object.
+        /// </summary>
+        public event Action OnNarrativeObjectEditVariable;
+
+        /// <summary>
         /// The style sheet for this visual element.
         /// </summary>
         public StyleSheet StyleSheet { get; set; } = null;
@@ -88,14 +94,29 @@ namespace CuttingRoom.Editor
 
             VisualElement container = new VisualElement();
 
-            VisualElement variablesSectionContainer = VariableStoreComponent.Render("Global Variables", narrativeSpace.GlobalVariableStore,
+            Variable.VariableCategory variableCategory = Variable.VariableCategory.UserDefined;
+
+            if (narrativeSpace != null && narrativeSpace.UnlockAdvancedFeatures)
+            {
+                variableCategory = Variable.VariableCategory.Any;
+            }
+
+            VisualElement variablesSectionContainer = VariableStoreComponent.Render("Global Variables", narrativeSpace.GlobalVariableStore, variableCategory,
                 (variableType) =>
                 {
+                    Undo.RecordObject(narrativeSpace.GlobalVariableStore, $"Add Variable {variableType}");
                     AddVariable(narrativeSpace.GlobalVariableStore, variableType);
                 },
                 (variable) =>
                 {
+                    Undo.RecordObject(narrativeSpace.GlobalVariableStore, $"Remove Variable {variable.Name}");
                     RemoveVariable(narrativeSpace.GlobalVariableStore, variable);
+                },
+                (editedVariable) =>
+                {
+                    Undo.RecordObject(narrativeSpace.GlobalVariableStore, $"Edit Variable {editedVariable.Name}");
+                    narrativeSpace.GlobalVariableStore.RefreshDictionary();
+                    OnNarrativeObjectEditVariable?.Invoke();
                 });
 
             variablesSectionContainer.styleSheets.Add(StyleSheet);
@@ -139,32 +160,59 @@ namespace CuttingRoom.Editor
             VisualElement processingTriggerSectionContainer = GetProcessingTriggersSection(processingTriggerRows, "End Triggers",
                 (triggerType) =>
                 {
-                    Undo.RecordObject(narrativeObjectNode.NarrativeObject, $"Add End Trigger {(triggerType)}");
+                    Undo.RecordObject(narrativeObjectNode.NarrativeObject, $"Add End Trigger {triggerType}");
                     AddProcessingTrigger(narrativeObjectNode.NarrativeObject, triggerType);
                 },
                 (trigger) =>
                 {
-                    Undo.RecordObject(narrativeObjectNode.NarrativeObject, $"Remove End Trigger {(trigger.GetType().Name)}");
+                    Undo.RecordObject(narrativeObjectNode.NarrativeObject, $"Remove End Trigger {trigger.GetType().Name}");
                     RemoveProcessingTrigger(narrativeObjectNode.NarrativeObject, trigger);
                 });
 
             processingTriggerSectionContainer.styleSheets.Add(StyleSheet);
             processingTriggerSectionContainer.AddToClassList("inspector-section-container");
 
-            VisualElement variablesSectionContainer = VariableStoreComponent.Render("Tags", narrativeObjectNode.NarrativeObject.VariableStore,
+            VisualElement systemTagsSectionContainer = VariableStoreComponent.Render("System Tags", narrativeObjectNode.NarrativeObject.VariableStore, Variable.VariableCategory.SystemDefined,
                 (variableType) =>
                 {
-                    Undo.RecordObject(narrativeObjectNode.NarrativeObject.VariableStore, $"Add Variable {(variableType)}");
+                    Undo.RecordObject(narrativeObjectNode.NarrativeObject.VariableStore, $"Add Variable {variableType}");
                     AddVariable(narrativeObjectNode.NarrativeObject.VariableStore, variableType);
                 },
                 (variable) =>
                 {
-                    Undo.RecordObject(narrativeObjectNode.NarrativeObject.VariableStore, $"Remove Variable {(variable.Name)}");
+                    Undo.RecordObject(narrativeObjectNode.NarrativeObject.VariableStore, $"Remove Variable {variable.Name}");
                     RemoveVariable(narrativeObjectNode.NarrativeObject.VariableStore, variable);
+                },
+                (editedVariable) =>
+                {
+                    Undo.RecordObject(narrativeObjectNode.NarrativeObject.VariableStore, $"Edit Variable {editedVariable.Name}");
+                    narrativeObjectNode.NarrativeObject.VariableStore.RefreshDictionary();
+                    OnNarrativeObjectEditVariable?.Invoke();
                 });
 
-            variablesSectionContainer.styleSheets.Add(StyleSheet);
-            variablesSectionContainer.AddToClassList("inspector-section-container");
+            systemTagsSectionContainer.styleSheets.Add(StyleSheet);
+            systemTagsSectionContainer.AddToClassList("inspector-section-container");
+
+            VisualElement tagsSectionContainer = VariableStoreComponent.Render("Tags", narrativeObjectNode.NarrativeObject.VariableStore, Variable.VariableCategory.UserDefined,
+                (variableType) =>
+                {
+                    Undo.RecordObject(narrativeObjectNode.NarrativeObject.VariableStore, $"Add Variable {variableType}");
+                    AddVariable(narrativeObjectNode.NarrativeObject.VariableStore, variableType);
+                },
+                (variable) =>
+                {
+                    Undo.RecordObject(narrativeObjectNode.NarrativeObject.VariableStore, $"Remove Variable {variable.Name}");
+                    RemoveVariable(narrativeObjectNode.NarrativeObject.VariableStore, variable);
+                },
+                (editedVariable) =>
+                {
+                    Undo.RecordObject(narrativeObjectNode.NarrativeObject.VariableStore, $"Edit Variable {editedVariable.Name}");
+                    narrativeObjectNode.NarrativeObject.VariableStore.RefreshDictionary();
+                    OnNarrativeObjectEditVariable?.Invoke();
+                });
+
+            tagsSectionContainer.styleSheets.Add(StyleSheet);
+            tagsSectionContainer.AddToClassList("inspector-section-container");
 
             // Input Constraints
             Dictionary<Constraint, VisualElement> candidateContraintRows = narrativeObjectNode.GetCandidateConstraintRows();
@@ -202,7 +250,9 @@ namespace CuttingRoom.Editor
             container.Add(UIElementsUtils.GetHorizontalDivider());
             container.Add(processingTriggerSectionContainer);
             container.Add(UIElementsUtils.GetHorizontalDivider());
-            container.Add(variablesSectionContainer);
+            container.Add(systemTagsSectionContainer);
+            container.Add(UIElementsUtils.GetHorizontalDivider());
+            container.Add(tagsSectionContainer);
             container.Add(UIElementsUtils.GetHorizontalDivider());
             container.Add(candidateConstraintsSection);
             container.Add(UIElementsUtils.GetHorizontalDivider());
@@ -270,7 +320,8 @@ namespace CuttingRoom.Editor
             if (variableStore != null && variableStore.variableList.Contains(variable))
             {
                 Undo.RecordObject(variableStore, "Remove variable");
-                variableStore.variableList.Remove(variable);
+                variableStore.RemoveVariable(variable);
+
 
                 UnityEngine.Object.DestroyImmediate(variable);
 
@@ -286,6 +337,16 @@ namespace CuttingRoom.Editor
         private void RemoveProcessingTrigger(NarrativeObject narrativeObject, ProcessingEndTrigger processingTrigger)
         {
             Undo.RecordObject(narrativeObject, "Remove End Trigger");
+
+            if (processingTrigger is VariableEndTrigger)
+            {
+                var variableTrigger = processingTrigger as VariableEndTrigger;
+                if (variableTrigger.ValueMatch != null)
+                {
+                    narrativeObject.VariableStore.RemoveVariable(variableTrigger.ValueMatch);
+                }
+            }
+
             narrativeObject.RemoveProcessingTrigger(processingTrigger);
 
             UnityEngine.Object.DestroyImmediate(processingTrigger);

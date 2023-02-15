@@ -1,4 +1,5 @@
 ﻿
+using CuttingRoom.Editor;
 using System;
 using UnityEngine;
 
@@ -7,8 +8,16 @@ namespace CuttingRoom.VariableSystem.Variables
     public class NarrativeObjectVariable : Variable
     {
         public NarrativeObject Value { get => value; }
+        public NarrativeObject defaultValue = null;
+
+        [InspectorVisible]
         [SerializeField]
         private NarrativeObject value = null;
+
+        public void Start()
+        {
+            value = defaultValue;
+        }
 
         public void Set(NarrativeObject newValue)
         {

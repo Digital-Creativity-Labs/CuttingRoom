@@ -98,6 +98,7 @@ public static class UIElementsUtils
     public static VisualElement GetTextField(string value, Action<string> onValueChanged)
     {
         TextField textField = new TextField();
+        textField.isDelayed = true;
         textField.value = value;
         textField.RegisterValueChangedCallback(evt =>
         {
@@ -282,6 +283,7 @@ public static class UIElementsUtils
     public static VisualElement CreateTextFieldRow(string labelText, string value, Action<string> OnValueChanged)
     {
         TextField textField = new TextField();
+        textField.isDelayed = true;
         textField.value = value;
         textField.RegisterValueChangedCallback(evt =>
         {

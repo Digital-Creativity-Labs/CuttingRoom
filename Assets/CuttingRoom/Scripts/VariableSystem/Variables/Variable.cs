@@ -6,7 +6,19 @@ namespace CuttingRoom.VariableSystem.Variables
 	[ExecuteInEditMode]
 	public class Variable : MonoBehaviour
 	{
-		public string Name = null;
+		public enum VariableCategory
+		{
+			Undefined,
+			SystemDefined,
+			UserDefined,
+			Any
+		}
+
+		public VariableCategory variableCategory = VariableCategory.Undefined;
+
+		[SerializeField]
+		private string variableName = null;
+		public string Name { get => variableName; set { variableName = value; OnVariableNameSet?.Invoke(this); } }
 
 		[HideInInspector]
 		public string guid = string.Empty;
@@ -16,9 +28,10 @@ namespace CuttingRoom.VariableSystem.Variables
 		/// </summary>
 		public delegate void OnVariableSetCallback(Variable variable);
 		public event OnVariableSetCallback OnVariableSet = null;
+        public event OnVariableSetCallback OnVariableNameSet = null;
 
 #if UNITY_EDITOR
-		private void Awake()
+        private void Awake()
 		{
 			if (guid == string.Empty)
 			{
