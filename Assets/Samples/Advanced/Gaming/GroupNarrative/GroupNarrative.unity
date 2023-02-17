@@ -261,8 +261,9 @@ GameObject:
   - component: {fileID: 277655713}
   - component: {fileID: 277655714}
   - component: {fileID: 277655717}
-  - component: {fileID: 277655716}
   - component: {fileID: 277655718}
+  - component: {fileID: 277655719}
+  - component: {fileID: 277655720}
   m_Layer: 0
   m_Name: 1.0
   m_TagString: Untagged
@@ -286,7 +287,7 @@ MonoBehaviour:
   outputSelectionDecisionPoint: {fileID: 277655714}
   variableStore: {fileID: 277655717}
   endTriggers:
-  - {fileID: 277655716}
+  - {fileID: 277655720}
   constraints: []
   mediaController: {fileID: 277655718}
   mediaParent: {fileID: 41199885}
@@ -324,7 +325,53 @@ Transform:
   m_Father: {fileID: 1463240305}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &277655716
+--- !u!114 &277655717
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 277655712}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d8fecdd77e447674585a2d837954a306, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  autoAddVariablesOnGameObject: 1
+  variableList:
+  - {fileID: 277655719}
+--- !u!114 &277655718
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 277655712}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e69f6f525fc5bf644a2f155c28a5694e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gameObjects:
+  - {fileID: 8347624901840340941, guid: f02f93ab5f6866e47b3f2d7cf3bc80ef, type: 3}
+--- !u!114 &277655719
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 277655712}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e132dfbb23143e0488b028cbecfc1c6d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  variableCategory: 1
+  variableName: hasPlayed
+  guid: a2e28403-5a46-4b31-a792-565402f4fb16
+  defaultValue: 0
+  value: 0
+--- !u!114 &277655720
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -341,34 +388,6 @@ MonoBehaviour:
   triggeringEvent: 1
   variableName: DoorEntered
   valueMatch: {fileID: 0}
---- !u!114 &277655717
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 277655712}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d8fecdd77e447674585a2d837954a306, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  autoAddVariablesOnGameObject: 1
-  variableList: []
---- !u!114 &277655718
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 277655712}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e69f6f525fc5bf644a2f155c28a5694e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  gameObjects:
-  - {fileID: 8347624901840340941, guid: f02f93ab5f6866e47b3f2d7cf3bc80ef, type: 3}
 --- !u!1 &776102888
 GameObject:
   m_ObjectHideFlags: 0
@@ -382,6 +401,7 @@ GameObject:
   - component: {fileID: 776102892}
   - component: {fileID: 776102891}
   - component: {fileID: 776102890}
+  - component: {fileID: 776102894}
   m_Layer: 0
   m_Name: 2.0
   m_TagString: Untagged
@@ -437,7 +457,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   autoAddVariablesOnGameObject: 1
-  variableList: []
+  variableList:
+  - {fileID: 776102894}
 --- !u!114 &776102892
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -477,6 +498,23 @@ MonoBehaviour:
   terminationMethodContainer:
     methodClass: 
     methodName: HasMadeSelection
+--- !u!114 &776102894
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 776102888}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e132dfbb23143e0488b028cbecfc1c6d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  variableCategory: 1
+  variableName: hasPlayed
+  guid: c2605eed-db30-44bb-b82e-b730bf482afd
+  defaultValue: 0
+  value: 0
 --- !u!1 &780995879
 GameObject:
   m_ObjectHideFlags: 0
@@ -536,6 +574,7 @@ GameObject:
   - component: {fileID: 905866575}
   - component: {fileID: 905866574}
   - component: {fileID: 905866578}
+  - component: {fileID: 905866579}
   m_Layer: 0
   m_Name: 2.2
   m_TagString: Untagged
@@ -576,7 +615,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   autoAddVariablesOnGameObject: 1
-  variableList: []
+  variableList:
+  - {fileID: 905866579}
 --- !u!114 &905866576
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -623,6 +663,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gameObjects:
   - {fileID: 5018205221012154495, guid: 93fe82fc530335c4aadd6f73421ebb6d, type: 3}
+--- !u!114 &905866579
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 905866573}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e132dfbb23143e0488b028cbecfc1c6d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  variableCategory: 1
+  variableName: hasPlayed
+  guid: dbcd5dc7-a02b-4860-91fe-fc88c010c3be
+  defaultValue: 0
+  value: 0
 --- !u!1 &910536142
 GameObject:
   m_ObjectHideFlags: 0
@@ -731,7 +788,9 @@ GameObject:
   - component: {fileID: 1463240305}
   - component: {fileID: 1463240304}
   - component: {fileID: 1463240306}
-  - component: {fileID: 1463240307}
+  - component: {fileID: 1463240308}
+  - component: {fileID: 1463240310}
+  - component: {fileID: 1463240309}
   m_Layer: 0
   m_Name: NarrativeSpace
   m_TagString: Untagged
@@ -752,6 +811,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rootNarrativeObject: {fileID: 277655713}
+  unlockAdvancedFeatures: 0
   globalVariableStore: {fileID: 1463240306}
 --- !u!4 &1463240305
 Transform:
@@ -784,8 +844,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   autoAddVariablesOnGameObject: 1
   variableList:
-  - {fileID: 1463240307}
---- !u!114 &1463240307
+  - {fileID: 0}
+  - {fileID: 1463240308}
+  - {fileID: 1463240310}
+  - {fileID: 1463240309}
+--- !u!114 &1463240308
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -797,9 +860,45 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e132dfbb23143e0488b028cbecfc1c6d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Name: DoorEntered
-  guid: 22da0caa-215b-4169-adbb-d48e78f79743
+  variableCategory: 2
+  variableName: DoorEntered
+  guid: febeb4a7-4080-40bf-9a8e-9635dc1c1abc
+  defaultValue: 0
   value: 0
+--- !u!114 &1463240309
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1463240303}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e132dfbb23143e0488b028cbecfc1c6d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  variableCategory: 1
+  variableName: FALSE
+  guid: 1e87e85b-d9f4-41f1-bf6d-ec8cda6284ab
+  defaultValue: 0
+  value: 0
+--- !u!114 &1463240310
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1463240303}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e132dfbb23143e0488b028cbecfc1c6d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  variableCategory: 1
+  variableName: TRUE
+  guid: 918d3078-2df6-4b37-9bd6-a495198d4985
+  defaultValue: 1
+  value: 1
 --- !u!1 &1678804021
 GameObject:
   m_ObjectHideFlags: 0
@@ -814,6 +913,7 @@ GameObject:
   - component: {fileID: 1678804025}
   - component: {fileID: 1678804027}
   - component: {fileID: 1678804026}
+  - component: {fileID: 1678804028}
   m_Layer: 0
   m_Name: 2.1
   m_TagString: Untagged
@@ -849,7 +949,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   autoAddVariablesOnGameObject: 1
-  variableList: []
+  variableList:
+  - {fileID: 1678804028}
 --- !u!114 &1678804024
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -913,7 +1014,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 441dd36b3b6ab5042a5abbb3173fdebe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  sourceLocation: 0
   Video: {fileID: 0}
+  fullscreen: 1
+  url: 
+  width: 1920
+  height: 1080
+  marginTop: 0
+  marginLeft: 0
+--- !u!114 &1678804028
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1678804021}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e132dfbb23143e0488b028cbecfc1c6d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  variableCategory: 1
+  variableName: hasPlayed
+  guid: 897233bb-e20a-41e7-be96-6e2adfd9c725
+  defaultValue: 0
+  value: 0
 --- !u!1001 &2069525506
 PrefabInstance:
   m_ObjectHideFlags: 0

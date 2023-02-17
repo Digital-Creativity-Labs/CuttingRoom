@@ -263,6 +263,7 @@ GameObject:
   - component: {fileID: 277655714}
   - component: {fileID: 277655716}
   - component: {fileID: 277655718}
+  - component: {fileID: 277655719}
   m_Layer: 0
   m_Name: 1.0
   m_TagString: Untagged
@@ -355,7 +356,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   autoAddVariablesOnGameObject: 1
-  variableList: []
+  variableList:
+  - {fileID: 277655719}
 --- !u!114 &277655718
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -370,6 +372,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gameObjects:
   - {fileID: 8347624901840340941, guid: 26802f0f2b431ae47b188bfd1474c438, type: 3}
+--- !u!114 &277655719
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 277655712}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e132dfbb23143e0488b028cbecfc1c6d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  variableCategory: 1
+  variableName: hasPlayed
+  guid: 36b53624-562b-4966-bb6b-b2854f7f5bef
+  defaultValue: 0
+  value: 0
 --- !u!1 &780995879
 GameObject:
   m_ObjectHideFlags: 0
@@ -527,6 +546,7 @@ GameObject:
   - component: {fileID: 1367962899}
   - component: {fileID: 1367962902}
   - component: {fileID: 1367962901}
+  - component: {fileID: 1367962903}
   m_Layer: 0
   m_Name: 2.2
   m_TagString: Untagged
@@ -568,7 +588,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   autoAddVariablesOnGameObject: 1
-  variableList: []
+  variableList:
+  - {fileID: 1367962903}
 --- !u!114 &1367962899
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -632,6 +653,23 @@ MonoBehaviour:
   variableName: DoorSelected
   comparisonType: 1
   value: Right
+--- !u!114 &1367962903
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1367962896}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e132dfbb23143e0488b028cbecfc1c6d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  variableCategory: 1
+  variableName: hasPlayed
+  guid: 9bbe7ff8-0f63-4989-a98d-fb7bdd8ff965
+  defaultValue: 0
+  value: 0
 --- !u!1 &1463240303
 GameObject:
   m_ObjectHideFlags: 0
@@ -644,6 +682,8 @@ GameObject:
   - component: {fileID: 1463240304}
   - component: {fileID: 1463240306}
   - component: {fileID: 1463240307}
+  - component: {fileID: 1463240309}
+  - component: {fileID: 1463240308}
   m_Layer: 0
   m_Name: NarrativeSpace
   m_TagString: Untagged
@@ -664,6 +704,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rootNarrativeObject: {fileID: 277655713}
+  unlockAdvancedFeatures: 0
   globalVariableStore: {fileID: 1463240306}
 --- !u!4 &1463240305
 Transform:
@@ -698,6 +739,8 @@ MonoBehaviour:
   autoAddVariablesOnGameObject: 1
   variableList:
   - {fileID: 1463240307}
+  - {fileID: 1463240309}
+  - {fileID: 1463240308}
 --- !u!114 &1463240307
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -710,9 +753,45 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ae69c8d62e9129a4e91f655cd5dcc1c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Name: DoorSelected
+  variableCategory: 2
+  variableName: DoorSelected
   guid: e7ce39f6-11a6-4f02-a3a3-97f64366a86b
+  defaultValue: 
   value: 
+--- !u!114 &1463240308
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1463240303}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e132dfbb23143e0488b028cbecfc1c6d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  variableCategory: 1
+  variableName: FALSE
+  guid: 133c172d-583c-47f4-9d30-7b256023e3bb
+  defaultValue: 0
+  value: 0
+--- !u!114 &1463240309
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1463240303}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e132dfbb23143e0488b028cbecfc1c6d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  variableCategory: 1
+  variableName: TRUE
+  guid: c225052e-010f-4ae3-8587-45278600a9b5
+  defaultValue: 1
+  value: 1
 --- !u!1 &1960273031
 GameObject:
   m_ObjectHideFlags: 0
@@ -727,6 +806,7 @@ GameObject:
   - component: {fileID: 1960273034}
   - component: {fileID: 1960273037}
   - component: {fileID: 1960273036}
+  - component: {fileID: 1960273038}
   m_Layer: 0
   m_Name: 2.1
   m_TagString: Untagged
@@ -768,7 +848,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   autoAddVariablesOnGameObject: 1
-  variableList: []
+  variableList:
+  - {fileID: 1960273038}
 --- !u!114 &1960273034
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -832,6 +913,23 @@ MonoBehaviour:
   variableName: DoorSelected
   comparisonType: 1
   value: Left
+--- !u!114 &1960273038
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1960273031}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e132dfbb23143e0488b028cbecfc1c6d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  variableCategory: 1
+  variableName: hasPlayed
+  guid: a8dd6677-83ec-4479-b2cd-36a0fe08bba8
+  defaultValue: 0
+  value: 0
 --- !u!1001 &2069525506
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -19,6 +19,13 @@ namespace CuttingRoom.VariableSystem
 
 		private Dictionary<string, Variable> variables = new Dictionary<string, Variable>();
 
+		private static string defaultNewVariableName = "New";
+
+		/// <summary>
+		/// Public read only accessor for variables
+		/// </summary>
+		public IReadOnlyDictionary<string, Variable> Variables => variables;
+
 		public class InvalidVariableException : Exception { public InvalidVariableException(string message) : base(message) { } }
 
 		public class VariableState
@@ -46,7 +53,7 @@ namespace CuttingRoom.VariableSystem
             {
                 Variable[] variables = GetComponents<Variable>();
 
-                for (int i = 0; i < variables.Length; i++)
+                for (int i = 0; i < variables.Length; ++i)
                 {
                     if (!variableList.Contains(variables[i]))
                     {
@@ -57,19 +64,41 @@ namespace CuttingRoom.VariableSystem
 
             variables = new Dictionary<string, Variable>();
             // Generate a dictionary for quick look up of variables.
-            for (int count = 0; count < variableList.Count; count++)
+            for (int count = 0; count < variableList.Count; ++count)
             {
 				Variable variable = variableList[count];
                 // Check that the entry in the variable list exists.
-                // There can be null entries due to human error/use.
-                if (variable != null && !string.IsNullOrEmpty(variable.Name))
+				if (variable == null)
+				{
+					// There can be null entries due to human error/use. Remove them if they exist.
+					variableList.RemoveAt(count);
+					--count;
+				}
+                else if (!string.IsNullOrEmpty(variable.Name))
                 {
                     variables[variable.Name] = variable;
                 }
             }
         }
 
-		public void RegisterOnVariableSetCallback(Action<Variable> onVariableSet)
+		public IReadOnlyDictionary<string, Variable> GetVariablesOfCategory(Variable.VariableCategory variableCategory)
+		{
+			if (variableList != null && variableList.Count > 0)
+			{
+				if (variableCategory == Variable.VariableCategory.Any)
+                {
+                    return variableList.ToDictionary(variable => variable.Name);
+                }
+				else
+				{
+					return variableList.Where(variable => variable != null && variable.variableCategory == variableCategory && !string.IsNullOrEmpty(variable.Name)).ToDictionary(variable => variable.Name);
+				}
+			}
+
+			return new Dictionary<string, Variable>();
+		}
+
+        public void RegisterOnVariableSetCallback(Action<Variable> onVariableSet)
 		{
 			foreach (KeyValuePair<string, Variable> pair in variables)
 			{
@@ -82,24 +111,16 @@ namespace CuttingRoom.VariableSystem
 			}
         }
 
-        public Variable GetOrAddVariableToGameObject<T>(GameObject obj, string variableName, object value = null) where T : Variable
+        public Variable GetOrAddVariable<T>(string variableName, Variable.VariableCategory variableCategory, object value = null) where T : Variable
         {
-            if (obj == null)
-            {
-                return null;
-            }
-            Variable variable = obj.GetComponents<T>().FirstOrDefault((v) =>
+			if (variables.ContainsKey(variableName))
 			{
-				return v.Name.Equals(variableName);
-			});
-
-			if (variable != null)
-			{
-				return variable;
+				return variables[variableName];
 			}
 			else
 			{
-				variable = obj.AddComponent<T>();
+				Variable variable = gameObject.AddComponent<T>();
+				variable.variableCategory = variableCategory;
 				if (variable != null)
 				{
 					variable.Name = variableName;
@@ -117,22 +138,41 @@ namespace CuttingRoom.VariableSystem
             return null;
         }
 
+		private string GenerateVariableName()
+		{
+			int i;
+			for (i = 0; Variables.ContainsKey($"{defaultNewVariableName}-{i}"); ++i) ;
+
+			return $"{defaultNewVariableName}-{i}";
+        }
+
         public void AddVariable(Variable variable)
 		{
+			if (string.IsNullOrEmpty(variable.Name))
+			{
+				variable.Name = GenerateVariableName();
+            }
+
+			if (!variables.ContainsKey(variable.Name))
+			{
+                variableList.Add(variable);
+				variables.Add(variable.Name, variable);
+			}
+        }
+
+        public void RemoveVariable(Variable variable)
+        {
 			if (string.IsNullOrEmpty(variable.Name))
 			{
 				throw new InvalidVariableException("Variables must have a VariableName assigned to them.");
 			}
 
-            if (!variableList.Contains(variable))
+            if (variables.ContainsKey(variable.Name))
             {
-                variableList.Add(variable);
+				Variable variableToRemove = variables[variable.Name];
+                variables.Remove(variable.Name);
+				variableList.Remove(variableToRemove);
             }
-
-			if (!variables.ContainsKey(variable.Name))
-			{
-				variables.Add(variable.Name, variable);
-			}
         }
 
         public Variable GetVariable(string variableName)

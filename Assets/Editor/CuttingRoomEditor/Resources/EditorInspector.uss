@@ -29,6 +29,10 @@
 	-unity-text-align: middle-center;
 }
 
+.no-edit-tag {
+	background-color: #2C2A45;
+}
+
 .tag-field-label {
 	width: 20%;
 	-unity-text-align: middle-right;

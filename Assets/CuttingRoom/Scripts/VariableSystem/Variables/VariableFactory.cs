@@ -23,59 +23,43 @@ namespace CuttingRoom.VariableSystem.Variables
 
 #if UNITY_EDITOR
         /// <summary>
-        /// Add a constraint to a narrative object.
+        /// Add a variable to a variable store.
         /// </summary>
-        /// <param name="narrativeObject"></param>
-        /// <param name="constraintType"></param>
-        public static Variable AddVariableToVariableStore(VariableStore variableStore, VariableType variableType)
+        /// <param name="variableStore"></param>
+        /// <param name="variableType"></param>
+        public static Variable AddVariableToVariableStore(VariableStore variableStore, VariableType variableType, Variable.VariableCategory variableCategory = Variable.VariableCategory.UserDefined, object value = null)
         {
             if (variableStore != null)
             {
                 Undo.RecordObject(variableStore, "Add variable");
-                Variable variable = AddVariableToGameObject(variableStore.gameObject, variableType);
-                // Add the constraint.
-                variableStore.variableList.Add(variable);
+                // Forced add the variable to the variable store with no name. One will be generated.
+                Variable variable = null;
+                if (variableStore != null)
+                {
+                    switch (variableType)
+                    {
+                        case VariableType.String:
+                            variable = variableStore.GetOrAddVariable<StringVariable>(string.Empty, variableCategory, value);
+                            break;
 
+                        case VariableType.Bool:
+                            variable = variableStore.GetOrAddVariable<BoolVariable>(string.Empty, variableCategory, value);
+                            break;
+
+                        case VariableType.Float:
+                            variable = variableStore.GetOrAddVariable<FloatVariable>(string.Empty, variableCategory, value);
+                            break;
+
+                        case VariableType.Int:
+                            variable = variableStore.GetOrAddVariable<IntVariable>(string.Empty, variableCategory, value);
+                            break;
+                    }
+
+                }
                 return variable;
             }
 
             return null;
-        }
-
-        private static Variable AddVariableToGameObject(GameObject gameObject, VariableType variableType)
-        {
-            Variable variable = null;
-            if (gameObject != null)
-            {
-                switch (variableType)
-                {
-                    case VariableType.String:
-
-                        variable = gameObject.AddComponent<StringVariable>();
-
-                        break;
-
-                    case VariableType.Bool:
-
-                        variable = gameObject.AddComponent<BoolVariable>();
-
-                        break;
-
-                    case VariableType.Float:
-
-                        variable = gameObject.AddComponent<FloatVariable>();
-
-                        break;
-
-                    case VariableType.Int:
-
-                        variable = gameObject.AddComponent<IntVariable>();
-
-                        break;
-                }
-
-            }
-            return variable;
         }
 #endif
     }

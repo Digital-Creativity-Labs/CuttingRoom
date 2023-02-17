@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CuttingRoom.Editor;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,8 +9,15 @@ namespace CuttingRoom.VariableSystem.Variables
 	public class BoolVariable : Variable
 	{
 		public bool Value { get => value; }
-		[SerializeField]
-		private bool value = false;
+        public bool defaultValue = false;
+
+		[InspectorVisible]
+		public bool value = false;
+
+		public void Start()
+		{
+			value = defaultValue;
+		}
 
 		public void Invert()
 		{
@@ -19,6 +27,10 @@ namespace CuttingRoom.VariableSystem.Variables
 		public void Set(bool value)
 		{
 			this.value = value;
+
+#if UNITY_EDITOR
+			defaultValue = value;
+#endif
 
 			RegisterVariableSet();
 		}

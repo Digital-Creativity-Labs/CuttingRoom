@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CuttingRoom.Editor;
+using System;
 using UnityEngine;
 
 namespace CuttingRoom.VariableSystem.Variables
@@ -9,10 +10,18 @@ namespace CuttingRoom.VariableSystem.Variables
 		/// Value of this variable.
 		/// </summary>
 		public int Value { get => value; }
+        public int defaultValue = 0;
+
+        [InspectorVisible]
         [SerializeField]
         private int value = 0;
 
-		public void Increment()
+        public void Start()
+        {
+            value = defaultValue;
+        }
+
+        public void Increment()
 		{
 			value++;
 		}
@@ -26,7 +35,11 @@ namespace CuttingRoom.VariableSystem.Variables
 		{
 			value = newValue;
 
-			RegisterVariableSet();
+#if UNITY_EDITOR
+            defaultValue = value;
+#endif
+
+            RegisterVariableSet();
 		}
 
 		public void Set(string newValue)

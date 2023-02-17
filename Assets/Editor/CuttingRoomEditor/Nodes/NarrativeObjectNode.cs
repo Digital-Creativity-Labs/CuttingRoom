@@ -281,6 +281,7 @@ namespace CuttingRoom.Editor
             {
                 Undo.RecordObject(NarrativeObject.gameObject, $"Set Narrative Object Name {(newValue)}");
                 NarrativeObject.gameObject.name = newValue;
+                NarrativeObject.OnValidate();
             });
 
             editorRows.Add(nameTextFieldRow);
@@ -454,15 +455,16 @@ namespace CuttingRoom.Editor
                             {
                                 List<string> variableNames = new List<string>();
                                 variableNames.Add("Undefined");
-                                foreach (Variable v in targetVariableStore.variableList)
+                                foreach (var v in targetVariableStore.Variables)
                                 {
-                                    if (v != null)
+                                    if (!string.IsNullOrEmpty(v.Key))
                                     {
-                                        variableNames.Add(v.Name);
+                                        variableNames.Add(v.Key);
                                     }
                                 }
 
-                                if (string.IsNullOrEmpty(variableProcessingTrigger.VariableName))
+                                if (string.IsNullOrEmpty(variableProcessingTrigger.VariableName)
+                                    || !targetVariableStore.Variables.ContainsKey(variableProcessingTrigger.VariableName))
                                 {
                                     variableProcessingTrigger.VariableName = "Undefined";
                                 }
@@ -517,7 +519,7 @@ namespace CuttingRoom.Editor
                                         Undo.RecordObjects(new UnityEngine.Object[] { localVariableStore, processingTrigger }, $"Set Value Match Variable Trigger");
                                         if (variableType == typeof(BoolVariable))
                                         {
-                                            variableProcessingTrigger.ValueMatch = localVariableStore.GetOrAddVariableToGameObject<BoolVariable>(NarrativeObject.gameObject, variableName);
+                                            variableProcessingTrigger.ValueMatch = localVariableStore.GetOrAddVariable<BoolVariable>(variableName, Variable.VariableCategory.SystemDefined);
                                             bool value = default;
                                             if (variableProcessingTrigger.ValueMatch != null)
                                             {
@@ -539,7 +541,7 @@ namespace CuttingRoom.Editor
                                         }
                                         else if (variableType == typeof(IntVariable))
                                         {
-                                            variableProcessingTrigger.ValueMatch = localVariableStore.GetOrAddVariableToGameObject<IntVariable>(NarrativeObject.gameObject, variableName);
+                                            variableProcessingTrigger.ValueMatch = localVariableStore.GetOrAddVariable<IntVariable>(variableName, Variable.VariableCategory.SystemDefined);
                                             int value = default;
                                             if (variableProcessingTrigger.ValueMatch != null)
                                             {
@@ -560,7 +562,7 @@ namespace CuttingRoom.Editor
                                         }
                                         else if (variableType == typeof(FloatVariable))
                                         {
-                                            variableProcessingTrigger.ValueMatch = localVariableStore.GetOrAddVariableToGameObject<FloatVariable>(NarrativeObject.gameObject, variableName);
+                                            variableProcessingTrigger.ValueMatch = localVariableStore.GetOrAddVariable<FloatVariable>(variableName, Variable.VariableCategory.SystemDefined);
                                             float value = default;
                                             if (variableProcessingTrigger.ValueMatch != null)
                                             {
@@ -581,7 +583,7 @@ namespace CuttingRoom.Editor
                                         }
                                         else if (variableType == typeof(StringVariable))
                                         {
-                                            variableProcessingTrigger.ValueMatch = localVariableStore.GetOrAddVariableToGameObject<StringVariable>(NarrativeObject.gameObject, variableName);
+                                            variableProcessingTrigger.ValueMatch = localVariableStore.GetOrAddVariable<StringVariable>(variableName, Variable.VariableCategory.SystemDefined);
                                             string value = default;
                                             if (variableProcessingTrigger.ValueMatch != null)
                                             {
@@ -951,6 +953,7 @@ namespace CuttingRoom.Editor
                 StringVariableConstraint stringVariableConstraint = GetConstraint<StringVariableConstraint>(constraint);
 
                 TextField textField = new TextField();
+                textField.isDelayed = true;
                 textField.value = stringVariableConstraint.value;
                 textField.RegisterValueChangedCallback(evt =>
                 {
@@ -1020,6 +1023,7 @@ namespace CuttingRoom.Editor
                 TagVariableConstraint tagConstraint = GetConstraint<TagVariableConstraint>(constraint);
 
                 TextField tagNameField = new TextField();
+                tagNameField.isDelayed = true;
                 tagNameField.value = tagConstraint.value;
                 tagNameField.RegisterValueChangedCallback(evt =>
                 {

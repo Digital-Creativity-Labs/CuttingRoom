@@ -1,3 +1,5 @@
+using CuttingRoom.VariableSystem.Variables;
+using CuttingRoom.VariableSystem;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
@@ -36,6 +38,12 @@ namespace CuttingRoom
         /// <returns></returns>
         public virtual IEnumerator Process(Sequencer sequencer, CancellationToken? cancellationToken = null)
         {
+            if (narrativeObject.VariableStore != null)
+            {
+                BoolVariable hasPlayed = narrativeObject.VariableStore.GetVariable(NarrativeObject.hasPlayedTagName) as BoolVariable;
+                hasPlayed.Set(true);
+            }
+
             List<Coroutine> endTriggers = new List<Coroutine>();
             if (narrativeObject.EndTriggers != null && narrativeObject.EndTriggers.Count > 0)
             {

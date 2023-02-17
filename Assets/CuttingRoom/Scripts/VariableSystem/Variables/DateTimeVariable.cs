@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CuttingRoom.Editor;
+using System;
 using UnityEngine;
 
 namespace CuttingRoom.VariableSystem.Variables
@@ -14,8 +15,16 @@ namespace CuttingRoom.VariableSystem.Variables
 		public int year = 1;
 
 		public DateTime Value { get => value; }
+        public DateTime defaultValue = default;
+
+        [InspectorVisible]
         [SerializeField]
         private DateTime value = default;
+
+        public void Start()
+        {
+            value = defaultValue;
+        }
 
         private void OnValidate()
 		{
@@ -51,7 +60,11 @@ namespace CuttingRoom.VariableSystem.Variables
 		{
 			value = newValue;
 
-			RegisterVariableSet();
+#if UNITY_EDITOR
+            defaultValue = value;
+#endif
+
+            RegisterVariableSet();
 		}
 
         public override void SetValue(object newValue)

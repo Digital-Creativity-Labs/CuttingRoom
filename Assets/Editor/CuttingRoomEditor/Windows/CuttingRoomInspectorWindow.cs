@@ -153,6 +153,7 @@ namespace CuttingRoom.Editor
 
                 Inspector.OnNarrativeObjectAddedVariable += OnNarrativeObjectAddedVariable;
                 Inspector.OnNarrativeObjectRemovedVariable += OnNarrativeObjectRemovedVariable;
+                Inspector.OnNarrativeObjectEditVariable += OnNarrativeObjectEditVariable;
             }
         }
 
@@ -279,13 +280,18 @@ namespace CuttingRoom.Editor
                     // When deleting a node, the narrative object will be null but the selection persists, so check this.
                     if (narrativeObjectNode.NarrativeObject == null)
                     {
+                        Action onGlobalChange = () => { Inspector.UpdateContentForGlobal(narrativeSpace); };
+                        narrativeSpace.OnChanged -= onGlobalChange;
+                        narrativeSpace.OnChanged += onGlobalChange;
                         // If the gameobject doesnt exist, then show global settings.
                         Inspector.UpdateContentForGlobal(narrativeSpace);
                     }
                     else
                     {
                         // Add callback to refresh inspector content on object changes.
-                        narrativeObjectNode.NarrativeObject.OnChanged += () => { Inspector.UpdateContentForNarrativeObjectNode(narrativeObjectNode); };
+                        Action onNarrativeObjectChanged = () => { Inspector.UpdateContentForNarrativeObjectNode(narrativeObjectNode); };
+                        narrativeObjectNode.NarrativeObject.OnChanged -= onNarrativeObjectChanged;
+                        narrativeObjectNode.NarrativeObject.OnChanged += onNarrativeObjectChanged;
                         Inspector.UpdateContentForNarrativeObjectNode(narrativeObjectNode);
                     }
                 }
@@ -340,6 +346,11 @@ namespace CuttingRoom.Editor
         }
 
         private void OnNarrativeObjectRemovedVariable()
+        {
+            RegenerateContents();
+        }
+
+        private void OnNarrativeObjectEditVariable()
         {
             RegenerateContents();
         }

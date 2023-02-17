@@ -859,6 +859,7 @@ namespace CuttingRoom.Editor
             Scene scene = SceneManager.GetActiveScene();
             if (scene != ActiveScene)
             {
+                OnWindowCleared();
                 // Refresh view stack if scene has changed
                 viewContainerStack.Clear();
                 viewContainerStack.Push(viewContainers[0]);
