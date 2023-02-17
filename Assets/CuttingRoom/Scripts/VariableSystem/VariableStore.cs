@@ -91,7 +91,7 @@ namespace CuttingRoom.VariableSystem
                 }
 				else
 				{
-					return variableList.Where(variable => variable.variableCategory == variableCategory).ToDictionary(variable => variable.Name);
+					return variableList.Where(variable => variable != null && variable.variableCategory == variableCategory && !string.IsNullOrEmpty(variable.Name)).ToDictionary(variable => variable.Name);
 				}
 			}
 
