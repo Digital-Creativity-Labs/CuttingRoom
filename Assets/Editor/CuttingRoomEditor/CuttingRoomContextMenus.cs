@@ -28,20 +28,20 @@ namespace CuttingRoom.Editor
 			return narrativeSpace;
 		}
 
-		public static Sequencer CreateSequencer()
-		{
-			Sequencer sequencer = new GameObject("Sequencer", typeof(Sequencer)).GetComponent<Sequencer>();
+		//public static Sequencer CreateSequencer()
+		//{
+		//	Sequencer sequencer = new GameObject("Sequencer", typeof(Sequencer)).GetComponent<Sequencer>();
 
-			// Find narrative space and try to link it to the sequencer.
-			NarrativeSpace narrativeSpace = GameObject.FindObjectOfType<NarrativeSpace>();
+		//	// Find narrative space and try to link it to the sequencer.
+		//	NarrativeSpace narrativeSpace = GameObject.FindObjectOfType<NarrativeSpace>();
 
-			if (narrativeSpace != null)
-			{
-				sequencer.NarrativeSpace = narrativeSpace;
-			}
+		//	if (narrativeSpace != null)
+		//	{
+		//		sequencer.NarrativeSpace = narrativeSpace;
+		//	}
 
-			return sequencer;
-		}
+		//	return sequencer;
+		//}
 
 		public static AtomicNarrativeObject InstantiateAtomicNarrativeObject()
 		{

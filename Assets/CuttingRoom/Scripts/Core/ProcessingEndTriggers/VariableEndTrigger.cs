@@ -62,11 +62,11 @@ namespace CuttingRoom
                 case VariableStoreLocation.Global:
 
                     // Find the sequencer.
-                    Sequencer sequencer = FindObjectOfType<Sequencer>();
+                    NarrativeSpace narrativeSpace = FindObjectOfType<NarrativeSpace>();
 
-                    if (sequencer != null)
+                    if (narrativeSpace != null)
                     {
-                        variable = sequencer.NarrativeSpace.GlobalVariableStore.GetVariable<Variable>(variableName);
+                        variable = narrativeSpace.GlobalVariableStore.GetVariable<Variable>(variableName);
                     }
 
                     break;

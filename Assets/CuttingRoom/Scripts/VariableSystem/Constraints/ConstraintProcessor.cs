@@ -6,7 +6,7 @@ using CuttingRoom.VariableSystem.Constraints;
 
 public static class ConstraintProcessor
 {
-	public static List<NarrativeObject> Process(Sequencer sequencer, NarrativeSpace narrativeSpace, List<NarrativeObject> candidates, List<Constraint> constraints)
+	public static List<NarrativeObject> Process(NarrativeSpace narrativeSpace, List<NarrativeObject> candidates, List<Constraint> constraints)
 	{
 		// All candidates are an option to begin with.
 		List<NarrativeObject> candidatesMatchingConstraints = new List<NarrativeObject>(candidates);
@@ -21,7 +21,7 @@ public static class ConstraintProcessor
 			{
 				Constraint constraint = constraints[constraintCount];
 
-				if (!constraint.Evaluate(sequencer, narrativeSpace, candidate))
+				if (!constraint.Evaluate(narrativeSpace, candidate))
 				{
 					candidatesMatchingConstraints.Remove(candidate);
 				}
@@ -37,7 +37,7 @@ public static class ConstraintProcessor
 			{
 				Constraint candidateConstraint = candidate.constraints[candidateConstraintCount];
 
-				if (!candidateConstraint.Evaluate(sequencer, narrativeSpace, candidate))
+				if (!candidateConstraint.Evaluate(narrativeSpace, candidate))
 				{
 					candidatesMatchingConstraints.Remove(candidate);
 				}

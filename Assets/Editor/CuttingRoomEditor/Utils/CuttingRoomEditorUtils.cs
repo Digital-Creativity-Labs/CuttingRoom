@@ -18,15 +18,15 @@ namespace CuttingRoom.Editor
             }
 
             // Ensure sequencer exists.
-            Sequencer sequencer = Object.FindObjectOfType<Sequencer>();
+            //Sequencer sequencer = Object.FindObjectOfType<Sequencer>();
 
-            if (sequencer == null)
-            {
-                sequencer = CuttingRoomContextMenus.CreateSequencer();
+            //if (sequencer == null)
+            //{
+            //    sequencer = CuttingRoomContextMenus.CreateSequencer();
 
-                // Set narrative space on the sequencer.
-                sequencer.NarrativeSpace = narrativeSpace;
-            }
+            //    // Set narrative space on the sequencer.
+            //    sequencer.NarrativeSpace = narrativeSpace;
+            //}
 
             return narrativeSpace;
         }

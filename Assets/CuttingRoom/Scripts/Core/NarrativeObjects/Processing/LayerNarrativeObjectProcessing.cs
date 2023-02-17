@@ -46,10 +46,12 @@ namespace CuttingRoom
             OnProcessingTriggerComplete += LayerEndTriggered;
 
             LayerNarrativeObject.PreProcess();
-            yield return LayerNarrativeObject.LayerSelectionDecisionPoint.Process(sequencer, OnSelection);
+            yield return LayerNarrativeObject.LayerSelectionDecisionPoint.Process(OnSelection);
 
             // Process the base functionality, output selection.
             yield return base.Process(sequencer, cancellationToken);
+
+            yield return WaitForSecondaryLayersToEnd();
 
             LayerNarrativeObject.PostProcess();
         }
@@ -60,8 +62,13 @@ namespace CuttingRoom
         private void LayerEndTriggered()
         {
             layerCancellationToken.Cancel();
+        }
+
+        private IEnumerator WaitForSecondaryLayersToEnd()
+        {
             foreach (var secondaryLayerCoroutine in secondaryLayerCoroutines)
             {
+                yield return secondaryLayerCoroutine;
                 LayerNarrativeObject.StopCoroutine(secondaryLayerCoroutine);
             }
         }
@@ -79,11 +86,12 @@ namespace CuttingRoom
                 {
                     if (layerRoot == LayerNarrativeObject.primaryLayerRootNarrativeObject)
                     {
-                        contentCoroutine = LayerNarrativeObject.StartCoroutine(sequencer.SequenceNarrativeObject(layerRoot, layerCancellationToken.Token));
+                        Sequencer subSequencer = new(layerRoot);
+                        //contentCoroutine = subSequencer.Start(layerCancellationToken.Token);
                     }
                     else
                     {
-                        secondaryLayerCoroutines.Add(LayerNarrativeObject.StartCoroutine(sequencer.SequenceNarrativeObject(layerRoot, layerCancellationToken.Token)));
+                        secondaryLayerCoroutines.Add(sequencer.ProcessNarrativeObject(layerRoot, layerCancellationToken.Token));
                     }
                 }    
             }

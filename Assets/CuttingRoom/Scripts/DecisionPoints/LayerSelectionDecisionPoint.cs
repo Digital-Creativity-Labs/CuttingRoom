@@ -11,15 +11,15 @@ namespace CuttingRoom
     public class LayerSelectionDecisionPoint : DecisionPoint
     {
 
-        public override IEnumerator Process(Sequencer sequencer, OnSelectionCallback onSelection)
+        public override IEnumerator Process(OnSelectionCallback onSelection)
         {
             // Not implemented
             throw new NotImplementedException("Process() not implemented for multi selection on groups.");
         }
 
-        public override IEnumerator Process(Sequencer sequencer, OnMultiSelectionCallback onSelection)
+        public override IEnumerator Process(OnMultiSelectionCallback onSelection)
         {
-            var validCandidates = ProcessConstraints(sequencer, constraints);
+            var validCandidates = ProcessConstraints(constraints);
             if (validCandidates != null)
             {
                 yield return onSelection.Invoke(validCandidates);

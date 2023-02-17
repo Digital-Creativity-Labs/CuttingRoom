@@ -66,12 +66,12 @@ namespace CuttingRoom
                 }
 
                 yield return MonitorForProcessComplete();
+                yield return cancellationMonitor;
 
                 foreach (var endTrig in endTriggers)
                 {
                     narrativeObject.StopCoroutine(endTrig);
                 }
-                yield return cancellationMonitor;
             }
 
 
@@ -84,11 +84,11 @@ namespace CuttingRoom
             }
             else
             {
-                yield return narrativeObject.OutputSelectionDecisionPoint.Process(sequencer, OnOutputSelection);
+                yield return narrativeObject.OutputSelectionDecisionPoint.Process(OnOutputSelection);
 
                 if (selectedOutputNarrativeObject != null)
                 {
-                    yield return narrativeObject.StartCoroutine(sequencer.SequenceNarrativeObject(selectedOutputNarrativeObject, cancellationToken));
+                    sequencer.SequenceNarrativeObject(selectedOutputNarrativeObject, cancellationToken);
                 }
             }
 

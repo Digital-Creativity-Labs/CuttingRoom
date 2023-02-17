@@ -37,43 +37,49 @@ namespace CuttingRoom
 		/// </summary>
 		protected OnSelectionCallback onSelection = null;
 
-		public abstract IEnumerator Process(Sequencer sequencer, OnSelectionCallback onSelection);
-        public abstract IEnumerator Process(Sequencer sequencer, OnMultiSelectionCallback onSelection);
+		public abstract IEnumerator Process(OnSelectionCallback onSelection);
+        public abstract IEnumerator Process(OnMultiSelectionCallback onSelection);
 
-        protected List<NarrativeObject> ProcessConstraints(Sequencer sequencer, List<Constraint> decisionPointConstraints)
+        protected List<NarrativeObject> ProcessConstraints(List<Constraint> decisionPointConstraints)
         {
 			// All candidates are an option to begin with.
 			List<NarrativeObject> candidatesMatchingConstraints = new List<NarrativeObject>(candidates);
 
-			// Iterate candidates and check them against decision point constraints.
-			for (int candidateCount = candidatesMatchingConstraints.Count - 1; candidateCount >= 0; candidateCount--)
+			NarrativeSpace narrativeSpace = FindObjectOfType<NarrativeSpace>();
+
+			if (narrativeSpace != null)
 			{
-				NarrativeObject candidate = candidatesMatchingConstraints[candidateCount];
 
-				// For each constraint.
-				for (int constraintCount = 0; constraintCount < decisionPointConstraints.Count; constraintCount++)
+				// Iterate candidates and check them against decision point constraints.
+				for (int candidateCount = candidatesMatchingConstraints.Count - 1; candidateCount >= 0; candidateCount--)
 				{
-					Constraint constraint = decisionPointConstraints[constraintCount];
+					NarrativeObject candidate = candidatesMatchingConstraints[candidateCount];
 
-					if (!constraint.Evaluate(sequencer, sequencer.NarrativeSpace, candidate))
+					// For each constraint.
+					for (int constraintCount = 0; constraintCount < decisionPointConstraints.Count; constraintCount++)
 					{
-						candidatesMatchingConstraints.Remove(candidate);
+						Constraint constraint = decisionPointConstraints[constraintCount];
+
+						if (!constraint.Evaluate(narrativeSpace, candidate))
+						{
+							candidatesMatchingConstraints.Remove(candidate);
+						}
 					}
 				}
-			}
 
-			for (int candidateCount = candidatesMatchingConstraints.Count - 1; candidateCount >= 0; candidateCount--)
-			{
-				NarrativeObject candidate = candidatesMatchingConstraints[candidateCount];
-
-				// For each constraint on the candidate.
-				for (int candidateConstraintCount = 0; candidateConstraintCount < candidate.constraints.Count; candidateConstraintCount++)
+				for (int candidateCount = candidatesMatchingConstraints.Count - 1; candidateCount >= 0; candidateCount--)
 				{
-					Constraint candidateConstraint = candidate.constraints[candidateConstraintCount];
+					NarrativeObject candidate = candidatesMatchingConstraints[candidateCount];
 
-					if (!candidateConstraint.Evaluate(sequencer, sequencer.NarrativeSpace, candidate))
+					// For each constraint on the candidate.
+					for (int candidateConstraintCount = 0; candidateConstraintCount < candidate.constraints.Count; candidateConstraintCount++)
 					{
-						candidatesMatchingConstraints.Remove(candidate);
+						Constraint candidateConstraint = candidate.constraints[candidateConstraintCount];
+
+						if (!candidateConstraint.Evaluate(narrativeSpace, candidate))
+						{
+							candidatesMatchingConstraints.Remove(candidate);
+						}
 					}
 				}
 			}

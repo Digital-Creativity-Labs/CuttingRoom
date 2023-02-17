@@ -123,7 +123,7 @@ namespace CuttingRoom.Editor
             if (contentType == MediaController.ContentTypeEnum.Video)
             {
                 // Find the sequencer.
-                Sequencer sequencer = UnityEngine.Object.FindObjectOfType<Sequencer>();
+                Sequencer sequencer = UnityEngine.Object.FindObjectOfType<NarrativeSpace>().Sequencer;
 
                 VideoController videoController = AtomicNarrativeObject.MediaController as VideoController;
                 if (videoController != null)
@@ -242,7 +242,7 @@ namespace CuttingRoom.Editor
                     VariableStore targetVariableStore = null;
 
                     // Find the sequencer.
-                    Sequencer sequencer = UnityEngine.Object.FindObjectOfType<Sequencer>();
+                    Sequencer sequencer = UnityEngine.Object.FindObjectOfType<NarrativeSpace>().Sequencer;
 
                     if (sequencer != null && sequencer.NarrativeSpace != null && !sequencer.NarrativeSpace.UnlockAdvancedFeatures)
                     {

@@ -20,6 +20,8 @@ namespace CuttingRoom
 		/// </summary>
 		private Sequencer sequencer = null;
 
+		private Sequencer subSequencer = null;
+
 		/// <summary>
 		/// Ctor.
 		/// </summary>
@@ -43,7 +45,7 @@ namespace CuttingRoom
 
             GroupNarrativeObject.PreProcess();
 
-			yield return GroupNarrativeObject.GroupSelectionDecisionPoint.Process(sequencer, OnSelection);
+			yield return GroupNarrativeObject.GroupSelectionDecisionPoint.Process(OnSelection);
 
 			yield return base.Process(sequencer, cancellationToken);
 
@@ -59,8 +61,10 @@ namespace CuttingRoom
 		{
 			if (selection != null)
 			{
-				contentCoroutine = GroupNarrativeObject.StartCoroutine(sequencer.SequenceNarrativeObject(selection, groupCancellationToken.Token));
-			}
+                subSequencer = new(selection);
+                subSequencer.Start(groupCancellationToken.Token);
+				contentCoroutine = narrativeObject.StartCoroutine(subSequencer.WaitForSequenceComplete());
+            }
 			// Nothing asynchronous needed here so return null.
 			yield return null;
         }

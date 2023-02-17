@@ -27,7 +27,7 @@ namespace CuttingRoom.VariableSystem.Constraints
 
         public override string Value => value;
 
-		public override bool Evaluate(Sequencer sequencer, NarrativeSpace narrativeSpace, NarrativeObject narrativeObject)
+		public override bool Evaluate(NarrativeSpace narrativeSpace, NarrativeObject narrativeObject)
 		{
 			if (narrativeObject != null && narrativeObject.VariableStore != null)
 			{
@@ -36,7 +36,7 @@ namespace CuttingRoom.VariableSystem.Constraints
 
 			if (tagVariable != null)
 			{
-				return Evaluate<TagVariableConstraint, Variable>(sequencer, narrativeSpace, narrativeObject, comparisonType.ToString());
+				return Evaluate<TagVariableConstraint, Variable>(narrativeSpace, narrativeObject, comparisonType.ToString());
 			}
 			else
 			{
