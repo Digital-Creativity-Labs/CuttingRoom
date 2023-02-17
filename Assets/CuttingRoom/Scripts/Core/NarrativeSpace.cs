@@ -64,18 +64,6 @@ namespace CuttingRoom
             {
                 globalVariableStore = GetComponent<VariableStore>();
             }
-            if (!globalVariableStore.Variables.ContainsKey("true"))
-            {
-                BoolVariable trueVariable = VariableFactory.AddVariableToVariableStore(globalVariableStore, VariableFactory.VariableType.Bool, Variable.VariableCategory.SystemDefined) as BoolVariable;
-                trueVariable.Name = "true";
-                trueVariable.SetValue(true);
-            }
-            if (!globalVariableStore.Variables.ContainsKey("false"))
-            {
-                BoolVariable falseVariable = VariableFactory.AddVariableToVariableStore(globalVariableStore, VariableFactory.VariableType.Bool, Variable.VariableCategory.SystemDefined) as BoolVariable;
-                falseVariable.Name = "false";
-                falseVariable.SetValue(false);
-            }
         }
 
         public event Action OnChanged;
