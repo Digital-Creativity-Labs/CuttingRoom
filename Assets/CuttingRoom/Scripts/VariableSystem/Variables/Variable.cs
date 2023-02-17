@@ -14,7 +14,7 @@ namespace CuttingRoom.VariableSystem.Variables
 			Any
 		}
 
-		public VariableCategory variableCategory = VariableCategory.Undefined;
+		public VariableCategory variableCategory = VariableCategory.UserDefined;
 
 		[SerializeField]
 		private string variableName = null;
