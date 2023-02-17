@@ -14,21 +14,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   narrativeObjectNodeStates:
   - narrativeObjectGuid: 06b5b2ab-b71b-4009-b450-3dc6870491ce
-    position: {x: 905, y: -25}
+    position: {x: 905, y: -28}
   - narrativeObjectGuid: c91fec49-478e-4276-a06b-4c65af7db260
-    position: {x: 905, y: 102}
+    position: {x: 905, y: 99}
   - narrativeObjectGuid: f1395552-c098-40f5-9656-a21a5f14c71e
-    position: {x: 1317, y: 184}
+    position: {x: 1320, y: 184}
   - narrativeObjectGuid: 22c72cc8-2b25-49da-81db-5b00b57f735f
     position: {x: 905, y: 272}
   - narrativeObjectGuid: a5ed8bd6-36b7-4ccc-9814-6a5caa9bcff0
-    position: {x: 905, y: 400}
+    position: {x: 905, y: 398}
   - narrativeObjectGuid: e16efe50-3b94-40fd-9f93-fb25e0f2f4b5
-    position: {x: 466, y: 184}
+    position: {x: 455, y: 184}
   - narrativeObjectGuid: 58f7e25e-38cd-4511-9015-fe6497a8366f
     position: {x: 465, y: 176}
   - narrativeObjectGuid: 5c6b3977-26df-4e11-a900-2d52b88878c7
-    position: {x: 792, y: 176}
+    position: {x: 791, y: 176}
   - narrativeObjectGuid: 728eeafd-4ccd-4fcf-a56f-72e3676bc3f4
     position: {x: 1088, y: 176}
   - narrativeObjectGuid: 8f8ebc9d-7ea7-4438-9aff-8da513d26762
@@ -44,7 +44,7 @@ MonoBehaviour:
   - narrativeObjectGuid: 987d59ef-3147-4239-8db7-c7623ceb119b
     position: {x: 809, y: 20}
   - narrativeObjectGuid: 02139cb5-d6c6-4d11-a399-c7a87e7cdb77
-    position: {x: 809, y: 168}
+    position: {x: 809, y: 167}
   - narrativeObjectGuid: 51c85242-67c8-4b37-8223-0d0cf340054b
     position: {x: 809, y: 316}
   viewContainerStates:

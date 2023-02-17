@@ -281,6 +281,7 @@ namespace CuttingRoom.Editor
             {
                 Undo.RecordObject(NarrativeObject.gameObject, $"Set Narrative Object Name {(newValue)}");
                 NarrativeObject.gameObject.name = newValue;
+                NarrativeObject.OnValidate();
             });
 
             editorRows.Add(nameTextFieldRow);

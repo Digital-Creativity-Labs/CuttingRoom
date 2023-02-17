@@ -487,6 +487,14 @@ namespace CuttingRoom.Editor
         }
 
         /// <summary>
+        /// Invoked whenever the values of a narrative object change.
+        /// </summary>
+        private void OnNarrativeObjectChanged()
+        {
+            RegenerateContents(true);
+        }
+
+        /// <summary>
         /// Invoked whenever the outputs of a narrative object change.
         /// </summary>
         private void OnNarrativeObjectOutputCandidatesChanged()
@@ -530,6 +538,9 @@ namespace CuttingRoom.Editor
             {
                 // Ensure variable store is initialised
                 narrativeObject.InitialiseVariableStore();
+
+                narrativeObject.OnChanged -= OnNarrativeObjectChanged;
+                narrativeObject.OnChanged += OnNarrativeObjectChanged;
 
                 if (narrativeObject.OutputSelectionDecisionPoint != null)
                 {

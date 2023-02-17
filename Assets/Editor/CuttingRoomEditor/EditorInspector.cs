@@ -105,7 +105,7 @@ namespace CuttingRoom.Editor
                 (variableType) =>
                 {
                     Undo.RecordObject(narrativeSpace.GlobalVariableStore, $"Add Variable {variableType}");
-                    AddVariable(narrativeSpace.GlobalVariableStore, variableType);
+                    AddVariable(narrativeSpace.GlobalVariableStore, variableType, Variable.VariableCategory.UserDefined);
                 },
                 (variable) =>
                 {
@@ -176,7 +176,7 @@ namespace CuttingRoom.Editor
                 (variableType) =>
                 {
                     Undo.RecordObject(narrativeObjectNode.NarrativeObject.VariableStore, $"Add Variable {variableType}");
-                    AddVariable(narrativeObjectNode.NarrativeObject.VariableStore, variableType);
+                    AddVariable(narrativeObjectNode.NarrativeObject.VariableStore, variableType, Variable.VariableCategory.SystemDefined);
                 },
                 (variable) =>
                 {
@@ -197,7 +197,7 @@ namespace CuttingRoom.Editor
                 (variableType) =>
                 {
                     Undo.RecordObject(narrativeObjectNode.NarrativeObject.VariableStore, $"Add Variable {variableType}");
-                    AddVariable(narrativeObjectNode.NarrativeObject.VariableStore, variableType);
+                    AddVariable(narrativeObjectNode.NarrativeObject.VariableStore, variableType, Variable.VariableCategory.UserDefined);
                 },
                 (variable) =>
                 {
@@ -298,11 +298,11 @@ namespace CuttingRoom.Editor
         /// </summary>
         /// <param name="variableStore"></param>
         /// <param name="variableType"></param>
-        private void AddVariable(VariableStore variableStore, VariableFactory.VariableType variableType)
+        private void AddVariable(VariableStore variableStore, VariableFactory.VariableType variableType, Variable.VariableCategory variableCategory)
         {
             if (variableStore != null)
             {
-                Variable variable = VariableFactory.AddVariableToVariableStore(variableStore, variableType);
+                Variable variable = VariableFactory.AddVariableToVariableStore(variableStore, variableType, variableCategory);
                 if (variable != null)
                 {
                     OnNarrativeObjectAddedVariable?.Invoke();
@@ -317,13 +317,13 @@ namespace CuttingRoom.Editor
         /// <param name="variable"></param>
         private void RemoveVariable(VariableStore variableStore, Variable variable)
         {
-            if (variableStore != null && variableStore.variableList.Contains(variable))
+            if (variableStore != null && variableStore.Variables.ContainsKey(variable.Name))
             {
+                Variable variableToRemove = variableStore.Variables[variable.Name];
                 Undo.RecordObject(variableStore, "Remove variable");
-                variableStore.RemoveVariable(variable);
+                variableStore.RemoveVariable(variableToRemove);
 
-
-                UnityEngine.Object.DestroyImmediate(variable);
+                UnityEngine.Object.DestroyImmediate(variableToRemove);
 
                 OnNarrativeObjectRemovedVariable?.Invoke();
             }

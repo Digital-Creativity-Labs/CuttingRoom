@@ -53,7 +53,7 @@ namespace CuttingRoom.VariableSystem
             {
                 Variable[] variables = GetComponents<Variable>();
 
-                for (int i = 0; i < variables.Length; i++)
+                for (int i = 0; i < variables.Length; ++i)
                 {
                     if (!variableList.Contains(variables[i]))
                     {
@@ -64,12 +64,17 @@ namespace CuttingRoom.VariableSystem
 
             variables = new Dictionary<string, Variable>();
             // Generate a dictionary for quick look up of variables.
-            for (int count = 0; count < variableList.Count; count++)
+            for (int count = 0; count < variableList.Count; ++count)
             {
 				Variable variable = variableList[count];
                 // Check that the entry in the variable list exists.
-                // There can be null entries due to human error/use.
-                if (variable != null && !string.IsNullOrEmpty(variable.Name))
+				if (variable == null)
+				{
+					// There can be null entries due to human error/use. Remove them if they exist.
+					variableList.RemoveAt(count);
+					--count;
+				}
+                else if (!string.IsNullOrEmpty(variable.Name))
                 {
                     variables[variable.Name] = variable;
                 }
@@ -108,18 +113,13 @@ namespace CuttingRoom.VariableSystem
 
         public Variable GetOrAddVariable<T>(string variableName, Variable.VariableCategory variableCategory, object value = null) where T : Variable
         {
-			Variable variable = gameObject.GetComponents<T>().FirstOrDefault((v) =>
+			if (variables.ContainsKey(variableName))
 			{
-				return v.Name.Equals(variableName);
-			});
-
-			if (variable != null)
-			{
-				return variable;
+				return variables[variableName];
 			}
 			else
 			{
-				variable = gameObject.AddComponent<T>();
+				Variable variable = gameObject.AddComponent<T>();
 				variable.variableCategory = variableCategory;
 				if (variable != null)
 				{
@@ -162,19 +162,16 @@ namespace CuttingRoom.VariableSystem
 
         public void RemoveVariable(Variable variable)
         {
-            if (string.IsNullOrEmpty(variable.Name))
-            {
-                throw new InvalidVariableException("Variables must have a VariableName assigned to them.");
-            }
+			if (string.IsNullOrEmpty(variable.Name))
+			{
+				throw new InvalidVariableException("Variables must have a VariableName assigned to them.");
+			}
 
-            if (!variableList.Contains(variable))
+            if (variables.ContainsKey(variable.Name))
             {
-                variableList.Remove(variable);
-            }
-
-            if (!variables.ContainsKey(variable.Name))
-            {
+				Variable variableToRemove = variables[variable.Name];
                 variables.Remove(variable.Name);
+				variableList.Remove(variableToRemove);
             }
         }
 

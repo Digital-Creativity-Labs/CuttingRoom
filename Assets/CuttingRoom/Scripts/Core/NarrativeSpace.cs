@@ -39,15 +39,43 @@ namespace CuttingRoom
         /// </summary>
         public VariableStore GlobalVariableStore { get { return globalVariableStore; } set { globalVariableStore = value; } }
 
+        public void Awake()
+        {
+            globalVariableStore = GetComponent<VariableStore>();
+#if UNITY_EDITOR
+            InitialiseVariableStore();
+#endif
+        }
+
 #if UNITY_EDITOR
         public void Reset()
         {
-            BoolVariable trueVariable = VariableFactory.AddVariableToVariableStore(globalVariableStore, VariableFactory.VariableType.Bool, Variable.VariableCategory.SystemDefined) as BoolVariable;
-            trueVariable.Name = "true";
-            trueVariable.SetValue(true);
-            BoolVariable falseVariable = VariableFactory.AddVariableToVariableStore(globalVariableStore, VariableFactory.VariableType.Bool, Variable.VariableCategory.SystemDefined) as BoolVariable;
-            falseVariable.Name = "false";
-            falseVariable.SetValue(false);
+            if (globalVariableStore == null)
+            {
+                // Set reference to variable store.
+                globalVariableStore = GetComponent<VariableStore>();
+            }
+            InitialiseVariableStore();
+        }
+
+        public void InitialiseVariableStore()
+        {
+            if (globalVariableStore == null)
+            {
+                globalVariableStore = GetComponent<VariableStore>();
+            }
+            if (!globalVariableStore.Variables.ContainsKey("true"))
+            {
+                BoolVariable trueVariable = VariableFactory.AddVariableToVariableStore(globalVariableStore, VariableFactory.VariableType.Bool, Variable.VariableCategory.SystemDefined) as BoolVariable;
+                trueVariable.Name = "true";
+                trueVariable.SetValue(true);
+            }
+            if (!globalVariableStore.Variables.ContainsKey("false"))
+            {
+                BoolVariable falseVariable = VariableFactory.AddVariableToVariableStore(globalVariableStore, VariableFactory.VariableType.Bool, Variable.VariableCategory.SystemDefined) as BoolVariable;
+                falseVariable.Name = "false";
+                falseVariable.SetValue(false);
+            }
         }
 
         public event Action OnChanged;
