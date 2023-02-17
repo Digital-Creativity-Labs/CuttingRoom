@@ -115,12 +115,6 @@ namespace CuttingRoom
         /// </summary>
         public virtual void PostProcess()
         {
-            if (VariableStore != null)
-            {
-                BoolVariable hasPlayed = VariableStore.GetVariable(hasPlayedTagName) as BoolVariable;
-                hasPlayed.Set(true);
-            }
-
             foreach (var trigger in endTriggers)
             {
                 if (trigger != null)
