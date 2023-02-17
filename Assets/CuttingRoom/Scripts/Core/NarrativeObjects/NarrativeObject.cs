@@ -14,6 +14,7 @@ using CuttingRoom.Editor;
 namespace CuttingRoom
 {
     [RequireComponent(typeof(OutputSelectionDecisionPoint), typeof(VariableStore))]
+    [ExecuteInEditMode]
     public class NarrativeObject : MonoBehaviour
     {
         public static string hasPlayedTagName = "hasPlayed";
@@ -64,16 +65,12 @@ namespace CuttingRoom
         /// </summary>
         public List<Constraint> constraints = new List<Constraint>();
 
+#if UNITY_EDITOR
         public void Awake()
         {
-            VariableStore = GetComponent<VariableStore>();
-#if UNITY_EDITOR
             InitialiseVariableStore();
-#endif
         }
 
-
-#if UNITY_EDITOR
         public void Reset()
         {
             ProcessingEndTrigger defaultEndOfContentTrigger = ProcessingEndTriggerFactory.AddProcessingTriggerToNarrativeObject(this, ProcessingEndTriggerFactory.TriggerType.EndOfContent);
@@ -88,10 +85,36 @@ namespace CuttingRoom
             }
             if (!VariableStore.Variables.ContainsKey(hasPlayedTagName))
             {
-                BoolVariable hasPlayedVariable = VariableStore.GetOrAddVariable<BoolVariable>(hasPlayedTagName, Variable.VariableCategory.SystemDefined) as BoolVariable;
-                hasPlayedVariable.Name = hasPlayedTagName;
-                hasPlayedVariable.SetValue(false);
+                BoolVariable falseVariable = VariableStore.GetOrAddVariable<BoolVariable>(hasPlayedTagName, Variable.VariableCategory.SystemDefined, false) as BoolVariable;
+                VariableStore.RefreshDictionary();
             }
+        }
+
+        public virtual void OnValidate()
+        {
+            if (EndTriggers != null)
+            {
+                foreach (var endTrigger in EndTriggers)
+                {
+                    if (endTrigger != null)
+                    {
+                        endTrigger.OnChanged -= OnChanged;
+                        endTrigger.OnChanged += OnChanged;
+                    }
+                }
+            }
+            if (VariableStore != null)
+            {
+                foreach (var variable in VariableStore.variableList)
+                {
+                    if (variable != null)
+                    {
+                        variable.OnVariableSet -= OnVariableChange;
+                        variable.OnVariableSet += OnVariableChange;
+                    }
+                }
+            }
+            OnChanged?.Invoke();
         }
 
 #endif
@@ -128,33 +151,6 @@ namespace CuttingRoom
         public event Action OnChanged;
 
         protected Action OnChangedInternal { get { return OnChanged; } }
-
-        public virtual void OnValidate()
-        {
-            if (EndTriggers != null)
-            {
-                foreach (var endTrigger in EndTriggers)
-                {
-                    if (endTrigger != null)
-                    {
-                        endTrigger.OnChanged -= OnChanged;
-                        endTrigger.OnChanged += OnChanged;
-                    }
-                }
-            }
-            if (VariableStore != null)
-            {
-                foreach (var variable in VariableStore.variableList)
-                {
-                    if (variable != null)
-                    {
-                        variable.OnVariableSet -= OnVariableChange;
-                        variable.OnVariableSet += OnVariableChange;
-                    }
-                }
-            }
-            OnChanged?.Invoke();
-        }
 
         private void OnVariableChange(Variable variable)
         {

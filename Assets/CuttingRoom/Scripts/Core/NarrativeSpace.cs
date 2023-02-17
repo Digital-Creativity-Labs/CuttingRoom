@@ -8,6 +8,7 @@ using System;
 namespace CuttingRoom
 {
     [RequireComponent(typeof(VariableStore))]
+    [ExecuteInEditMode]
     public class NarrativeSpace : MonoBehaviour
     {
         /// <summary>
@@ -39,22 +40,9 @@ namespace CuttingRoom
         /// </summary>
         public VariableStore GlobalVariableStore { get { return globalVariableStore; } set { globalVariableStore = value; } }
 
+#if UNITY_EDITOR
         public void Awake()
         {
-            globalVariableStore = GetComponent<VariableStore>();
-#if UNITY_EDITOR
-            InitialiseVariableStore();
-#endif
-        }
-
-#if UNITY_EDITOR
-        public void Reset()
-        {
-            if (globalVariableStore == null)
-            {
-                // Set reference to variable store.
-                globalVariableStore = GetComponent<VariableStore>();
-            }
             InitialiseVariableStore();
         }
 
@@ -63,6 +51,16 @@ namespace CuttingRoom
             if (globalVariableStore == null)
             {
                 globalVariableStore = GetComponent<VariableStore>();
+            }
+            if (!globalVariableStore.Variables.ContainsKey("true"))
+            {
+                BoolVariable trueVariable = globalVariableStore.GetOrAddVariable<BoolVariable>("TRUE", Variable.VariableCategory.SystemDefined, true) as BoolVariable;
+                globalVariableStore.RefreshDictionary();
+            }
+            if (!globalVariableStore.Variables.ContainsKey("false"))
+            {
+                BoolVariable falseVariable = globalVariableStore.GetOrAddVariable<BoolVariable>("FALSE", Variable.VariableCategory.SystemDefined, false) as BoolVariable;
+                globalVariableStore.RefreshDictionary();
             }
         }
 

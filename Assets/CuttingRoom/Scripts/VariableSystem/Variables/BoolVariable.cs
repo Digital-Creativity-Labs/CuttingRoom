@@ -28,6 +28,10 @@ namespace CuttingRoom.VariableSystem.Variables
 		{
 			this.value = value;
 
+#if UNITY_EDITOR
+			defaultValue = value;
+#endif
+
 			RegisterVariableSet();
 		}
 

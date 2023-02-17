@@ -22,7 +22,11 @@ namespace CuttingRoom.VariableSystem.Variables
 		{
 			value = newValue;
 
-			RegisterVariableSet();
+#if UNITY_EDITOR
+            defaultValue = value;
+#endif
+
+            RegisterVariableSet();
         }
         public override void SetValue(object newValue)
         {

@@ -24,7 +24,7 @@ MonoBehaviour:
   - narrativeObjectGuid: a5ed8bd6-36b7-4ccc-9814-6a5caa9bcff0
     position: {x: 905, y: 398}
   - narrativeObjectGuid: e16efe50-3b94-40fd-9f93-fb25e0f2f4b5
-    position: {x: 455, y: 184}
+    position: {x: 456, y: 184}
   - narrativeObjectGuid: 58f7e25e-38cd-4511-9015-fe6497a8366f
     position: {x: 465, y: 176}
   - narrativeObjectGuid: 5c6b3977-26df-4e11-a900-2d52b88878c7
@@ -50,6 +50,9 @@ MonoBehaviour:
   viewContainerStates:
   - narrativeObjectGuid: 0
     narrativeObjectNodeGuids:
+    - b490e06d-c3d3-4e29-bf1b-1d38e551cc7b
+    - abcd84de-e790-4372-8d20-f4d328211c0b
+    - df25f675-2b54-46d5-ad12-aed5745fe27c
     - 06b5b2ab-b71b-4009-b450-3dc6870491ce
     - c91fec49-478e-4276-a06b-4c65af7db260
     - f1395552-c098-40f5-9656-a21a5f14c71e
