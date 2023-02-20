@@ -68,20 +68,25 @@ namespace CuttingRoom
 #if UNITY_EDITOR
         public void Awake()
         {
-            InitialiseVariableStore();
+            InitialiseVariableStore(forceRefresh: true);
         }
 
         public void Reset()
         {
             ProcessingEndTrigger defaultEndOfContentTrigger = ProcessingEndTriggerFactory.AddProcessingTriggerToNarrativeObject(this, ProcessingEndTriggerFactory.TriggerType.EndOfContent);
-            InitialiseVariableStore();
+            InitialiseVariableStore(forceRefresh: true);
         }
 
-        public void InitialiseVariableStore()
+        public void InitialiseVariableStore(bool forceRefresh = false)
         {
             if (VariableStore == null)
             {
                 VariableStore = GetComponent<VariableStore>();
+                VariableStore.RefreshDictionary();
+            }
+            else if (forceRefresh)
+            {
+                VariableStore.RefreshDictionary();
             }
             if (!VariableStore.Variables.ContainsKey(hasPlayedTagName))
             {
