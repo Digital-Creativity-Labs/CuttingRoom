@@ -40,9 +40,11 @@ namespace CuttingRoom
 
         private Queue<SequencedNarrativeObject> narrativeObjectSequenceQueue = new Queue<SequencedNarrativeObject>();
 
-        public NarrativeObject CurrentNarrativeObject = null;
+        public NarrativeObject CurrentNarrativeObjectForSequence { get; private set; } = null;
 
-        public List<NarrativeObject> SequenceHistory = new();
+        static public NarrativeObject CurrentNarrativeObject { get; private set; } = null;
+
+        static public List<NarrativeObject> SequenceHistory { get; private set; } = new();
 
         public bool SequenceComplete { get; private set; } = false;
 
@@ -98,10 +100,19 @@ namespace CuttingRoom
 
             while (narrativeObjectSequenceQueue.Count > 0)
             {
+#if UNITY_EDITOR
+                string history = "";
+                foreach (var narrativeObject in SequenceHistory)
+                {
+                    history = $"{history}{narrativeObject.name} -> ";
+                }
+                Debug.Log(history);
+#endif
                 SequencedNarrativeObject sequencedNarrativeObject = narrativeObjectSequenceQueue.Dequeue();
                 CurrentNarrativeObject = sequencedNarrativeObject.narrativeObject;
+                CurrentNarrativeObjectForSequence = sequencedNarrativeObject.narrativeObject;
+                SequenceHistory.Add(CurrentNarrativeObjectForSequence);
                 yield return ProcessNarrativeObject(sequencedNarrativeObject.narrativeObject, sequencedNarrativeObject.cancellationToken);
-                SequenceHistory.Add(CurrentNarrativeObject);
             }
 
             SequenceComplete = true;
