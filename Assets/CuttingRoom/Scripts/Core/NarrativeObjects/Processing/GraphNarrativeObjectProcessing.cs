@@ -21,6 +21,8 @@ namespace CuttingRoom
         /// </summary>
         private Sequencer sequencer = null;
 
+        private Sequencer subSequencer = null;
+
         /// <summary>
         /// Ctor.
         /// </summary>
@@ -45,8 +47,9 @@ namespace CuttingRoom
             GraphNarrativeObject.PreProcess();
 
             // Process from the defined root.
-            Sequencer subSequencer = new(GraphNarrativeObject.rootNarrativeObject);
-            //contentCoroutine = subSequencer.Start(graphCancellationToken.Token);            
+            subSequencer = new(GraphNarrativeObject.rootNarrativeObject);
+            subSequencer.Start(graphCancellationToken.Token);
+            contentCoroutine = GraphNarrativeObject.StartCoroutine(subSequencer.WaitForSequenceComplete());
 
             // Process the base functionality, output selection.
             yield return base.Process(sequencer, cancellationToken);

@@ -123,12 +123,12 @@ namespace CuttingRoom.Editor
             if (contentType == MediaController.ContentTypeEnum.Video)
             {
                 // Find the sequencer.
-                Sequencer sequencer = UnityEngine.Object.FindObjectOfType<NarrativeSpace>().Sequencer;
+                NarrativeSpace narrativeSpace = UnityEngine.Object.FindObjectOfType<NarrativeSpace>();
 
                 VideoController videoController = AtomicNarrativeObject.MediaController as VideoController;
                 if (videoController != null)
                 {
-                    if (sequencer != null && (sequencer.NarrativeSpace.UnlockAdvancedFeatures || videoController.sourceLocation != VideoController.SourceLocation.VideoClip))
+                    if (narrativeSpace != null && (narrativeSpace.UnlockAdvancedFeatures || videoController.sourceLocation != VideoController.SourceLocation.VideoClip))
                     {
                         // Set video source type
                         VisualElement videoSourcePicker = UIElementsUtils.CreateEnumFieldRow("Video Source Type", videoController.sourceLocation, (newValue) =>
@@ -241,10 +241,10 @@ namespace CuttingRoom.Editor
                     VariableSetter variableSetter = buttonController.variableSetter;
                     VariableStore targetVariableStore = null;
 
-                    // Find the sequencer.
-                    Sequencer sequencer = UnityEngine.Object.FindObjectOfType<NarrativeSpace>().Sequencer;
+                    // Find the narrative space.
+                    NarrativeSpace narrativeSpace = UnityEngine.Object.FindObjectOfType<NarrativeSpace>();
 
-                    if (sequencer != null && sequencer.NarrativeSpace != null && !sequencer.NarrativeSpace.UnlockAdvancedFeatures)
+                    if (narrativeSpace != null && !narrativeSpace.UnlockAdvancedFeatures)
                     {
                         // Force only global variable without advance feature unlock
                         variableSetter.variableStoreLocation = VariableStoreLocation.Global;
@@ -254,9 +254,9 @@ namespace CuttingRoom.Editor
                     switch (variableSetter.variableStoreLocation)
                     {
                         case VariableStoreLocation.Global:
-                            if (sequencer != null && sequencer.NarrativeSpace != null)
+                            if (narrativeSpace != null)
                             {
-                                targetVariableStore = sequencer.NarrativeSpace.GlobalVariableStore;
+                                targetVariableStore = narrativeSpace.GlobalVariableStore;
                             }
                             break;
 
@@ -268,7 +268,7 @@ namespace CuttingRoom.Editor
                             break;
                     }
 
-                    if (sequencer != null && sequencer.NarrativeSpace != null && sequencer.NarrativeSpace.UnlockAdvancedFeatures)
+                    if (narrativeSpace != null && narrativeSpace.UnlockAdvancedFeatures)
                     {
                         // Variable Location
                         VisualElement variableStoreLocationEnumField = UIElementsUtils.CreateEnumFieldRow("Button Variable Location", variableSetter.variableStoreLocation, (newValue) =>

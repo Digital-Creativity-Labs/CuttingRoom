@@ -22,6 +22,8 @@ namespace CuttingRoom
         /// </summary>
         private Sequencer sequencer = null;
 
+        private Sequencer subSequencer = null;
+
         private List<Coroutine> secondaryLayerCoroutines = new List<Coroutine>();
 
         /// <summary>
@@ -86,8 +88,9 @@ namespace CuttingRoom
                 {
                     if (layerRoot == LayerNarrativeObject.primaryLayerRootNarrativeObject)
                     {
-                        Sequencer subSequencer = new(layerRoot);
-                        //contentCoroutine = subSequencer.Start(layerCancellationToken.Token);
+                        subSequencer = new(layerRoot);
+                        subSequencer.Start(layerCancellationToken.Token);
+                        contentCoroutine = LayerNarrativeObject.StartCoroutine(subSequencer.WaitForSequenceComplete());
                     }
                     else
                     {

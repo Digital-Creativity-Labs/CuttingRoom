@@ -40,7 +40,9 @@ namespace CuttingRoom
 
         private Queue<SequencedNarrativeObject> narrativeObjectSequenceQueue = new Queue<SequencedNarrativeObject>();
 
+        public NarrativeObject CurrentNarrativeObject = null;
 
+        public List<NarrativeObject> SequenceHistory = new();
 
         public bool SequenceComplete { get; private set; } = false;
 
@@ -64,7 +66,6 @@ namespace CuttingRoom
         /// </summary>
         public void Start(CancellationToken? cancellationToken = null)
         {
-            narrativeSpace = Object.FindObjectOfType<NarrativeSpace>();
             if (autoStartProcessing)
             {
                 if (NarrativeSpace != null && rootNarrativeObject != null)
@@ -72,7 +73,11 @@ namespace CuttingRoom
                     sequenceCoroutine = NarrativeSpace.StartCoroutine(ProcessingCoroutine(cancellationToken));
                 }
             }
-            SequenceComplete = true;
+        }
+
+        public IEnumerator WaitForSequenceStart()
+        {
+            yield return new WaitUntil(() => { return sequenceCoroutine != null; });
         }
 
         public IEnumerator WaitForSequenceComplete()
@@ -89,13 +94,17 @@ namespace CuttingRoom
         /// <returns></returns>
         private IEnumerator ProcessingCoroutine(CancellationToken? cancellationToken = null)
         {
-            SequenceNarrativeObject(narrativeSpace.RootNarrativeObject, cancellationToken);
+            SequenceNarrativeObject(rootNarrativeObject, cancellationToken);
 
             while (narrativeObjectSequenceQueue.Count > 0)
             {
                 SequencedNarrativeObject sequencedNarrativeObject = narrativeObjectSequenceQueue.Dequeue();
+                CurrentNarrativeObject = sequencedNarrativeObject.narrativeObject;
                 yield return ProcessNarrativeObject(sequencedNarrativeObject.narrativeObject, sequencedNarrativeObject.cancellationToken);
+                SequenceHistory.Add(CurrentNarrativeObject);
             }
+
+            SequenceComplete = true;
         }
 
         /// <summary>
