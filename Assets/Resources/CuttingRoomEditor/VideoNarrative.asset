@@ -50,6 +50,8 @@ MonoBehaviour:
   viewContainerStates:
   - narrativeObjectGuid: 0
     narrativeObjectNodeGuids:
+    - 6a2495cb-d16f-4950-b6a1-a3044532eeb8
+    - 44effc51-e3ce-4cfe-928d-da3d82bfed4f
     - 06b5b2ab-b71b-4009-b450-3dc6870491ce
     - c91fec49-478e-4276-a06b-4c65af7db260
     - f1395552-c098-40f5-9656-a21a5f14c71e
@@ -75,5 +77,13 @@ MonoBehaviour:
     - 987d59ef-3147-4239-8db7-c7623ceb119b
     - 02139cb5-d6c6-4d11-a399-c7a87e7cdb77
     - 51c85242-67c8-4b37-8223-0d0cf340054b
+  - narrativeObjectGuid: ea19580d-cf21-4388-9dc4-c2f871889a86
+    narrativeObjectNodeGuids:
+    - 58b54b3e-9c11-4fa8-9f64-63bb17a9f44b
+    - fd7e95b0-7cb5-4d52-8b2e-b0c9f96f77ec
+  - narrativeObjectGuid: c21edd03-764e-468c-88d6-570f5e24372a
+    narrativeObjectNodeGuids:
+    - 2012dce6-2632-49af-9391-215550a4ffe8
+    - 022aa23b-4f5f-4129-808b-e5a836b59ceb
   viewContainerStackGuids:
   - 0
