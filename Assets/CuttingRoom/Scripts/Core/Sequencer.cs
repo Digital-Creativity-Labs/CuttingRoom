@@ -77,11 +77,6 @@ namespace CuttingRoom
             }
         }
 
-        public IEnumerator WaitForSequenceStart()
-        {
-            yield return new WaitUntil(() => { return sequenceCoroutine != null; });
-        }
-
         public IEnumerator WaitForSequenceComplete()
         {
             if (sequenceCoroutine != null)
