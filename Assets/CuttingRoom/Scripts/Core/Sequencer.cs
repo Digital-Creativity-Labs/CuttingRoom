@@ -53,6 +53,11 @@ namespace CuttingRoom
         private Queue<SequencedNarrativeObject> narrativeObjectSequenceQueue = new Queue<SequencedNarrativeObject>();
 
         /// <summary>
+        /// List of narrative objects that are running as a sub sequence. These run in parallel.
+        /// </summary>
+        private List<SequencedNarrativeObject> subSequenceNarrativeObjects = new List<SequencedNarrativeObject>();
+
+        /// <summary>
         /// Reference to latest processing Narrative Object for this sequence.
         /// </summary>
         public NarrativeObject CurrentNarrativeObjectForSequence { get; private set; } = null;
@@ -153,6 +158,9 @@ namespace CuttingRoom
 #endif
                 SequencedNarrativeObject sequencedNarrativeObject = narrativeObjectSequenceQueue.Dequeue();
                 yield return ProcessNarrativeObject(sequencedNarrativeObject.narrativeObject, sequencedNarrativeObject.cancellationToken);
+
+                // Once complete clear the sub sequence
+                subSequenceNarrativeObjects.Clear();
             }
 
             SequenceComplete = true;
@@ -170,6 +178,23 @@ namespace CuttingRoom
             {
                 narrativeObjectSequenceQueue.Enqueue(new SequencedNarrativeObject(narrativeObject, cancellationToken));
             }
+        }
+
+        /// <summary>
+        /// Sequence a narrative object to be processed in parrallel to current sequence.
+        /// </summary>
+        /// <param name="narrativeObject"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public Coroutine SubSequenceNarrativeObject(NarrativeObject narrativeObject, CancellationToken? cancellationToken = null)
+        {
+            var subSequenceNarrativeObjectCoroutine = ProcessNarrativeObject(narrativeObject, cancellationToken);
+            if (subSequenceNarrativeObjectCoroutine != null)
+            {
+                subSequenceNarrativeObjects.Add(new SequencedNarrativeObject(narrativeObject, cancellationToken));
+            }
+
+            return subSequenceNarrativeObjectCoroutine;
         }
 
         /// <summary>
