@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
+using static CuttingRoom.Sequencer;
 
 namespace CuttingRoom
 {
@@ -26,6 +27,9 @@ namespace CuttingRoom
 
         private Coroutine sequenceCoroutine = null;
 
+        /// <summary>
+        /// Class to pair Narrative Object with cancellation token.
+        /// </summary>
         public class SequencedNarrativeObject
         {
             public NarrativeObject narrativeObject = null;
@@ -38,16 +42,53 @@ namespace CuttingRoom
             }
         }
 
-        private Queue<SequencedNarrativeObject> narrativeObjectSequenceQueue = new Queue<SequencedNarrativeObject>();
-
-        public NarrativeObject CurrentNarrativeObjectForSequence { get; private set; } = null;
-
-        static public NarrativeObject CurrentNarrativeObject { get; private set; } = null;
-
-        static public List<NarrativeObject> SequenceHistory { get; private set; } = new();
-
+        /// <summary>
+        /// Boolean flag indicating if the sequence is complete.
+        /// </summary>
         public bool SequenceComplete { get; private set; } = false;
 
+        /// <summary>
+        /// Narrative object queue for processing.
+        /// </summary>
+        private Queue<SequencedNarrativeObject> narrativeObjectSequenceQueue = new Queue<SequencedNarrativeObject>();
+
+        /// <summary>
+        /// Reference to latest processing Narrative Object for this sequence.
+        /// </summary>
+        public NarrativeObject CurrentNarrativeObjectForSequence { get; private set; } = null;
+
+        /// <summary>
+        /// Static reference to latest processing Narrative Object.
+        /// </summary>
+        static public NarrativeObject CurrentNarrativeObject { get; private set; } = null;
+
+        /// <summary>
+        /// Static sequence history. Updated by all sequences/ sub sequences.
+        /// </summary>
+        static public List<NarrativeObject> SequenceHistory { get; private set; } = new();
+
+        /// <summary>
+        /// Safely record Narrative Object to history.
+        /// </summary>
+        /// <param name="narrativeObject"></param>
+        static public void RecordToHistory(NarrativeObject narrativeObject)
+        {
+            if (narrativeObject != null)
+            {
+                lock (SequenceHistory)
+                {
+                    CurrentNarrativeObject = narrativeObject;
+                    SequenceHistory.Add(narrativeObject);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Constructor for sequencer.
+        /// </summary>
+        /// <param name="rootNarrativeObject"></param>
+        /// <param name="narrativeSpace"></param>
+        /// <param name="autoStartProcessing"></param>
         public Sequencer(NarrativeObject rootNarrativeObject, NarrativeSpace narrativeSpace = null, bool autoStartProcessing = true)
         {
             this.rootNarrativeObject = rootNarrativeObject;
@@ -66,6 +107,7 @@ namespace CuttingRoom
         /// <summary>
         /// Start Function.
         /// </summary>
+        /// <param name="cancellationToken"></param>
         public void Start(CancellationToken? cancellationToken = null)
         {
             if (autoStartProcessing)
@@ -77,6 +119,10 @@ namespace CuttingRoom
             }
         }
 
+        /// <summary>
+        /// Coroutine for waiting for sequence to complete.
+        /// </summary>
+        /// <returns></returns>
         public IEnumerator WaitForSequenceComplete()
         {
             if (sequenceCoroutine != null)
@@ -86,8 +132,9 @@ namespace CuttingRoom
         }
 
         /// <summary>
-        /// Coroutine for processing narrative objects.
+        /// Coroutine for processing sequence.
         /// </summary>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         private IEnumerator ProcessingCoroutine(CancellationToken? cancellationToken = null)
         {
@@ -96,6 +143,7 @@ namespace CuttingRoom
             while (narrativeObjectSequenceQueue.Count > 0)
             {
 #if UNITY_EDITOR
+                // Log sequence
                 string history = "";
                 foreach (var narrativeObject in SequenceHistory)
                 {
@@ -104,9 +152,6 @@ namespace CuttingRoom
                 Debug.Log(history);
 #endif
                 SequencedNarrativeObject sequencedNarrativeObject = narrativeObjectSequenceQueue.Dequeue();
-                CurrentNarrativeObject = sequencedNarrativeObject.narrativeObject;
-                CurrentNarrativeObjectForSequence = sequencedNarrativeObject.narrativeObject;
-                SequenceHistory.Add(CurrentNarrativeObjectForSequence);
                 yield return ProcessNarrativeObject(sequencedNarrativeObject.narrativeObject, sequencedNarrativeObject.cancellationToken);
             }
 
@@ -117,6 +162,7 @@ namespace CuttingRoom
         /// Sequence a narrative object to be processed.
         /// </summary>
         /// <param name="narrativeObject"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public void SequenceNarrativeObject(NarrativeObject narrativeObject, CancellationToken? cancellationToken = null)
         {
@@ -127,9 +173,10 @@ namespace CuttingRoom
         }
 
         /// <summary>
-        /// Start a narrative object to be processed.
+        /// Start coroutine to process narrative object.
         /// </summary>
         /// <param name="narrativeObject"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public Coroutine ProcessNarrativeObject(NarrativeObject narrativeObject, CancellationToken? cancellationToken = null)
         {
@@ -163,6 +210,11 @@ namespace CuttingRoom
 
                 coroutine = NarrativeSpace.StartCoroutine(SequencerLayerNarrativeObject(layerNarrativeObject, cancellationToken));
             }
+
+            // Record new item on sequence
+            CurrentNarrativeObjectForSequence = narrativeObject;
+            RecordToHistory(CurrentNarrativeObjectForSequence);
+
             return coroutine;
         }
 
@@ -170,6 +222,7 @@ namespace CuttingRoom
         /// Sequence an atomic for processing.
         /// </summary>
         /// <param name="atomicNarrativeObject"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         private IEnumerator SequenceAtomicNarrativeObject(AtomicNarrativeObject atomicNarrativeObject, CancellationToken? cancellationToken = null)
         {
@@ -182,6 +235,7 @@ namespace CuttingRoom
         /// Sequence a group for processing.
         /// </summary>
         /// <param name="groupNarrativeObject"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         private IEnumerator SequencerGroupNarrativeObject(GroupNarrativeObject groupNarrativeObject, CancellationToken? cancellationToken = null)
         {
@@ -194,6 +248,7 @@ namespace CuttingRoom
         /// Sequence a graph for processing.
         /// </summary>
         /// <param name="graphNarrativeObject"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         private IEnumerator SequencerGraphNarrativeObject(GraphNarrativeObject graphNarrativeObject, CancellationToken? cancellationToken = null)
         {
@@ -206,6 +261,7 @@ namespace CuttingRoom
         /// Sequence a layer for processing.
         /// </summary>
         /// <param name="layerNarrativeObject"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         private IEnumerator SequencerLayerNarrativeObject(LayerNarrativeObject layerNarrativeObject, CancellationToken? cancellationToken = null)
         {

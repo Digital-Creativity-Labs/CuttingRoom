@@ -77,6 +77,10 @@ namespace CuttingRoom
             InitialiseVariableStore(forceRefresh: true);
         }
 
+        /// <summary>
+        /// Ensure variable store is correctly initialised and contains required variables.
+        /// </summary>
+        /// <param name="forceRefresh"></param>
         public void InitialiseVariableStore(bool forceRefresh = false)
         {
             if (VariableStore == null)
@@ -90,11 +94,14 @@ namespace CuttingRoom
             }
             if (!VariableStore.Variables.ContainsKey(hasPlayedTagName))
             {
-                BoolVariable falseVariable = VariableStore.GetOrAddVariable<BoolVariable>(hasPlayedTagName, Variable.VariableCategory.SystemDefined, false) as BoolVariable;
+                BoolVariable hasPlayedVariable = VariableStore.GetOrAddVariable<BoolVariable>(hasPlayedTagName, Variable.VariableCategory.SystemDefined, false) as BoolVariable;
                 VariableStore.RefreshDictionary();
             }
         }
 
+        /// <summary>
+        /// Updates event handlers for all triggers and variables
+        /// </summary>
         public virtual void OnValidate()
         {
             if (EndTriggers != null)

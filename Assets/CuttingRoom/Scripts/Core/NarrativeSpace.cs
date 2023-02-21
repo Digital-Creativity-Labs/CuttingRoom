@@ -60,6 +60,9 @@ namespace CuttingRoom
             InitialiseVariableStore();
         }
 
+        /// <summary>
+        /// Ensure variable store is correctly initialised and contains required variables.
+        /// </summary>
         public void InitialiseVariableStore()
         {
             if (globalVariableStore == null)
@@ -80,6 +83,9 @@ namespace CuttingRoom
 
         public event Action OnChanged;
 
+        /// <summary>
+        /// Updates event handlers for all variables
+        /// </summary>
         public virtual void OnValidate()
         {
             if (globalVariableStore != null)
