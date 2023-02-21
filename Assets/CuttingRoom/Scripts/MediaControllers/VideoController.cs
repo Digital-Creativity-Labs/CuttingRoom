@@ -168,6 +168,10 @@ namespace CuttingRoom
         /// </summary>
         public override void Unload()
         {
+            if (videoPlayer == null)
+            {
+
+            }
             videoPlayer.Stop();
             StartCoroutine(ShutdownDelay());
         }

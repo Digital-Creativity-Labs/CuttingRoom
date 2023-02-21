@@ -4,6 +4,7 @@ using UnityEngine;
 using CuttingRoom.VariableSystem;
 using CuttingRoom.VariableSystem.Variables;
 using System;
+using UnityEditor;
 
 namespace CuttingRoom
 {
@@ -35,10 +36,23 @@ namespace CuttingRoom
         [SerializeField]
         private VariableStore globalVariableStore = null;
 
+        private Sequencer sequencer = null;
+
+        public Sequencer Sequencer { get => sequencer; }
+
         /// <summary>
         /// Get accessor for the global variable store.
         /// </summary>
         public VariableStore GlobalVariableStore { get { return globalVariableStore; } set { globalVariableStore = value; } }
+
+        public void Start()
+        {
+            if (Application.isPlaying || EditorApplication.isPlaying)
+            {
+                sequencer = new(rootNarrativeObject, this, true);
+                sequencer.Start();
+            }
+        }
 
 #if UNITY_EDITOR
         public void Awake()
@@ -46,6 +60,9 @@ namespace CuttingRoom
             InitialiseVariableStore();
         }
 
+        /// <summary>
+        /// Ensure variable store is correctly initialised and contains required variables.
+        /// </summary>
         public void InitialiseVariableStore()
         {
             if (globalVariableStore == null)
@@ -66,6 +83,9 @@ namespace CuttingRoom
 
         public event Action OnChanged;
 
+        /// <summary>
+        /// Updates event handlers for all variables
+        /// </summary>
         public virtual void OnValidate()
         {
             if (globalVariableStore != null)

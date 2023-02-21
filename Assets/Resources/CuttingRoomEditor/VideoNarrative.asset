@@ -34,7 +34,7 @@ MonoBehaviour:
   - narrativeObjectGuid: 8f8ebc9d-7ea7-4438-9aff-8da513d26762
     position: {x: 901, y: 305}
   - narrativeObjectGuid: e0e2011d-fbfd-4079-a002-cded5d4b6ba7
-    position: {x: 901, y: 127}
+    position: {x: 901, y: 125}
   - narrativeObjectGuid: 2537d322-9ddf-48f6-959b-f10393847a84
     position: {x: 826, y: -12}
   - narrativeObjectGuid: f8d958bf-99b0-4029-84af-b0fe51e51367
@@ -47,12 +47,27 @@ MonoBehaviour:
     position: {x: 809, y: 167}
   - narrativeObjectGuid: 51c85242-67c8-4b37-8223-0d0cf340054b
     position: {x: 809, y: 316}
+  - narrativeObjectGuid: c446a44a-c5f7-4993-8ea0-62729730df12
+    position: {x: 800, y: 491}
+  - narrativeObjectGuid: 94fa40ae-f1b3-40d0-bf5b-c041b329e12b
+    position: {x: 819, y: 326}
+  - narrativeObjectGuid: 7682bee6-3d33-4705-8ce5-6c86f23cd3d3
+    position: {x: 819, y: 326}
+  - narrativeObjectGuid: 8fd85a41-9f67-40c7-b54d-47e7bbed9187
+    position: {x: 208, y: 456}
+  - narrativeObjectGuid: 65ab60bd-b6e1-48d3-a2e0-76b1fb4ef852
+    position: {x: 283, y: 409}
+  - narrativeObjectGuid: 6fdf1960-ab9b-4152-8173-669a6a1733c2
+    position: {x: 675, y: 229}
+  - narrativeObjectGuid: e8c95535-8821-47d0-9021-ce23f91235e7
+    position: {x: 675, y: 393}
+  - narrativeObjectGuid: d1d60210-8110-4699-a4e6-37e004550951
+    position: {x: 523, y: 350}
+  - narrativeObjectGuid: 32018dca-2d98-4a44-bb99-17d244b2beef
+    position: {x: 479, y: 388}
   viewContainerStates:
   - narrativeObjectGuid: 0
     narrativeObjectNodeGuids:
-    - b490e06d-c3d3-4e29-bf1b-1d38e551cc7b
-    - abcd84de-e790-4372-8d20-f4d328211c0b
-    - df25f675-2b54-46d5-ad12-aed5745fe27c
     - 06b5b2ab-b71b-4009-b450-3dc6870491ce
     - c91fec49-478e-4276-a06b-4c65af7db260
     - f1395552-c098-40f5-9656-a21a5f14c71e
@@ -78,5 +93,17 @@ MonoBehaviour:
     - 987d59ef-3147-4239-8db7-c7623ceb119b
     - 02139cb5-d6c6-4d11-a399-c7a87e7cdb77
     - 51c85242-67c8-4b37-8223-0d0cf340054b
+  - narrativeObjectGuid: ea19580d-cf21-4388-9dc4-c2f871889a86
+    narrativeObjectNodeGuids:
+    - 58b54b3e-9c11-4fa8-9f64-63bb17a9f44b
+    - fd7e95b0-7cb5-4d52-8b2e-b0c9f96f77ec
+  - narrativeObjectGuid: c21edd03-764e-468c-88d6-570f5e24372a
+    narrativeObjectNodeGuids:
+    - 2012dce6-2632-49af-9391-215550a4ffe8
+    - 022aa23b-4f5f-4129-808b-e5a836b59ceb
+  - narrativeObjectGuid: c446a44a-c5f7-4993-8ea0-62729730df12
+    narrativeObjectNodeGuids:
+    - 6fdf1960-ab9b-4152-8173-669a6a1733c2
+    - e8c95535-8821-47d0-9021-ce23f91235e7
   viewContainerStackGuids:
   - 0

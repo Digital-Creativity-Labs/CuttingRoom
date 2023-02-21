@@ -381,9 +381,9 @@ namespace CuttingRoom.Editor
                             Variable targetVariable = null;
 
                             // Find the sequencer.
-                            Sequencer sequencer = UnityEngine.Object.FindObjectOfType<Sequencer>();
+                            NarrativeSpace narrativeSpace = UnityEngine.Object.FindObjectOfType<NarrativeSpace>();
 
-                            if (sequencer != null && sequencer.NarrativeSpace != null && !sequencer.NarrativeSpace.UnlockAdvancedFeatures)
+                            if (narrativeSpace != null && !narrativeSpace.UnlockAdvancedFeatures)
                             {
                                 // Force only global variable without advance feature unlock
                                 variableProcessingTrigger.VariableLocation = VariableStoreLocation.Global;
@@ -393,9 +393,9 @@ namespace CuttingRoom.Editor
                             switch (variableProcessingTrigger.VariableLocation)
                             {
                                 case VariableStoreLocation.Global:
-                                    if (sequencer != null && sequencer.NarrativeSpace != null)
+                                    if (narrativeSpace != null)
                                     {
-                                        targetVariableStore = sequencer.NarrativeSpace.GlobalVariableStore;
+                                        targetVariableStore = narrativeSpace.GlobalVariableStore;
                                     }
                                     break;
 
@@ -428,7 +428,7 @@ namespace CuttingRoom.Editor
                             processingTriggerRow.Add(variableTriggerRow);
 
                             // Variable Location
-                            if (sequencer != null && sequencer.NarrativeSpace != null && sequencer.NarrativeSpace.UnlockAdvancedFeatures)
+                            if (narrativeSpace != null && narrativeSpace.UnlockAdvancedFeatures)
                             {
                                 VisualElement variableLocationRow = UIElementsUtils.GetRowContainer();
                                 variableLocationRow.styleSheets.Add(StyleSheet);
@@ -660,9 +660,9 @@ namespace CuttingRoom.Editor
 
 
                 // Find the sequencer.
-                Sequencer sequencer = UnityEngine.Object.FindObjectOfType<Sequencer>();
+                NarrativeSpace narrativeSpace = UnityEngine.Object.FindObjectOfType<NarrativeSpace>();
 
-                if (sequencer != null && sequencer.NarrativeSpace != null && !sequencer.NarrativeSpace.UnlockAdvancedFeatures)
+                if (narrativeSpace != null && !narrativeSpace.UnlockAdvancedFeatures)
                 {
                     // Force only global variable without advance feature unlock
                     constraint.variableStoreLocation = VariableStoreLocation.Global;
@@ -676,9 +676,9 @@ namespace CuttingRoom.Editor
                     switch (constraint.variableStoreLocation)
                     {
                         case VariableStoreLocation.Global:
-                            if (sequencer != null && sequencer.NarrativeSpace != null)
+                            if (narrativeSpace != null)
                             {
-                                targetVariableStore = sequencer.NarrativeSpace.GlobalVariableStore;
+                                targetVariableStore = narrativeSpace.GlobalVariableStore;
                             }
                             break;
 
@@ -691,7 +691,7 @@ namespace CuttingRoom.Editor
                     }
                 }
 
-                if (sequencer != null && sequencer.NarrativeSpace != null && sequencer.NarrativeSpace.UnlockAdvancedFeatures)
+                if (narrativeSpace != null && narrativeSpace.UnlockAdvancedFeatures)
                 {
                     // Variable Location
                     VisualElement varLocationRow = UIElementsUtils.GetRowContainer();

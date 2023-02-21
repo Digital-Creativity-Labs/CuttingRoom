@@ -30,9 +30,9 @@ namespace CuttingRoom.VariableSystem.Constraints
 			}
 		}
 
-        public virtual bool Evaluate(Sequencer sequencer, NarrativeSpace narrativeSpace, NarrativeObject narrativeObject) { throw new NotImplementedException("Constraint must implement Evaluate() method."); }
+        public virtual bool Evaluate(NarrativeSpace narrativeSpace, NarrativeObject narrativeObject) { throw new NotImplementedException("Constraint must implement Evaluate() method."); }
 
-		protected bool Evaluate<T1, T2>(Sequencer sequencer, NarrativeSpace narrativeSpace, NarrativeObject narrativeObject, string methodName) where T1 : Constraint where T2 : Variable
+		protected bool Evaluate<T1, T2>(NarrativeSpace narrativeSpace, NarrativeObject narrativeObject, string methodName) where T1 : Constraint where T2 : Variable
 		{
 			bool resolves = false;
 
@@ -77,11 +77,7 @@ namespace CuttingRoom.VariableSystem.Constraints
 					{
 						Type parameterType = methodParameters[methodParameterCount].ParameterType;
 
-						if (parameterType == typeof(Sequencer))
-						{
-							parameters.Add(sequencer);
-						}
-						else if (parameterType == typeof(NarrativeSpace))
+						if (parameterType == typeof(NarrativeSpace))
 						{
 							parameters.Add(narrativeSpace);
 						}
@@ -111,7 +107,7 @@ namespace CuttingRoom.VariableSystem.Constraints
 				{
 					Constraint nestedConstraint = nestedConstraintQueue.Dequeue();
 
-					resolves = nestedConstraint.Evaluate(sequencer, narrativeSpace, narrativeObject);
+					resolves = nestedConstraint.Evaluate(narrativeSpace, narrativeObject);
 				}
 			}
 

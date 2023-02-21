@@ -39,7 +39,7 @@ namespace CuttingRoom
         /// </summary>
         /// <param name="onSelection"></param>
         /// <returns></returns>
-        public override IEnumerator Process(Sequencer sequencer, OnSelectionCallback onSelection)
+        public override IEnumerator Process(OnSelectionCallback onSelection)
         {
             // If the output selection method is known.
             if (methodContainer.Initialised)
@@ -48,7 +48,7 @@ namespace CuttingRoom
                 if (candidates.Count > 0)
                 {
                     // Get the valid candidates based on constraints.
-                    List<NarrativeObject> validCandidates = ProcessConstraints(sequencer, constraints);
+                    List<NarrativeObject> validCandidates = ProcessConstraints(constraints);
 
                     MethodContainer.Args args = new MethodContainer.Args { onSelection = onSelection, candidates = validCandidates };
 
@@ -58,7 +58,7 @@ namespace CuttingRoom
             }
         }
 
-        public override IEnumerator Process(Sequencer sequencer, OnMultiSelectionCallback onSelection)
+        public override IEnumerator Process(OnMultiSelectionCallback onSelection)
         {
             // Not implemented
             throw new NotImplementedException("Process() not implemented for multi selection on groups.");

@@ -22,6 +22,8 @@ namespace CuttingRoom
         /// </summary>
         private Sequencer sequencer = null;
 
+        private Sequencer subSequencer = null;
+
         private List<Coroutine> secondaryLayerCoroutines = new List<Coroutine>();
 
         /// <summary>
@@ -46,10 +48,12 @@ namespace CuttingRoom
             OnProcessingTriggerComplete += LayerEndTriggered;
 
             LayerNarrativeObject.PreProcess();
-            yield return LayerNarrativeObject.LayerSelectionDecisionPoint.Process(sequencer, OnSelection);
+            yield return LayerNarrativeObject.LayerSelectionDecisionPoint.Process(OnSelection);
 
             // Process the base functionality, output selection.
             yield return base.Process(sequencer, cancellationToken);
+
+            yield return WaitForSecondaryLayersToEnd();
 
             LayerNarrativeObject.PostProcess();
         }
@@ -60,8 +64,13 @@ namespace CuttingRoom
         private void LayerEndTriggered()
         {
             layerCancellationToken.Cancel();
+        }
+
+        private IEnumerator WaitForSecondaryLayersToEnd()
+        {
             foreach (var secondaryLayerCoroutine in secondaryLayerCoroutines)
             {
+                yield return secondaryLayerCoroutine;
                 LayerNarrativeObject.StopCoroutine(secondaryLayerCoroutine);
             }
         }
@@ -79,11 +88,13 @@ namespace CuttingRoom
                 {
                     if (layerRoot == LayerNarrativeObject.primaryLayerRootNarrativeObject)
                     {
-                        contentCoroutine = LayerNarrativeObject.StartCoroutine(sequencer.SequenceNarrativeObject(layerRoot, layerCancellationToken.Token));
+                        subSequencer = new(layerRoot);
+                        subSequencer.Start(layerCancellationToken.Token);
+                        contentCoroutine = LayerNarrativeObject.StartCoroutine(subSequencer.WaitForSequenceComplete());
                     }
                     else
                     {
-                        secondaryLayerCoroutines.Add(LayerNarrativeObject.StartCoroutine(sequencer.SequenceNarrativeObject(layerRoot, layerCancellationToken.Token)));
+                        secondaryLayerCoroutines.Add(sequencer.SubSequenceNarrativeObject(layerRoot, layerCancellationToken.Token));
                     }
                 }    
             }

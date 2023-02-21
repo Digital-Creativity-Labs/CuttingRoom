@@ -25,5 +25,20 @@ MonoBehaviour:
     - b490e06d-c3d3-4e29-bf1b-1d38e551cc7b
     - abcd84de-e790-4372-8d20-f4d328211c0b
     - df25f675-2b54-46d5-ad12-aed5745fe27c
+  - narrativeObjectGuid: f1395552-c098-40f5-9656-a21a5f14c71e
+    narrativeObjectNodeGuids:
+    - 58f7e25e-38cd-4511-9015-fe6497a8366f
+    - 5c6b3977-26df-4e11-a900-2d52b88878c7
+    - 728eeafd-4ccd-4fcf-a56f-72e3676bc3f4
+  - narrativeObjectGuid: a5ed8bd6-36b7-4ccc-9814-6a5caa9bcff0
+    narrativeObjectNodeGuids:
+    - 2537d322-9ddf-48f6-959b-f10393847a84
+    - f8d958bf-99b0-4029-84af-b0fe51e51367
+    - 5b7d1dd5-7b87-4e0b-9751-7a06c7ebde18
+  - narrativeObjectGuid: e16efe50-3b94-40fd-9f93-fb25e0f2f4b5
+    narrativeObjectNodeGuids:
+    - 987d59ef-3147-4239-8db7-c7623ceb119b
+    - 02139cb5-d6c6-4d11-a399-c7a87e7cdb77
+    - 51c85242-67c8-4b37-8223-0d0cf340054b
   viewContainerStackGuids:
   - 0

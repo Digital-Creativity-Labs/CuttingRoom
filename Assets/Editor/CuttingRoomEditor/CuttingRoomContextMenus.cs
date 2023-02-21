@@ -11,36 +11,12 @@ namespace CuttingRoom.Editor
 	{
 		private const int menuItemPriority = 0;
 
-		//[MenuItem("Cutting Room/Scene Utilities/Set All Atomic Narrative Object Durations To Length Of Media Source")]
-		//public static void SetAllAtomsDurationToMediaLength()
-		//{
-		//	if (EditorUtility.DisplayDialog("Warning", "Are you sure you want to set all Atomic Narrative Objects to the length of their assigned Media Source?", "Yes", "Cancel"))
-		//	{
-		//		CuttingRoomUtilities.SetAllSceneAtomsDurationToMediaLength();
-		//	}
-		//}
-
 		[MenuItem("GameObject/Cutting Room/Create/Narrative Space", false, menuItemPriority)]
 		public static NarrativeSpace CreateNarrativeSpace()
 		{
 			NarrativeSpace narrativeSpace = new GameObject("NarrativeSpace", typeof(NarrativeSpace)).GetComponent<NarrativeSpace>();
 
 			return narrativeSpace;
-		}
-
-		public static Sequencer CreateSequencer()
-		{
-			Sequencer sequencer = new GameObject("Sequencer", typeof(Sequencer)).GetComponent<Sequencer>();
-
-			// Find narrative space and try to link it to the sequencer.
-			NarrativeSpace narrativeSpace = GameObject.FindObjectOfType<NarrativeSpace>();
-
-			if (narrativeSpace != null)
-			{
-				sequencer.NarrativeSpace = narrativeSpace;
-			}
-
-			return sequencer;
 		}
 
 		public static AtomicNarrativeObject InstantiateAtomicNarrativeObject()
@@ -158,40 +134,5 @@ namespace CuttingRoom.Editor
 			// Ping the object to ensure it is visible in hierarchy (unfolded).
 			EditorGUIUtility.PingObject(gameObject);
 		}
-
-		//[MenuItem("CONTEXT/AtomicNarrativeObject/Set Duration To Length of MediaSource")]
-		//public static async void SetDurationToLengthOfMediaSource(MenuCommand command)
-		//{
-		//	AtomicNarrativeObject atomicNarrativeObject = (AtomicNarrativeObject)command.context;
-
-		//	if (atomicNarrativeObject.mediaSource != null)
-		//	{
-		//		MediaController mediaController = atomicNarrativeObject.mediaSource.mediaControllerPrefab.GetComponent<MediaController>();
-
-		//		float duration = 0.0f;
-
-		//		// Try to get the duration. If the controller has not overriden the GetDuration method, task returned is null so duration is undefined. Set to 0.0f.
-		//		Task<float> getDurationTask = mediaController.GetDuration(atomicNarrativeObject.mediaSource);
-
-		//		if (getDurationTask != null)
-		//		{
-		//			duration = await getDurationTask;
-		//		}
-		//		else
-		//		{
-		//			Debug.Log("Controller has provided an implementation of the GetDuration method. Duration is defaulting to 0.0f.");
-		//		}
-
-		//		atomicNarrativeObject.duration = duration;
-
-		//		EditorUtility.SetDirty(atomicNarrativeObject);
-		//	}
-		//	else
-		//	{
-		//		atomicNarrativeObject.duration = 0.0f;
-
-		//		EditorUtility.SetDirty(atomicNarrativeObject);
-		//	}
-		//}
 	}
 }
