@@ -326,6 +326,7 @@ public static class UIElementsUtils
     public static VisualElement CreateIntegerFieldRow(string labelText, int value, Action<int> OnValueChanged)
     {
         IntegerField intField = new IntegerField();
+        intField.isDelayed = true;
         intField.value = value;
         intField.RegisterValueChangedCallback(evt =>
         {
@@ -349,6 +350,7 @@ public static class UIElementsUtils
     public static VisualElement CreateFloatFieldRow(string labelText, float value, Action<float> OnValueChanged)
     {
         FloatField floatField = new FloatField();
+        floatField.isDelayed = true;
         floatField.value = value;
         floatField.RegisterValueChangedCallback(evt =>
         {
@@ -422,6 +424,7 @@ public static class UIElementsUtils
     /// </summary>
     /// <param name="labelText"></param>
     /// <param name="value"></param>
+    /// <param name="choices"></param>
     /// <param name="OnValueChanged"></param>
     /// <returns></returns>
     public static VisualElement CreatePopUpFieldRow<T>(string labelText, T value, List<T> choices, Action<T> OnValueChanged)
@@ -433,6 +436,27 @@ public static class UIElementsUtils
             OnValueChanged?.Invoke(evt.newValue);
         });
         BlackboardRow blackboardRow = new BlackboardRow(new Label(labelText), popUpField);
+        blackboardRow.expanded = true;
+
+        return blackboardRow;
+    }
+
+    /// <summary>
+    /// Create a blackboard row with an enum field.
+    /// </summary>
+    /// <param name="labelText"></param>
+    /// <param name="value"></param>
+    /// <param name="OnValueChanged"></param>
+    /// <returns></returns>
+    public static VisualElement CreateColorFieldRow(string labelText, Color value, Action<Color> OnValueChanged)
+    {
+        ColorField colorField = new ColorField();
+        colorField.value = value;
+        colorField.RegisterValueChangedCallback(evt =>
+        {
+            OnValueChanged?.Invoke(evt.newValue);
+        });
+        BlackboardRow blackboardRow = new BlackboardRow(new Label(labelText), colorField);
         blackboardRow.expanded = true;
 
         return blackboardRow;

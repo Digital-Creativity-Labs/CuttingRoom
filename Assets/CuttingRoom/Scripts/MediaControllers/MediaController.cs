@@ -12,6 +12,7 @@ namespace CuttingRoom
             Undefined,
             Video,
             Audio,
+            Text,
             ButtonUI,
             GameObject
         }
@@ -55,6 +56,8 @@ namespace CuttingRoom
                         return parentObject.GetComponent<VideoController>() ?? parentObject.AddComponent<VideoController>();
                     case ContentTypeEnum.Audio:
                         return parentObject.GetComponent<AudioController>() ?? parentObject.AddComponent<AudioController>();
+                    case ContentTypeEnum.Text:
+                        return parentObject.GetComponent<TextController>() ?? parentObject.AddComponent<TextController>();
                     case ContentTypeEnum.ButtonUI:
                         return parentObject.GetComponent<ButtonUIController>() ?? parentObject.AddComponent<ButtonUIController>();
                     case ContentTypeEnum.GameObject:

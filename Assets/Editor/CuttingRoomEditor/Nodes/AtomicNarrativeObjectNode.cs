@@ -233,6 +233,52 @@ namespace CuttingRoom.Editor
                     mediaSourceRow.Add(audioPicker);
                 }
             }
+            else if (contentType == MediaController.ContentTypeEnum.Text)
+            {
+                TextController textController = AtomicNarrativeObject.MediaController as TextController;
+                if (textController != null)
+                {
+                    VisualElement textField = UIElementsUtils.CreateTextFieldRow("Text", textController.text, (newValue) =>
+                    {
+                        Undo.RecordObject(textController, "Set Text Content");
+                        textController.text = newValue;
+                        AtomicNarrativeObject.MediaController = textController;
+                        // Flag that the object has changed.
+                        AtomicNarrativeObject.OnValidate();
+                    });
+                    mediaSourceRow.Add(textField);
+
+                    VisualElement fontSizeField = UIElementsUtils.CreateFloatFieldRow("Font Size", textController.fontSize, (newValue) =>
+                    {
+                        Undo.RecordObject(textController, "Set Font Size");
+                        textController.fontSize = newValue;
+                        AtomicNarrativeObject.MediaController = textController;
+                        // Flag that the object has changed.
+                        AtomicNarrativeObject.OnValidate();
+                    });
+                    mediaSourceRow.Add(fontSizeField);
+
+                    VisualElement fontColourField = UIElementsUtils.CreateColorFieldRow("Font Colour", textController.fontColour, (newValue) =>
+                    {
+                        Undo.RecordObject(textController, "Set Font Colour");
+                        textController.fontColour = newValue;
+                        AtomicNarrativeObject.MediaController = textController;
+                        // Flag that the object has changed.
+                        AtomicNarrativeObject.OnValidate();
+                    });
+                    mediaSourceRow.Add(fontColourField);
+
+                    VisualElement textStyle = UIElementsUtils.CreateObjectFieldRow("Custom Style Sheet", textController.styleSheetOverride, (newValue) =>
+                    {
+                        Undo.RecordObject(textController, "Change Custom Text Stylesheet");
+                        textController.styleSheetOverride = newValue;
+                        AtomicNarrativeObject.MediaController = textController;
+                        // Flag that the object has changed.
+                        AtomicNarrativeObject.OnValidate();
+                    });
+                    mediaSourceRow.Add(textStyle);
+                }
+            }
             else if (contentType == MediaController.ContentTypeEnum.ButtonUI)
             {
                 ButtonUIController buttonController = AtomicNarrativeObject.MediaController as ButtonUIController;
