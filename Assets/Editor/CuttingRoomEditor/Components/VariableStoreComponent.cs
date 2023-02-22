@@ -161,7 +161,6 @@ namespace CuttingRoom.Editor
 
                         valueField = intField;
                     }
-                    valueField.SetEnabled(editable);
                     valRow.Add(valLabel);
                     valRow.Add(valueField);
                     variableContainer.Add(valRow);
