@@ -101,9 +101,10 @@ namespace CuttingRoom
                     {
                         if (uiDocument.panelSettings == null)
                         {
-                            uiDocument.panelSettings = Resources.Load<PanelSettings>("CuttingRoom/UI/UIVideoPanelSettings");
+                            uiDocument.panelSettings = Resources.Load<PanelSettings>("CuttingRoom/UI/SubscreenVideoPanelSettings");
                         }
                         rootVisualElement = uiDocument.rootVisualElement;
+                        rootVisualElement.pickingMode = PickingMode.Ignore;
 
                         rootVisualElement.style.width = Screen.width;
                         rootVisualElement.style.height = Screen.height;
