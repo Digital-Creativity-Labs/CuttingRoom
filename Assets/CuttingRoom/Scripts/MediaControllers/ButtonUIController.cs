@@ -51,6 +51,11 @@ namespace CuttingRoom
 
         public StyleSheet styleSheetOverride = null;
 
+        /// <summary>
+        /// Sort order defines what UI elements will appear on top. The highest number will be on top.
+        /// </summary>
+        public int sortOrder = 0;
+
         private UnityEngine.Object uiPrefab;
 
         private GameObject uiObject;

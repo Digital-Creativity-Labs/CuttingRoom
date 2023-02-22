@@ -322,6 +322,16 @@ namespace CuttingRoom.Editor
                         mediaSourceRow.Add(variableNamePopUpField);
                     }
 
+                    VisualElement buttonSortOrder = UIElementsUtils.CreateIntegerFieldRow("Sort Order", buttonController.sortOrder, (newValue) =>
+                    {
+                        Undo.RecordObject(buttonController, "Change Custom Button UI Sort Order");
+                        buttonController.sortOrder = newValue;
+                        AtomicNarrativeObject.MediaController = buttonController;
+                        // Flag that the object has changed.
+                        AtomicNarrativeObject.OnValidate();
+                    });
+                    mediaSourceRow.Add(buttonSortOrder);
+
                     VisualElement buttonStyle = UIElementsUtils.CreateObjectFieldRow("Custom Style Sheet", buttonController.styleSheetOverride, (newValue) =>
                     {
                         Undo.RecordObject(buttonController, "Change Custom Button UI Stylesheet");
