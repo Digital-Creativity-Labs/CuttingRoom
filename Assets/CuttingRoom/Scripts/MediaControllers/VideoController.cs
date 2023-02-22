@@ -101,7 +101,8 @@ namespace CuttingRoom
                     {
                         if (uiDocument.panelSettings == null)
                         {
-                            uiDocument.panelSettings = Resources.Load<PanelSettings>("CuttingRoom/UI/SubscreenVideoPanelSettings");
+                            uiDocument.panelSettings = Resources.Load<PanelSettings>("CuttingRoom/UI/OverlayPanelSettings");
+                            uiDocument.sortingOrder = 0;
                         }
                         rootVisualElement = uiDocument.rootVisualElement;
                         rootVisualElement.pickingMode = PickingMode.Ignore;

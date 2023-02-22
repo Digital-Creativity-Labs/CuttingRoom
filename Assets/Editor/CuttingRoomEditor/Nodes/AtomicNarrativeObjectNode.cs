@@ -158,7 +158,7 @@ namespace CuttingRoom.Editor
                     else if (videoController.sourceLocation == VideoController.SourceLocation.Url)
                     {
                         // Set video url
-                        VisualElement videoUrl = UIElementsUtils.CreateTextFieldRow("Video", videoController.url, (newValue) =>
+                        VisualElement videoUrl = UIElementsUtils.CreateTextFieldRow("Video", videoController.url, multiline: false, (newValue) =>
                         {
                             Undo.RecordObject(videoController, "Set Video URL");
                             videoController.url = newValue;
@@ -238,7 +238,7 @@ namespace CuttingRoom.Editor
                 TextController textController = AtomicNarrativeObject.MediaController as TextController;
                 if (textController != null)
                 {
-                    VisualElement textField = UIElementsUtils.CreateTextFieldRow("Text", textController.text, (newValue) =>
+                    VisualElement textField = UIElementsUtils.CreateTextFieldRow("Text", textController.text, multiline: true, (newValue) =>
                     {
                         Undo.RecordObject(textController, "Set Text Content");
                         textController.text = newValue;
@@ -262,11 +262,15 @@ namespace CuttingRoom.Editor
                     {
                         Undo.RecordObject(textController, "Set Font Colour");
                         textController.fontColour = newValue;
-                        AtomicNarrativeObject.MediaController = textController;
-                        // Flag that the object has changed.
-                        AtomicNarrativeObject.OnValidate();
                     });
                     mediaSourceRow.Add(fontColourField);
+
+                    VisualElement backgroundColourField = UIElementsUtils.CreateColorFieldRow("Background Colour", textController.backgroundColour, (newValue) =>
+                    {
+                        Undo.RecordObject(textController, "Set Background Colour");
+                        textController.backgroundColour = newValue;
+                    });
+                    mediaSourceRow.Add(backgroundColourField);
 
                     VisualElement textStyle = UIElementsUtils.CreateObjectFieldRow("Custom Style Sheet", textController.styleSheetOverride, (newValue) =>
                     {

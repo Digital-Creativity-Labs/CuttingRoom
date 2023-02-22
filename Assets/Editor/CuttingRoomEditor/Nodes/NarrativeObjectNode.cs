@@ -277,7 +277,7 @@ namespace CuttingRoom.Editor
         {
             List<VisualElement> editorRows = new List<VisualElement>();
 
-            VisualElement nameTextFieldRow = UIElementsUtils.CreateTextFieldRow("Name", NarrativeObject.gameObject.name, (newValue) =>
+            VisualElement nameTextFieldRow = UIElementsUtils.CreateTextFieldRow("Name", NarrativeObject.gameObject.name, multiline: false, (newValue) =>
             {
                 Undo.RecordObject(NarrativeObject.gameObject, $"Set Narrative Object Name {(newValue)}");
                 NarrativeObject.gameObject.name = newValue;

@@ -20,6 +20,8 @@ namespace CuttingRoom
 
         public Color fontColour = Color.white;
 
+        public Color backgroundColour = Color.clear;
+
         public float fontSize = 32;
 
         public StyleSheet styleSheetOverride = null;
@@ -62,12 +64,16 @@ namespace CuttingRoom
                     {
                         TextElement textElement = textContainer as TextElement;
                         textElement.text = text;
-
                         if (styleSheetOverride == null)
                         {
                             if (fontColour != textElement.style.color)
                             {
                                 textElement.style.color = fontColour;
+                            }
+
+                            if (backgroundColour != textContainer.style.backgroundColor)
+                            {
+                                textContainer.style.backgroundColor = backgroundColour;
                             }
 
                             if (fontSize != textElement.style.fontSize)
@@ -100,7 +106,7 @@ namespace CuttingRoom
         {
             textScreenObject = Instantiate(textScreenPrefab as GameObject, atomicNarrativeObject.MediaParent);
             uiDocument = textScreenObject.GetComponentInChildren<UIDocument>();
-            if (styleSheetOverride != null)
+            if (uiDocument != null && styleSheetOverride != null)
             {
                 uiDocument.rootVisualElement.styleSheets.Clear();
                 uiDocument.rootVisualElement.styleSheets.Add(styleSheetOverride);

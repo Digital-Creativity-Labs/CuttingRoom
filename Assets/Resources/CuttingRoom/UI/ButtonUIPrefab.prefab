@@ -77,10 +77,10 @@ MonoBehaviour:
   m_Script: {fileID: 19102, guid: 0000000000000000e000000000000000, type: 0}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_PanelSettings: {fileID: 11400000, guid: a6bb926dcdde13848a2ecf73e36b04ab, type: 2}
+  m_PanelSettings: {fileID: 11400000, guid: 593b891b5991e044e97d5cbede5fdc1a, type: 2}
   m_ParentUI: {fileID: 0}
   sourceAsset: {fileID: 9197481963319205126, guid: 790068192aec46a42bdb76ea08e119fe, type: 3}
-  m_SortingOrder: 0
+  m_SortingOrder: 10
 --- !u!114 &8712800399572818334
 MonoBehaviour:
   m_ObjectHideFlags: 0

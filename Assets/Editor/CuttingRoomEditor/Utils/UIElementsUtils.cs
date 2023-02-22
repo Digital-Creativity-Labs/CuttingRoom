@@ -280,10 +280,11 @@ public static class UIElementsUtils
     /// <param name="value"></param>
     /// <param name="OnValueChanged"></param>
     /// <returns></returns>
-    public static VisualElement CreateTextFieldRow(string labelText, string value, Action<string> OnValueChanged)
+    public static VisualElement CreateTextFieldRow(string labelText, string value, bool multiline, Action<string> OnValueChanged)
     {
         TextField textField = new TextField();
         textField.isDelayed = true;
+        textField.multiline = multiline;
         textField.value = value;
         textField.RegisterValueChangedCallback(evt =>
         {
