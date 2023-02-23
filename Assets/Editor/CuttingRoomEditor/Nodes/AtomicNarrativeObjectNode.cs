@@ -298,7 +298,53 @@ namespace CuttingRoom.Editor
                     });
                     mediaSourceRow.Add(imageField);
 
-                    VisualElement textStyle = UIElementsUtils.CreateObjectFieldRow("Custom Style Sheet", imageController.styleSheetOverride, (newValue) =>
+
+                    // Fullscreen video toggle
+                    VisualElement imageFullscreenToggle = UIElementsUtils.CreateBoolFieldRow("Fullscreen", imageController.fullscreen, (newValue) =>
+                    {
+                        Undo.RecordObject(imageController, "Set Image Fullscreen");
+                        imageController.fullscreen = newValue;
+                        AtomicNarrativeObject.MediaController = imageController;
+                        // Flag that the object has changed.
+                        AtomicNarrativeObject.OnValidate();
+                    });
+                    mediaSourceRow.Add(imageFullscreenToggle);
+
+                    // Non-fullscreen video settings
+                    if (!imageController.fullscreen)
+                    {
+                        // Width
+                        VisualElement imageWidth = UIElementsUtils.CreateIntegerFieldRow("Width", imageController.width, (newValue) =>
+                        {
+                            Undo.RecordObject(imageController, "Set Image Width");
+                            imageController.width = newValue;
+                        });
+                        // Height
+                        VisualElement imageHeight = UIElementsUtils.CreateIntegerFieldRow("Height", imageController.height, (newValue) =>
+                        {
+                            Undo.RecordObject(imageController, "Set Image Height");
+                            imageController.height = newValue;
+                        });
+                        // Left Margin
+                        VisualElement imageLeftMargin = UIElementsUtils.CreateIntegerFieldRow("Margin Left", imageController.marginLeft, (newValue) =>
+                        {
+                            Undo.RecordObject(imageController, "Set Video Margin - Left");
+                            imageController.marginLeft = newValue;
+                        });
+                        // Top Margin
+                        VisualElement imageTopMargin = UIElementsUtils.CreateIntegerFieldRow("Margin Top", imageController.marginTop, (newValue) =>
+                        {
+                            Undo.RecordObject(imageController, "Set Video Margin - Top");
+                            imageController.marginTop = newValue;
+                        });
+
+                        mediaSourceRow.Add(imageWidth);
+                        mediaSourceRow.Add(imageHeight);
+                        mediaSourceRow.Add(imageLeftMargin);
+                        mediaSourceRow.Add(imageTopMargin);
+                    }
+
+                    VisualElement imageStyle = UIElementsUtils.CreateObjectFieldRow("Custom Style Sheet", imageController.styleSheetOverride, (newValue) =>
                     {
                         Undo.RecordObject(imageController, "Change Custom Image Stylesheet");
                         imageController.styleSheetOverride = newValue;
@@ -306,7 +352,7 @@ namespace CuttingRoom.Editor
                         // Flag that the object has changed.
                         AtomicNarrativeObject.OnValidate();
                     });
-                    mediaSourceRow.Add(textStyle);
+                    mediaSourceRow.Add(imageStyle);
                 }
             }
             else if (contentType == MediaController.ContentTypeEnum.ButtonUI)

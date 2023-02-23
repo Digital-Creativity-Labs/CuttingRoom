@@ -955,7 +955,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3f69598ad61606049b9fc977e7c44713, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  numberOfButtons: 4
+  numberOfButtons: 5
   styleSheetOverride: {fileID: 7433441132597879392, guid: 414e84ffc95f8dc47b097af6f654c77e, type: 3}
   sortOrder: 0
   variableSetter: {fileID: 358956553}
@@ -964,11 +964,13 @@ MonoBehaviour:
   - 2
   - 3
   - 4
+  - 5
   buttonValues:
   - A
   - B
   - C
   - D
+  - E
 --- !u!114 &358956553
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1429,10 +1431,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   candidates:
-  - {fileID: 118441145}
   - {fileID: 1615880542}
   - {fileID: 847789834}
   - {fileID: 1076746252}
+  - {fileID: 1385413824}
+  - {fileID: 118441145}
   constraints:
   - {fileID: 871223314}
   methodContainer:
@@ -2640,6 +2643,182 @@ Transform:
   m_Children: []
   m_Father: {fileID: 871223312}
   m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1385413818
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1385413827}
+  - component: {fileID: 1385413826}
+  - component: {fileID: 1385413825}
+  - component: {fileID: 1385413824}
+  - component: {fileID: 1385413823}
+  - component: {fileID: 1385413822}
+  - component: {fileID: 1385413821}
+  - component: {fileID: 1385413820}
+  - component: {fileID: 1385413819}
+  m_Layer: 0
+  m_Name: Image
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1385413819
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1385413818}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ae69c8d62e9129a4e91f655cd5dcc1c1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  variableCategory: 2
+  variableName: FirstDecision
+  guid: 3b03a868-887b-4ec9-b8f2-adaae61e8335
+  defaultValue: E
+  value: E
+--- !u!114 &1385413820
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1385413818}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 208e5ff9d5b1505459dc4be617f2652b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  triggered: 0
+  duration: 3
+--- !u!114 &1385413821
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1385413818}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c8459d464ca521044875ed10375b08ab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  image: {fileID: 2800000, guid: b0b432f146c9cf446a89be39dce9ccff, type: 3}
+  fullscreen: 0
+  styleSheetOverride: {fileID: 0}
+  width: 960
+  height: 540
+  marginTop: 0
+  marginLeft: 0
+  sortOrder: 0
+--- !u!114 &1385413822
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1385413818}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: acbb6697a9bfee74d9ea18c0171f1cca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  triggered: 0
+--- !u!114 &1385413823
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1385413818}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e132dfbb23143e0488b028cbecfc1c6d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  variableCategory: 1
+  variableName: hasPlayed
+  guid: b7753b2f-7ff9-4b8f-9005-4d235d75fd42
+  defaultValue: 0
+  value: 0
+--- !u!114 &1385413824
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1385413818}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb76aed733bdbcd43a727bf81355ac8c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  guid: 00b04d71-c3e1-4b6b-8b0a-d0f369c1d409
+  outputSelectionDecisionPoint: {fileID: 1385413826}
+  variableStore: {fileID: 1385413825}
+  endTriggers:
+  - {fileID: 1385413822}
+  - {fileID: 1385413820}
+  constraints: []
+  mediaController: {fileID: 1385413821}
+  mediaParent: {fileID: 0}
+  mediaSourceUnloadEvent: 1
+--- !u!114 &1385413825
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1385413818}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d8fecdd77e447674585a2d837954a306, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  autoAddVariablesOnGameObject: 1
+  variableList:
+  - {fileID: 1385413823}
+  - {fileID: 1385413819}
+--- !u!114 &1385413826
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1385413818}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b33dbf477cd3f6409b204de1b971a43, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  candidates:
+  - {fileID: 10034512}
+  constraints: []
+  methodContainer:
+    methodClass: 
+    methodName: Random
+--- !u!4 &1385413827
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1385413818}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1504551313
 GameObject:

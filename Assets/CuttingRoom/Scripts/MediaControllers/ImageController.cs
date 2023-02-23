@@ -18,7 +18,15 @@ namespace CuttingRoom
 
         public Texture2D image = null;
 
+        public bool fullscreen = true;
+
         public StyleSheet styleSheetOverride = null;
+
+        // Options for non-fullscreen image
+        public int width = 1920;
+        public int height = 1080;
+        public int marginTop = 0;
+        public int marginLeft = 0;
 
         /// <summary>
         /// Sort order defines what UI elements will appear on top. The highest number will be on top.
@@ -57,6 +65,17 @@ namespace CuttingRoom
                     if (imageContainer != null)
                     {
                         imageContainer.style.backgroundImage = new StyleBackground(image);
+                        if (styleSheetOverride == null)
+                        {
+                            if (!fullscreen)
+                            {
+                                imageContainer.style.width = width;
+                                imageContainer.style.height = height;
+                                imageContainer.style.position = Position.Relative;
+                                imageContainer.style.marginTop = marginTop;
+                                imageContainer.style.marginLeft = marginLeft;
+                            }
+                        }
                     }
                 }
             }
