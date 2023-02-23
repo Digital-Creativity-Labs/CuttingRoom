@@ -1,0 +1,6 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/Resources/CuttingRoom/UI/Style/ImageScreenTemplate.uss?fileID=7433441132597879392&amp;guid=624b5ffded841684c8a6492e9bf7d673&amp;type=3#ImageScreenTemplate" />
+    <ui:VisualElement name="RootElement" picking-mode="Ignore" class="fullscreen-canvas">
+        <ui:VisualElement name="ImageContainer" class="image-container" />
+    </ui:VisualElement>
+</ui:UXML>
