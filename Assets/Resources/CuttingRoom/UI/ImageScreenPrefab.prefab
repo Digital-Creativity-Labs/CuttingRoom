@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8659982568320037037}
   m_Layer: 0
-  m_Name: TextScreenPrefab
+  m_Name: ImageScreenPrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -78,5 +78,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_PanelSettings: {fileID: 11400000, guid: 593b891b5991e044e97d5cbede5fdc1a, type: 2}
   m_ParentUI: {fileID: 0}
-  sourceAsset: {fileID: 9197481963319205126, guid: 07d3f07dff66ab04a954e0ee99062006, type: 3}
-  m_SortingOrder: 5
+  sourceAsset: {fileID: 9197481963319205126, guid: be3341a8b9f6edc4d86747255b34ba95, type: 3}
+  m_SortingOrder: 0

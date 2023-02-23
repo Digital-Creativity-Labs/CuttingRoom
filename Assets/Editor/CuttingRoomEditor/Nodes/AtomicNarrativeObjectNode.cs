@@ -283,6 +283,32 @@ namespace CuttingRoom.Editor
                     mediaSourceRow.Add(textStyle);
                 }
             }
+            else if (contentType == MediaController.ContentTypeEnum.Image)
+            {
+                ImageController imageController = AtomicNarrativeObject.MediaController as ImageController;
+                if (imageController != null)
+                {
+                    VisualElement imageField = UIElementsUtils.CreateObjectFieldRow("Image", imageController.image, (newValue) =>
+                    {
+                        Undo.RecordObject(imageController, "Set Image Content");
+                        imageController.image = newValue;
+                        AtomicNarrativeObject.MediaController = imageController;
+                        // Flag that the object has changed.
+                        AtomicNarrativeObject.OnValidate();
+                    });
+                    mediaSourceRow.Add(imageField);
+
+                    VisualElement textStyle = UIElementsUtils.CreateObjectFieldRow("Custom Style Sheet", imageController.styleSheetOverride, (newValue) =>
+                    {
+                        Undo.RecordObject(imageController, "Change Custom Image Stylesheet");
+                        imageController.styleSheetOverride = newValue;
+                        AtomicNarrativeObject.MediaController = imageController;
+                        // Flag that the object has changed.
+                        AtomicNarrativeObject.OnValidate();
+                    });
+                    mediaSourceRow.Add(textStyle);
+                }
+            }
             else if (contentType == MediaController.ContentTypeEnum.ButtonUI)
             {
                 ButtonUIController buttonController = AtomicNarrativeObject.MediaController as ButtonUIController;
