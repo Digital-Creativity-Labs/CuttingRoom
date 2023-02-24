@@ -1059,11 +1059,12 @@ namespace CuttingRoom.Editor
             // For each node, make sure all edges exist.
             foreach (NarrativeObjectNode narrativeObjectNode in visibleNarrativeObjectNodes)
             {
+                NarrativeSpace narrativeSpace = UnityEngine.Object.FindObjectOfType<NarrativeSpace>();
                 // If the node is the root of the current view.
-                if (narrativeObjectNode.NarrativeObject.guid == viewContainerRootNarrativeObjectGuid)
+                if (narrativeObjectNode.NarrativeObject.guid == viewContainerRootNarrativeObjectGuid || narrativeObjectNode.NarrativeObject.guid == narrativeSpace.RootNarrativeObject.guid)
                 {
                     bool mainRoot = false;
-                    if (visibleViewContainer.narrativeObjectGuid == rootViewContainerGuid)
+                    if (visibleViewContainer.narrativeObjectGuid == rootViewContainerGuid || narrativeObjectNode.NarrativeObject.guid == narrativeSpace.RootNarrativeObject.guid)
                     {
                         mainRoot = true;
                     }
