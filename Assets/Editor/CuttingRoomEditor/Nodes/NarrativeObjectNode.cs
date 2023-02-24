@@ -197,7 +197,7 @@ namespace CuttingRoom.Editor
             {
                 if (ParentNarrativeObject is GraphNarrativeObject)
                 {
-                    evt.menu.AppendAction("Set as Parent Narrative Object Root", OnSetAsParentNarrativeObjectRootFromContextualMenu, DropdownMenuAction.Status.Normal);
+                    evt.menu.AppendAction("Set as Narrative Object Root", OnSetAsParentNarrativeObjectRootFromContextualMenu, DropdownMenuAction.Status.Normal);
                 }
                 // If this node exists inside a view which can have candidates.
                 else if (ParentNarrativeObject is GroupNarrativeObject)
