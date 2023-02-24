@@ -12,6 +12,7 @@ using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEditor.UIElements;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.UIElements;
 
 namespace CuttingRoom.Editor
@@ -810,14 +811,32 @@ namespace CuttingRoom.Editor
                 onClickAddConstraint?.Invoke((ConstraintFactory.ConstraintType)constraintTypeEnumField.value);
             });
 
+            VisualElement topRow = new();
+            topRow.style.width = constraintsSection.style.width;
+            topRow.style.flexDirection = FlexDirection.Row;
+            topRow.style.justifyContent = Justify.SpaceBetween;
+
             VisualElement addConstraintControlsContainer = new VisualElement();
             addConstraintControlsContainer.AddToClassList("add-constraint-controls-container");
             addConstraintControlsContainer.styleSheets.Add(StyleSheet);
 
-            addConstraintControlsContainer.Insert(0, addConstraintButton);
-            addConstraintControlsContainer.Insert(1, constraintTypeEnumField);
+            addConstraintControlsContainer.Add(addConstraintButton);
+            addConstraintControlsContainer.Add(constraintTypeEnumField);
 
-            constraintsSection.Add(addConstraintControlsContainer);
+            topRow.Add(addConstraintControlsContainer);
+
+            VisualElement anyOrAllToggle = new();
+            var buttonGroup = new RadioButtonGroup("Constraint Mode:");//, new List<string>() { "Valid if ANY", "Valid if ALL" });
+            buttonGroup.style.flexDirection = FlexDirection.Row;
+            buttonGroup.AddToClassList("constraint-option-pill");
+            var anyButton = new RadioButton("Valid if ANY");
+            var allButton = new RadioButton("Valid if ALL");
+            buttonGroup.Add(anyButton);
+            buttonGroup.Add(allButton);
+            anyOrAllToggle.Add(buttonGroup);
+            topRow.Add(anyOrAllToggle);
+
+            constraintsSection.Add(topRow);
 
             if (constraintVisualElements.Count > 0)
             {
