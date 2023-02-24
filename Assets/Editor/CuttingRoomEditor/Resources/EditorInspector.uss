@@ -131,8 +131,8 @@
 }
 
 .unity-radio-button__label {
-	min-width: none;
+	min-width: 0;
 }
 .unity-base-field__label {
-	min-width: none;
+	min-width: 0;
 }
