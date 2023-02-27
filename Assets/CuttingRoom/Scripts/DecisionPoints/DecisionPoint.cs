@@ -4,12 +4,17 @@ using UnityEngine;
 using CuttingRoom.VariableSystem.Constraints;
 using System;
 using System.Linq;
-using UnityEditor;
+using CuttingRoom.VariableSystem;
 
 namespace CuttingRoom
 {
     public abstract class DecisionPoint : MonoBehaviour
     {
+        /// <summary>
+        /// The mode with which to process the constraints.
+        /// </summary>
+        public ConstraintMode constraintMode = ConstraintMode.ValidIfAll;
+
         /// <summary>
         /// The possible candidates for this decision point.
         /// </summary>
@@ -49,39 +54,65 @@ namespace CuttingRoom
 
 			if (narrativeSpace != null)
 			{
-
 				// Iterate candidates and check them against decision point constraints.
 				for (int candidateCount = candidatesMatchingConstraints.Count - 1; candidateCount >= 0; candidateCount--)
 				{
 					NarrativeObject candidate = candidatesMatchingConstraints[candidateCount];
 
-					// For each constraint.
-					for (int constraintCount = 0; constraintCount < decisionPointConstraints.Count; constraintCount++)
+					bool valid = true;
+
+                    // For each constraint.
+                    for (int constraintCount = 0; constraintCount < decisionPointConstraints.Count; constraintCount++)
 					{
 						Constraint constraint = decisionPointConstraints[constraintCount];
 
-						if (!constraint.Evaluate(narrativeSpace, candidate))
+                        valid = constraint.Evaluate(narrativeSpace, candidate);
+
+						// If mode is ALL an invalid result means candidate is invalid, so accept false result and move on.
+						// If mode is ANY a valid result meas the candidate is valid, so accept true result and move on.
+                        if (!valid && constraintMode == ConstraintMode.ValidIfAll
+							|| valid && constraintMode == ConstraintMode.ValidIfAny)
 						{
-							candidatesMatchingConstraints.Remove(candidate);
+							break;
 						}
 					}
+
+					// If not valid remove from the list.
+					if (!valid)
+					{
+						candidatesMatchingConstraints.Remove(candidate);
+                    }
 				}
 
 				for (int candidateCount = candidatesMatchingConstraints.Count - 1; candidateCount >= 0; candidateCount--)
 				{
 					NarrativeObject candidate = candidatesMatchingConstraints[candidateCount];
 
-					// For each constraint on the candidate.
-					for (int candidateConstraintCount = 0; candidateConstraintCount < candidate.constraints.Count; candidateConstraintCount++)
+					ConstraintMode candidateConstraintMode = candidate.constraintMode;
+                    bool valid = true;
+
+                    // For each constraint on the candidate.
+                    for (int candidateConstraintCount = 0; candidateConstraintCount < candidate.constraints.Count; candidateConstraintCount++)
 					{
 						Constraint candidateConstraint = candidate.constraints[candidateConstraintCount];
 
-						if (!candidateConstraint.Evaluate(narrativeSpace, candidate))
-						{
-							candidatesMatchingConstraints.Remove(candidate);
-						}
-					}
-				}
+                        valid = candidateConstraint.Evaluate(narrativeSpace, candidate);
+
+                        // If mode is ALL an invalid result means candidate is invalid, so accept false result and move on.
+                        // If mode is ANY a valid result meas the candidate is valid, so accept true result and move on.
+                        if (!valid && candidateConstraintMode == ConstraintMode.ValidIfAll
+                            || valid && candidateConstraintMode == ConstraintMode.ValidIfAny)
+                        {
+                            break;
+                        }
+                    }
+					
+					// If not valid remove from the list.
+                    if (!valid)
+                    {
+                        candidatesMatchingConstraints.Remove(candidate);
+                    }
+                }
 			}
 
 			return candidatesMatchingConstraints;

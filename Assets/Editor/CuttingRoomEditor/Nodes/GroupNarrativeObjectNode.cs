@@ -130,9 +130,11 @@ namespace CuttingRoom.Editor
             rows.Add(UIElementsUtils.GetHorizontalDivider());
 
             // Group selection constraints.
-            Dictionary<Constraint, VisualElement> groupSelectionConstraintRows = GetConstraintRows(GroupNarrativeObject.GroupSelectionDecisionPoint.Constraints);
-
-            VisualElement groupSelectionConstraintsSection = GetConstraintSection(groupSelectionConstraintRows, "Group Selection Constraints",
+            VisualElement groupSelectionConstraintsSection = ConstraintsComponent.Render("Group Selection Constraints", GroupNarrativeObject, GroupNarrativeObject.GroupSelectionDecisionPoint.Constraints, GroupNarrativeObject.GroupSelectionDecisionPoint.constraintMode,
+                (newConstraintMode) =>
+                {
+                    GroupNarrativeObject.GroupSelectionDecisionPoint.constraintMode = newConstraintMode;
+                },
                 (constraintType) =>
                 {
                     Undo.RecordObject(GroupNarrativeObject.GroupSelectionDecisionPoint, $"Add Constraint {(constraintType)}");
@@ -152,7 +154,7 @@ namespace CuttingRoom.Editor
                         UnityEngine.Object.DestroyImmediate(removedConstraint);
                         NarrativeObject.OnValidate();
                     }
-                });
+                }, StyleSheet);
 
             rows.Add(groupSelectionConstraintsSection);
 

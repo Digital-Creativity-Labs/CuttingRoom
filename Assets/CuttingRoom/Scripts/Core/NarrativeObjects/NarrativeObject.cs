@@ -65,6 +65,11 @@ namespace CuttingRoom
         /// </summary>
         public List<Constraint> constraints = new List<Constraint>();
 
+        /// <summary>
+        /// The mode with which to process the constraints applied to this node.
+        /// </summary>
+        public ConstraintMode constraintMode = ConstraintMode.ValidIfAll;
+
 #if UNITY_EDITOR
         public void Awake()
         {
