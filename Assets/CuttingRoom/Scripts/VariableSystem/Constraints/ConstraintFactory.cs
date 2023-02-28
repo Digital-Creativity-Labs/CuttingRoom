@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 
 namespace CuttingRoom.VariableSystem.Constraints
@@ -97,6 +92,34 @@ namespace CuttingRoom.VariableSystem.Constraints
             }
 
             return constraint;
+        }
+
+        public static ConstraintType? ConstraintToTypeEnum(Constraint constraint)
+        {
+            if (constraint != null)
+            {
+                if (constraint is StringVariableConstraint)
+                {
+                    return ConstraintType.String;
+                }
+                else if (constraint is BoolVariableConstraint)
+                {
+                    return ConstraintType.Bool;
+                }
+                else if (constraint is IntVariableConstraint)
+                {
+                    return ConstraintType.Int;
+                }
+                else if (constraint is FloatVariableConstraint)
+                {
+                    return ConstraintType.Float;
+                }
+                else if (constraint is TagVariableConstraint)
+                {
+                    return ConstraintType.Tag;
+                }
+            }
+            return null;
         }
 #endif
     }

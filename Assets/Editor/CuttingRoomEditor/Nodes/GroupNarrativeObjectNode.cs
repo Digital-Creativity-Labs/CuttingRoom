@@ -154,7 +154,7 @@ namespace CuttingRoom.Editor
                         UnityEngine.Object.DestroyImmediate(removedConstraint);
                         NarrativeObject.OnValidate();
                     }
-                }, StyleSheet);
+                }, supportedTypes: new() { ConstraintFactory.ConstraintType.Tag }, StyleSheet);
 
             rows.Add(groupSelectionConstraintsSection);
 

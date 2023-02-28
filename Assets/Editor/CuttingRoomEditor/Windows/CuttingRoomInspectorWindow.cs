@@ -250,11 +250,7 @@ namespace CuttingRoom.Editor
             // In this case, the "selected" list is going to be empty, rendering global settings (no editor selection).
             if (CREditorWindow != null && CREditorWindow.GraphView != null)
             {
-                if (selectionSource == SelectionSource.Editor)
-                {
-                    selected = CREditorWindow.GraphView.selected;
-                }
-                else if (selectionSource == SelectionSource.Hierarchy)
+                if (selectionSource == SelectionSource.Hierarchy)
                 {
                     GameObject selectedGameObject = Selection.activeGameObject;
                     if (selectedGameObject != null && selectedGameObject.TryGetComponent(out NarrativeObject narrativeObject))
@@ -268,6 +264,10 @@ namespace CuttingRoom.Editor
                             }
                         }
                     }
+                }
+                else
+                {
+                    selected = CREditorWindow.GraphView.selected;
                 }
             }
 

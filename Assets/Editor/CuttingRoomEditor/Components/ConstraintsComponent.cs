@@ -15,7 +15,7 @@ namespace CuttingRoom.Editor
 {
     public static class ConstraintsComponent
     {
-        public static VisualElement Render(string labelText, NarrativeObject narrativeObject, List<Constraint> constraints, ConstraintMode constraintMode, Action<ConstraintMode> onConstraintModeChanged, Action<ConstraintFactory.ConstraintType> onClickAddConstraint, Action<Constraint> onClickRemoveConstraint, StyleSheet styleSheet = null)
+        public static VisualElement Render(string labelText, NarrativeObject narrativeObject, List<Constraint> constraints, ConstraintMode constraintMode, Action<ConstraintMode> onConstraintModeChanged, Action<ConstraintFactory.ConstraintType> onClickAddConstraint, Action<Constraint> onClickRemoveConstraint, HashSet<ConstraintFactory.ConstraintType> supportedTypes = null, StyleSheet styleSheet = null)
         {
             if (styleSheet != null)
             {
@@ -24,7 +24,7 @@ namespace CuttingRoom.Editor
             VisualElement constraintsComponent;
 
             var constraintRows = GetConstraintRows(narrativeObject, ref constraints);
-            constraintsComponent = CreateConstraintSection(labelText, constraintRows, constraintMode, onConstraintModeChanged, onClickAddConstraint, onClickRemoveConstraint);
+            constraintsComponent = CreateConstraintSection(labelText, constraintRows, constraintMode, onConstraintModeChanged, onClickAddConstraint, onClickRemoveConstraint, supportedTypes);
 
             constraintsComponent.styleSheets.Add(styleSheet);
             constraintsComponent.AddToClassList("inspector-section-container");
@@ -48,10 +48,10 @@ namespace CuttingRoom.Editor
                 void SetConstraintRowLabelText()
                 {
 #if UNITY_2021_1_OR_NEWER
-                    string constraintName = $"{constraint.variableStoreLocation} {(constraint.variableName != null ? constraint.variableName : "<color=red>Undefined</color>")} {comparisonTypeEnumField.value} {constraint.Value}";
+                    string constraintName = $"<{ConstraintFactory.ConstraintToTypeEnum(constraint)}> {constraint.Value} {comparisonTypeEnumField.value} {(constraint.variableName != null ? constraint.variableName : "<color=red>Undefined</color>")}";
 #else
                     // No rich text before 2021.1
-                    string constraintName = $"{constraint.GetType().Name.Replace("Variable", " ")}: {(constraint.variableStoreLocation != VariableStoreLocation.Undefined ? constraint.variableStoreLocation.ToString() : "<variable location>")} {(constraint.variableName != null ? constraint.variableName : "<name>")} {comparisonTypeEnumField.value} {constraint.Value}";
+                    string constraintName = $"<{ConstraintFactory.ConstraintToTypeEnum(constraint)}> {constraint.Value} {comparisonTypeEnumField.value} {(constraint.variableName != null ? constraint.variableName : "Undefined")}";
 #endif
                     constraintRowLabel.text = constraintName;
                 }
@@ -134,6 +134,27 @@ namespace CuttingRoom.Editor
                     constraint.variableName = "Undefined";
                 }
 
+                // Add a field for the value of the constraint specified.
+                VisualElement valueField = GetConstraintValueField(constraint, () =>
+                {
+                    SetConstraintRowLabelText();
+                });
+                constraintContainer.Add(valueField);
+
+                VisualElement comparisonRow = UIElementsUtils.GetRowContainer();
+                Label comparisonLabel = new Label("Comparison: ");
+                comparisonLabel.AddToClassList("constraint-field-label");
+                comparisonRow.Add(comparisonLabel);
+                comparisonTypeEnumField = GetConstraintComparisonTypeEnumField(constraint, () =>
+                {
+                    SetConstraintRowLabelText();
+                });
+                comparisonTypeEnumField.AddToClassList("constraint-field-value");
+                comparisonRow.Add(comparisonTypeEnumField);
+
+                // Add the comparison type enum field based on the type of constraint being visualised.
+                constraintContainer.Add(comparisonRow);
+
                 // Variable Name
                 VisualElement varNameRow = UIElementsUtils.GetRowContainer();
                 Label varNameLabel = new Label("Variable Name: ");
@@ -160,26 +181,6 @@ namespace CuttingRoom.Editor
                 varNameRow.Add(variableNameField);
                 constraintContainer.Add(varNameRow);
 
-                VisualElement comparisonRow = UIElementsUtils.GetRowContainer();
-                Label comparisonLabel = new Label("Comparison: ");
-                comparisonLabel.AddToClassList("constraint-field-label");
-                comparisonRow.Add(comparisonLabel);
-                comparisonTypeEnumField = GetConstraintComparisonTypeEnumField(constraint, () =>
-                {
-                    SetConstraintRowLabelText();
-                });
-                comparisonTypeEnumField.AddToClassList("constraint-field-value");
-                comparisonRow.Add(comparisonTypeEnumField);
-
-                // Add the comparison type enum field based on the type of constraint being visualised.
-                constraintContainer.Add(comparisonRow);
-
-                // Add a field for the value of the constraint specified.
-                AddConstraintValueField(constraintContainer, constraint, () =>
-                {
-                    SetConstraintRowLabelText();
-                });
-
                 SetConstraintRowLabelText();
 
                 VisualElement constraintRow = new VisualElement();
@@ -200,15 +201,29 @@ namespace CuttingRoom.Editor
         /// <param name="onClickAddConstraint"></param>
         /// <param name="onClickRemoveConstraint"></param>
         /// <returns></returns>
-        private static VisualElement CreateConstraintSection(string labelText, Dictionary<Constraint, VisualElement> constraintVisualElements, ConstraintMode constraintMode, Action<ConstraintMode> onConstraintModeChanged, Action<ConstraintFactory.ConstraintType> onClickAddConstraint, Action<Constraint> onClickRemoveConstraint)
+        private static VisualElement CreateConstraintSection(string labelText, Dictionary<Constraint, VisualElement> constraintVisualElements,
+            ConstraintMode constraintMode, Action<ConstraintMode> onConstraintModeChanged,
+            Action<ConstraintFactory.ConstraintType> onClickAddConstraint, Action<Constraint> onClickRemoveConstraint, HashSet<ConstraintFactory.ConstraintType> supportedTypes = null)
         {
             VisualElement constraintsSection = UIElementsUtils.GetContainerWithLabel(labelText);
+            var constraintTypes = Enum.GetNames(typeof(ConstraintFactory.ConstraintType)).ToList();
 
-            EnumField constraintTypeEnumField = new EnumField(ConstraintFactory.ConstraintType.String);
+            if (supportedTypes != null)
+            {
+                if (supportedTypes.Count == 0)
+                {
+                    return null;
+                }
+                constraintTypes = constraintTypes.Where((constraintType) => 
+                supportedTypes.Contains((ConstraintFactory.ConstraintType)Enum.Parse(typeof(ConstraintFactory.ConstraintType), constraintType))).ToList();
+            }
+
+
+            var constraintTypeField = new PopupField<string>(constraintTypes, 0);
 
             VisualElement addConstraintButton = UIElementsUtils.GetSquareButton("+", () =>
             {
-                onClickAddConstraint?.Invoke((ConstraintFactory.ConstraintType)constraintTypeEnumField.value);
+                onClickAddConstraint?.Invoke((ConstraintFactory.ConstraintType)Enum.Parse(typeof(ConstraintFactory.ConstraintType), constraintTypeField.value));
             });
 
             VisualElement topRow = new();
@@ -220,7 +235,7 @@ namespace CuttingRoom.Editor
             addConstraintControlsContainer.AddToClassList("add-constraint-controls-container");
 
             addConstraintControlsContainer.Add(addConstraintButton);
-            addConstraintControlsContainer.Add(constraintTypeEnumField);
+            addConstraintControlsContainer.Add(constraintTypeField);
 
             topRow.Add(addConstraintControlsContainer);
 
@@ -372,7 +387,7 @@ namespace CuttingRoom.Editor
         /// </summary>
         /// <param name="container"></param>
         /// <param name="constraint"></param>
-        private static void AddConstraintValueField(VisualElement container, Constraint constraint, Action onValueChanged)
+        private static VisualElement GetConstraintValueField(Constraint constraint, Action onValueChanged)
         {
             VisualElement row = UIElementsUtils.GetRowContainer();
             Label label = new Label("Value: ");
@@ -471,7 +486,7 @@ namespace CuttingRoom.Editor
             row.Add(label);
             row.Add(valueField);
 
-            container.Add(row);
+            return row;
         }
     }
 }

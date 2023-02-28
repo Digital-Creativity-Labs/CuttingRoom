@@ -227,7 +227,7 @@ namespace CuttingRoom.Editor
                 (removedConstraint) =>
                 {
                     RemoveConstraint(narrativeObjectNode.NarrativeObject, removedConstraint);
-                }, StyleSheet);
+                }, supportedTypes: null, StyleSheet);
             candidateConstraintsSection.styleSheets.Add(StyleSheet);
             candidateConstraintsSection.AddToClassList("inspector-section-container");
 
@@ -244,7 +244,7 @@ namespace CuttingRoom.Editor
                 (removedConstraint) =>
                 {
                     RemoveConstraint(narrativeObjectNode.NarrativeObject.OutputSelectionDecisionPoint, removedConstraint);
-                }, StyleSheet);
+                }, supportedTypes: new() { ConstraintFactory.ConstraintType.Tag }, StyleSheet);
 
             outputConstraintsSection.styleSheets.Add(StyleSheet);
             outputConstraintsSection.AddToClassList("inspector-section-container");
@@ -289,7 +289,7 @@ namespace CuttingRoom.Editor
                 (removedConstraint) =>
                 {
                     RemoveConstraint(candidateNarrativeObjectNode.NarrativeObject, removedConstraint);
-                }, StyleSheet);
+                }, supportedTypes: null, StyleSheet);
             candidateConstraintsSection.styleSheets.Add(StyleSheet);
             candidateConstraintsSection.AddToClassList("inspector-section-container");
 
