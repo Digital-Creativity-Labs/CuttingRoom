@@ -5,5 +5,10 @@
 		Undefined,
 		Global,
 		Local,
-	}
+    }
+    public enum ConstraintMode
+    {
+        ValidIfAll,
+        ValidIfAny
+    }
 }

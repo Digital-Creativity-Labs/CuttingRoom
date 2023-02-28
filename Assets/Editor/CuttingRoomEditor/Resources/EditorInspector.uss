@@ -71,6 +71,13 @@
 	-unity-font-style: bold;
 }
 
+.constraint-option-pill {
+	background-color: #515151;
+	border-radius: 10px;
+	padding-left: 10px;
+	padding-right: 10px;
+}
+
 .constraint-fields-container {
 	width: 100%;
 	margin-left: 2%;
@@ -121,4 +128,11 @@
 
 .trigger-field-value {
 	flex-grow: 1;
+}
+
+.unity-radio-button__label {
+	min-width: 0;
+}
+.unity-base-field__label {
+	min-width: 0;
 }

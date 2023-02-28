@@ -214,10 +214,12 @@ namespace CuttingRoom.Editor
             tagsSectionContainer.styleSheets.Add(StyleSheet);
             tagsSectionContainer.AddToClassList("inspector-section-container");
 
-            // Input Constraints
-            Dictionary<Constraint, VisualElement> candidateContraintRows = narrativeObjectNode.GetCandidateConstraintRows();
-
-            VisualElement candidateConstraintsSection = narrativeObjectNode.GetConstraintSection(candidateContraintRows, "Self Constraints",
+            // Self Constraints
+            VisualElement candidateConstraintsSection = ConstraintsComponent.Render("Self Constraints", narrativeObjectNode.NarrativeObject, narrativeObjectNode.NarrativeObject.constraints, narrativeObjectNode.NarrativeObject.constraintMode,
+                (newConstraintMode) =>
+                {
+                    narrativeObjectNode.NarrativeObject.constraintMode = newConstraintMode;
+                },
                 (constraintType) =>
                 {
                     AddConstraint(narrativeObjectNode.NarrativeObject, constraintType);
@@ -225,15 +227,16 @@ namespace CuttingRoom.Editor
                 (removedConstraint) =>
                 {
                     RemoveConstraint(narrativeObjectNode.NarrativeObject, removedConstraint);
-                });
-
+                }, StyleSheet);
             candidateConstraintsSection.styleSheets.Add(StyleSheet);
             candidateConstraintsSection.AddToClassList("inspector-section-container");
 
-            // Output constraints.
-            Dictionary<Constraint, VisualElement> outputDecisionPointConstraintRows = narrativeObjectNode.GetOutputDecisionPointConstraintRows();
-
-            VisualElement outputConstraintsSection = narrativeObjectNode.GetConstraintSection(outputDecisionPointConstraintRows, "Output Constraints",
+            // Output constraints
+            VisualElement outputConstraintsSection = ConstraintsComponent.Render("Output Constraints", narrativeObjectNode.NarrativeObject, narrativeObjectNode.NarrativeObject.OutputSelectionDecisionPoint.Constraints, narrativeObjectNode.NarrativeObject.OutputSelectionDecisionPoint.constraintMode,
+                (newConstraintMode) =>
+                {
+                    narrativeObjectNode.NarrativeObject.OutputSelectionDecisionPoint.constraintMode = newConstraintMode;
+                },
                 (constraintType) =>
                 {
                     AddConstraint(narrativeObjectNode.NarrativeObject.OutputSelectionDecisionPoint, constraintType);
@@ -241,7 +244,7 @@ namespace CuttingRoom.Editor
                 (removedConstraint) =>
                 {
                     RemoveConstraint(narrativeObjectNode.NarrativeObject.OutputSelectionDecisionPoint, removedConstraint);
-                });
+                }, StyleSheet);
 
             outputConstraintsSection.styleSheets.Add(StyleSheet);
             outputConstraintsSection.AddToClassList("inspector-section-container");
@@ -272,10 +275,13 @@ namespace CuttingRoom.Editor
 
             VisualElement container = new VisualElement();
 
-            // Candidate constraints.
-            Dictionary<Constraint, VisualElement> candidateContraintRows = candidateNarrativeObjectNode.GetCandidateConstraintRows();
-
-            VisualElement candidateConstraintsSection = candidateNarrativeObjectNode.GetConstraintSection(candidateContraintRows, "Candidate Constraints",
+            // Candidate Constraints
+            VisualElement candidateConstraintsSection = ConstraintsComponent.Render("Candidate Constraints", candidateNarrativeObjectNode.NarrativeObject,
+                candidateNarrativeObjectNode.NarrativeObject.constraints, candidateNarrativeObjectNode.NarrativeObject.constraintMode,
+                (newConstraintMode) =>
+                {
+                    candidateNarrativeObjectNode.NarrativeObject.constraintMode = newConstraintMode;
+                },
                 (constraintType) =>
                 {
                     AddConstraint(candidateNarrativeObjectNode.NarrativeObject, constraintType);
@@ -283,8 +289,7 @@ namespace CuttingRoom.Editor
                 (removedConstraint) =>
                 {
                     RemoveConstraint(candidateNarrativeObjectNode.NarrativeObject, removedConstraint);
-                });
-
+                }, StyleSheet);
             candidateConstraintsSection.styleSheets.Add(StyleSheet);
             candidateConstraintsSection.AddToClassList("inspector-section-container");
 
