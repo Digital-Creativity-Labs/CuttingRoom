@@ -5,6 +5,7 @@ using CuttingRoom.VariableSystem;
 using CuttingRoom.VariableSystem.Variables;
 using System;
 using UnityEditor;
+using System.Threading;
 
 namespace CuttingRoom
 {
@@ -45,12 +46,17 @@ namespace CuttingRoom
         /// </summary>
         public VariableStore GlobalVariableStore { get { return globalVariableStore; } set { globalVariableStore = value; } }
 
+        /// <summary>
+        /// Root cancellation token for sequencer
+        /// </summary>
+        public readonly CancellationTokenSource rootCancellationToken = new();
+
         public void Start()
         {
             if (Application.isPlaying || EditorApplication.isPlaying)
             {
                 sequencer = new(rootNarrativeObject, this, true);
-                sequencer.Start();
+                sequencer.Start(rootCancellationToken.Token);
             }
         }
 

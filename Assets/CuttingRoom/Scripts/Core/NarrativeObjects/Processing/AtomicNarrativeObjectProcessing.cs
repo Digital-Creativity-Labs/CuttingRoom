@@ -51,7 +51,10 @@ namespace CuttingRoom
 
             LoadMediaController();
 
-            contentCoroutine = AtomicNarrativeObject.StartCoroutine(mediaController.WaitForEndOfContent());
+            if (mediaController != null)
+            {
+                contentCoroutine = AtomicNarrativeObject.StartCoroutine(mediaController.WaitForEndOfContent());
+            }
 
             yield return base.Process(sequencer, cancellationToken);
 

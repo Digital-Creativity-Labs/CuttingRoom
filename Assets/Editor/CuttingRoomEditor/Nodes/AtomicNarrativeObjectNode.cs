@@ -87,7 +87,7 @@ namespace CuttingRoom.Editor
         {
             List<VisualElement> rows = new List<VisualElement>(base.GetEditableFieldRows());
 
-            MediaController.ContentTypeEnum contentType = MediaController.ContentTypeEnum.Undefined;
+            MediaController.ContentTypeEnum contentType = MediaController.ContentTypeEnum.Empty;
 
             if (AtomicNarrativeObject.MediaController != null)
             {
@@ -114,7 +114,7 @@ namespace CuttingRoom.Editor
                 }
                 else
                 {
-                    contentType = MediaController.ContentTypeEnum.Undefined;
+                    contentType = MediaController.ContentTypeEnum.Empty;
                 }
                 // Flag that the object has changed.
                 AtomicNarrativeObject.OnValidate();
