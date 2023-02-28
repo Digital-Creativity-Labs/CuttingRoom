@@ -45,6 +45,7 @@ namespace CuttingRoom.Editor
 
         private enum SelectionSource
         {
+            None,
             Editor,
             Hierarchy
         }
@@ -94,11 +95,11 @@ namespace CuttingRoom.Editor
             CREditorWindow.OnSelect -= OnEditorSelection;
             CREditorWindow.OnSelect += OnEditorSelection;
 
-            CREditorWindow.OnDeselect -= RegenerateContents;
-            CREditorWindow.OnDeselect += RegenerateContents;
+            CREditorWindow.OnDeselect -= OnEditorSelection;
+            CREditorWindow.OnDeselect += OnEditorSelection;
 
-            CREditorWindow.OnSelectionCleared -= RegenerateContents;
-            CREditorWindow.OnSelectionCleared += RegenerateContents;
+            CREditorWindow.OnSelectionCleared -= OnEditorSelection;
+            CREditorWindow.OnSelectionCleared += OnEditorSelection;
 
             Selection.selectionChanged -= OnHierarchySelection;
             Selection.selectionChanged += OnHierarchySelection;
@@ -128,8 +129,8 @@ namespace CuttingRoom.Editor
             if (CREditorWindow != null)
             {
                 CREditorWindow.OnDelete -= RegenerateContents;
-                CREditorWindow.OnSelect -= RegenerateContents;
-                CREditorWindow.OnDeselect -= RegenerateContents;
+                CREditorWindow.OnSelect -= OnEditorSelection;
+                CREditorWindow.OnDeselect -= OnEditorSelection;
                 CREditorWindow.OnSelectionCleared -= OnEditorSelection;
                 Selection.selectionChanged -= OnHierarchySelection;
                 EditorApplication.playModeStateChanged -= HandlePlayModeChange;
@@ -210,12 +211,14 @@ namespace CuttingRoom.Editor
         {
             selectionSource = SelectionSource.Editor;
             RegenerateContents();
+            selectionSource = SelectionSource.None;
         }
 
         private void OnHierarchySelection()
         {
             selectionSource = SelectionSource.Hierarchy;
             RegenerateContents();
+            selectionSource = SelectionSource.None;
         }
 
         private void RegenerateContents()
@@ -305,7 +308,8 @@ namespace CuttingRoom.Editor
                     Inspector.UpdateContentForEdge(outputNarrativeObjectNode, inputNarrativeObjectNode);
                 }
             }
-            else
+            // Do not update to global content if the selection change is from the Hierarchy. Hierarchy cleared selections happen when edges are selected.
+            else if (selectionSource == SelectionSource.Editor)
             {
                 // No selection so show variables for global things.
                 Inspector.UpdateContentForGlobal(narrativeSpace);

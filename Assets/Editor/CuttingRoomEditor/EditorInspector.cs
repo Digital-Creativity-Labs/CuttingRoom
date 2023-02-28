@@ -273,27 +273,29 @@ namespace CuttingRoom.Editor
         {
             scrollView.Clear();
 
-            //VisualElement container = new VisualElement();
+            VisualElement container = new VisualElement();
 
-            //// Candidate constraints.
-            //Dictionary<Constraint, VisualElement> candidateContraintRows = candidateNarrativeObjectNode.GetCandidateConstraintRows();
+            // Candidate Constraints
+            VisualElement candidateConstraintsSection = ConstraintsComponent.Render("Candidate Constraints", candidateNarrativeObjectNode.NarrativeObject,
+                candidateNarrativeObjectNode.NarrativeObject.constraints, candidateNarrativeObjectNode.NarrativeObject.constraintMode,
+                (newConstraintMode) =>
+                {
+                    candidateNarrativeObjectNode.NarrativeObject.constraintMode = newConstraintMode;
+                },
+                (constraintType) =>
+                {
+                    AddConstraint(candidateNarrativeObjectNode.NarrativeObject, constraintType);
+                },
+                (removedConstraint) =>
+                {
+                    RemoveConstraint(candidateNarrativeObjectNode.NarrativeObject, removedConstraint);
+                }, StyleSheet);
+            candidateConstraintsSection.styleSheets.Add(StyleSheet);
+            candidateConstraintsSection.AddToClassList("inspector-section-container");
 
-            //VisualElement candidateConstraintsSection = candidateNarrativeObjectNode.GetConstraintSection(candidateContraintRows, "Candidate Constraints",
-            //    (constraintType) =>
-            //    {
-            //        AddConstraint(candidateNarrativeObjectNode.NarrativeObject, constraintType);
-            //    },
-            //    (removedConstraint) =>
-            //    {
-            //        RemoveConstraint(candidateNarrativeObjectNode.NarrativeObject, removedConstraint);
-            //    });
+            container.Add(candidateConstraintsSection);
 
-            //candidateConstraintsSection.styleSheets.Add(StyleSheet);
-            //candidateConstraintsSection.AddToClassList("inspector-section-container");
-
-            //container.Add(candidateConstraintsSection);
-
-            //scrollView.Add(container);
+            scrollView.Add(container);
         }
 
         /// <summary>
