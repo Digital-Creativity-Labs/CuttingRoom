@@ -397,27 +397,36 @@ namespace CuttingRoom.Editor
             // Refresh Candidates
             foreach (var narrativeObject in narrativeObjects)
             {
+                NarrativeObject parentNarrativeObject = allNarrativeObjects.ContainsKey(viewContainerID) ? allNarrativeObjects[viewContainerID] : null;
+
                 if (narrativeObject != null && narrativeObject.OutputSelectionDecisionPoint != null
                     && narrativeObject.OutputSelectionDecisionPoint.Candidates != null
                     && narrativeObject.OutputSelectionDecisionPoint.Candidates.Count > 0)
                 {
-                    List<NarrativeObject> candidatesToRemove = new();
-                    for (int i = 0; i < narrativeObject.OutputSelectionDecisionPoint.Candidates.Count; ++i)
+                    if (parentNarrativeObject == null || parentNarrativeObject is GraphNarrativeObject)
                     {
-                        var candidate = narrativeObject.OutputSelectionDecisionPoint.Candidates[i];
-                        if (changedGuidNarrativeObjectLookup.ContainsKey(candidate.guid))
+                        List<NarrativeObject> candidatesToRemove = new();
+                        for (int i = 0; i < narrativeObject.OutputSelectionDecisionPoint.Candidates.Count; ++i)
                         {
-                            narrativeObject.OutputSelectionDecisionPoint.Candidates[i] = changedGuidNarrativeObjectLookup[candidate.guid];
+                            var candidate = narrativeObject.OutputSelectionDecisionPoint.Candidates[i];
+                            if (changedGuidNarrativeObjectLookup.ContainsKey(candidate.guid))
+                            {
+                                narrativeObject.OutputSelectionDecisionPoint.Candidates[i] = changedGuidNarrativeObjectLookup[candidate.guid];
+                            }
+                            else if (!changedGuidNarrativeObjectLookup.ContainsValue(candidate))
+                            {
+                                candidatesToRemove.Add(candidate);
+                            }
                         }
-                        else if (!changedGuidNarrativeObjectLookup.ContainsValue(candidate))
+
+                        foreach (var candidate in candidatesToRemove)
                         {
-                            candidatesToRemove.Add(candidate);
+                            narrativeObject.OutputSelectionDecisionPoint.RemoveCandidate(candidate);
                         }
                     }
-
-                    foreach (var candidate in candidatesToRemove)
+                    else
                     {
-                        narrativeObject.OutputSelectionDecisionPoint.RemoveCandidate(candidate);
+                        narrativeObject.OutputSelectionDecisionPoint.Candidates.Clear();
                     }
                 }
 

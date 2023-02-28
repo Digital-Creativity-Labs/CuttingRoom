@@ -94,7 +94,8 @@ namespace CuttingRoom
                     }
                     else
                     {
-                        secondaryLayerCoroutines.Add(sequencer.SubSequenceNarrativeObject(layerRoot, layerCancellationToken.Token));
+                        //secondaryLayerCoroutines.Add(sequencer.SubSequenceNarrativeObject(layerRoot, layerCancellationToken.Token));
+                        sequencer.StartSubSequence(layerRoot, layerCancellationToken.Token);
                     }
                 }    
             }

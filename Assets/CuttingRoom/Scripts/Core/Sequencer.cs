@@ -53,9 +53,9 @@ namespace CuttingRoom
         private Queue<SequencedNarrativeObject> narrativeObjectSequenceQueue = new Queue<SequencedNarrativeObject>();
 
         /// <summary>
-        /// List of narrative objects that are running as a sub sequence. These run in parallel.
+        /// List of sub sequences. These run in parallel.
         /// </summary>
-        private List<SequencedNarrativeObject> subSequenceNarrativeObjects = new List<SequencedNarrativeObject>();
+        private List<Sequencer> subSequences = new List<Sequencer>();
 
         /// <summary>
         /// Reference to latest processing Narrative Object for this sequence.
@@ -159,8 +159,8 @@ namespace CuttingRoom
                 SequencedNarrativeObject sequencedNarrativeObject = narrativeObjectSequenceQueue.Dequeue();
                 yield return ProcessNarrativeObject(sequencedNarrativeObject.narrativeObject, sequencedNarrativeObject.cancellationToken);
 
-                // Once complete clear the sub sequence
-                subSequenceNarrativeObjects.Clear();
+                // Once complete clear the sub sequences
+                subSequences.Clear();
             }
 
             SequenceComplete = true;
@@ -183,18 +183,16 @@ namespace CuttingRoom
         /// <summary>
         /// Sequence a narrative object to be processed in parrallel to current sequence.
         /// </summary>
-        /// <param name="narrativeObject"></param>
+        /// <param name="rootNarrativeObject"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public Coroutine SubSequenceNarrativeObject(NarrativeObject narrativeObject, CancellationToken? cancellationToken = null)
+        public Sequencer StartSubSequence(NarrativeObject rootNarrativeObject, CancellationToken? cancellationToken = null)
         {
-            var subSequenceNarrativeObjectCoroutine = ProcessNarrativeObject(narrativeObject, cancellationToken);
-            if (subSequenceNarrativeObjectCoroutine != null)
-            {
-                subSequenceNarrativeObjects.Add(new SequencedNarrativeObject(narrativeObject, cancellationToken));
-            }
+            Sequencer subSequence = new(rootNarrativeObject, NarrativeSpace);
+            subSequence.Start(cancellationToken);
+            subSequences.Add(subSequence);
 
-            return subSequenceNarrativeObjectCoroutine;
+            return subSequence;
         }
 
         /// <summary>
