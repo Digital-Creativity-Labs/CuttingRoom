@@ -240,7 +240,7 @@ namespace CuttingRoom.Editor
             topRow.Add(addConstraintControlsContainer);
 
             VisualElement anyOrAllToggle = new();
-            var buttonGroup = new RadioButtonGroup("Constraint Mode:");//, new List<string>() { "Valid if ANY", "Valid if ALL" });
+            var buttonGroup = new RadioButtonGroup("Constraint Mode:");
             buttonGroup.style.flexDirection = FlexDirection.Row;
             buttonGroup.AddToClassList("constraint-option-pill");
             var allButton = new RadioButton("Valid if ALL");

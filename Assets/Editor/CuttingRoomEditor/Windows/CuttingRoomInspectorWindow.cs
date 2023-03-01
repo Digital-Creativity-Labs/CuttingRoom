@@ -309,7 +309,7 @@ namespace CuttingRoom.Editor
                 }
             }
             // Do not update to global content if the selection change is from the Hierarchy. Hierarchy cleared selections happen when edges are selected.
-            else if (selectionSource == SelectionSource.Editor)
+            else if (selectionSource != SelectionSource.Hierarchy)
             {
                 // No selection so show variables for global things.
                 Inspector.UpdateContentForGlobal(narrativeSpace);
