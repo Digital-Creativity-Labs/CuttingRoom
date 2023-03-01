@@ -8,6 +8,7 @@ using System.Linq;
 using UnityEngine.SceneManagement;
 using UnityEditor.SceneManagement;
 using Newtonsoft.Json;
+using UnityEngine.UI;
 
 namespace CuttingRoom.Editor
 {
@@ -20,6 +21,7 @@ namespace CuttingRoom.Editor
 
         public Dictionary<string, NarrativeObjectNode> CopiedNodes { get; private set; } = new();
         public Dictionary<string, NarrativeObjectNode> CutNodes { get; private set; } = new();
+        public Dictionary<string, NarrativeObjectNode> DeleteNodes { get; private set; } = new();
 
         /// <summary>
         /// Edges currently in the graph and their info.
@@ -169,6 +171,7 @@ namespace CuttingRoom.Editor
             window.OnNarrativeObjectCreated += OnNarrativeObjectCreated;
 
             graphViewChanged += OnGraphViewChangedEvent;
+            deleteSelection += OnDeleteSelection;
             serializeGraphElements += CutCopyOperation;
             unserializeAndPaste += PasteOperation;
 
@@ -354,6 +357,41 @@ namespace CuttingRoom.Editor
         }
 
         /// <summary>
+        /// Invoked whenever the selection is cleared within the graph view.
+        /// </summary>
+        public void OnDeleteSelection(string operationName, AskUser askUser)
+        {
+            if (operationName == "Cut")
+            {
+                foreach (var selection in selected)
+                {
+                    if (selection is NarrativeObjectNode)
+                    {
+                        NarrativeObjectNode narrativeObjectNode = selection as NarrativeObjectNode;
+                        // A copied object that is to be removed  is a cut object object. Do not delete until they are pasted
+                        if (CopiedNodes.ContainsKey(narrativeObjectNode.NarrativeObject.guid))
+                        {
+                            CutNodes.Add(narrativeObjectNode.NarrativeObject.guid, narrativeObjectNode);
+                            CopiedNodes.Remove(narrativeObjectNode.NarrativeObject.guid);
+                        }
+                    }
+                }
+            }
+            else if (operationName == "Delete")
+            {
+                foreach (var selection in selected)
+                {
+                    if (selection is NarrativeObjectNode)
+                    {
+                        NarrativeObjectNode narrativeObjectNode = selection as NarrativeObjectNode;
+                        DeleteNodes[narrativeObjectNode.NarrativeObject.guid] = narrativeObjectNode;
+                    }
+                }
+            }
+            DeleteSelection();
+        }
+
+        /// <summary>
         /// Returns a list of compatible ports for a specified start port to connect to.
         /// </summary>
         /// <param name="startPort"></param>
@@ -487,8 +525,8 @@ namespace CuttingRoom.Editor
                             continue;
                         }
 
-                        // Only delete if not part of active copy or cut
-                        if (!CopiedNodes.ContainsKey(deletedEdgeState.OutputNarrativeObjectNode.NarrativeObject.guid) && !CutNodes.ContainsKey(deletedEdgeState.OutputNarrativeObjectNode.NarrativeObject.guid))
+                        // Only delete if not part of active cut
+                        if (!CutNodes.ContainsKey(deletedEdgeState.OutputNarrativeObjectNode.NarrativeObject.guid))
                         {
                             // Disconnect the narrative objects in the edge state which has been removed.
                             deletedEdgeState.OutputNarrativeObjectNode.NarrativeObject.OutputSelectionDecisionPoint.RemoveCandidate(deletedEdgeState.InputNarrativeObjectNode.NarrativeObject);
@@ -505,14 +543,16 @@ namespace CuttingRoom.Editor
                         ViewContainer visibleViewContainer = viewContainerStack.Peek();
                         RemoveNarrativeObjectAsCandidateOfViewContainer(visibleViewContainer, narrativeObjectNode.NarrativeObject);
 
-                        // A copied object that is to be removed  is a cut object object. Do not delete until they are pasted
-                        if (CopiedNodes.ContainsKey(narrativeObjectNode.NarrativeObject.guid))
+                        // Remove deleted node from list if deleted.
+                        if (DeleteNodes.ContainsKey(narrativeObjectNode.NarrativeObject.guid))
                         {
-                            CutNodes.Add(narrativeObjectNode.NarrativeObject.guid, narrativeObjectNode);
-                            CopiedNodes.Remove(narrativeObjectNode.NarrativeObject.guid);
-                        }
-                        else
-                        {
+                            DeleteNodes.Remove(narrativeObjectNode.NarrativeObject.guid);
+
+                            if (CopiedNodes.ContainsKey(narrativeObjectNode.NarrativeObject.guid))
+                            {
+                                CopiedNodes.Remove(narrativeObjectNode.NarrativeObject.guid);
+                            }
+
                             // Destroy the object in the hierarchy that the node being deleted represents.
                             UnityEngine.Object.DestroyImmediate(narrativeObjectNode.NarrativeObject.gameObject);
                         }
