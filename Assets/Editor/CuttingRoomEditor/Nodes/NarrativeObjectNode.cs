@@ -114,17 +114,6 @@ namespace CuttingRoom.Editor
             inputContainer.Add(InputPort);
             outputContainer.Add(OutputPort);
 
-            if (parentNarrativeObject == null || parentNarrativeObject is GraphNarrativeObject)
-            {
-                inputContainer.SetEnabled(true);
-                outputContainer.SetEnabled(true);
-            }
-            else
-            {
-                inputContainer.SetEnabled(false);
-                outputContainer.SetEnabled(false);
-            }
-
             StyleSheet = Resources.Load<StyleSheet>("NarrativeObjectNode");
 
             titleElement = this.Q<VisualElement>("title");
