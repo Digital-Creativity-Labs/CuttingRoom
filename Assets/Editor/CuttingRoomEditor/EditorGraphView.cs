@@ -359,7 +359,7 @@ namespace CuttingRoom.Editor
         /// <summary>
         /// Invoked whenever the selection is cleared within the graph view.
         /// </summary>
-        public void OnDeleteSelection(string operationName, AskUser askUser)
+        private void OnDeleteSelection(string operationName, AskUser askUser)
         {
             if (operationName == "Cut")
             {

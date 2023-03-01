@@ -88,6 +88,11 @@ namespace CuttingRoom.Editor
         private Dictionary<string, NarrativeObject> allNarrativeObjects = new();
 
         /// <summary>
+        /// Boolean for tracking if hierarchy change is a deletion
+        /// </summary>
+        private bool hierarchyDeletion = false;
+
+        /// <summary>
         /// Menu option to open editor window.
         /// </summary>
         [MenuItem("Cutting Room/Editor")]
@@ -533,6 +538,18 @@ namespace CuttingRoom.Editor
                 {
                     narrativeObject.OutputSelectionDecisionPoint.OnCandidatesChanged -= OnNarrativeObjectOutputCandidatesChanged;
                     narrativeObject.OutputSelectionDecisionPoint.OnCandidatesChanged += OnNarrativeObjectOutputCandidatesChanged;
+
+                    if (narrativeObject.OutputSelectionDecisionPoint.Candidates != null
+                        && narrativeObject.OutputSelectionDecisionPoint.Candidates.Count > 0)
+                    {
+                        for (int i = narrativeObject.OutputSelectionDecisionPoint.Candidates.Count - 1; i >= 0; --i)
+                        {
+                            if (narrativeObject.OutputSelectionDecisionPoint.Candidates[i] == null)
+                            {
+                                narrativeObject.OutputSelectionDecisionPoint.Candidates.RemoveAt(i);
+                            }
+                        }
+                    }
                 }
 
                 if (narrativeObject is GroupNarrativeObject)
@@ -584,7 +601,6 @@ namespace CuttingRoom.Editor
             EditorApplication.hierarchyChanged -= OnHierarchyChanged;
         }
 
-
         private void OnCreateGameObjectHierarchy(ref ObjectChangeEventStream stream)
         {
             List<NarrativeObject> copiedNarrativeObjects = new();
@@ -624,6 +640,11 @@ namespace CuttingRoom.Editor
                                 ProcessNarrativeObjectReparent(childNarrativeObject, previousParentNarrativeObject, parentNarrativeObject);
                                 RefreshNarrativeObjectLinks(new List<NarrativeObject>() { childNarrativeObject }, viewContainerID, ref allNarrativeObjects);
                             }
+                            break;
+                        }
+                    case ObjectChangeKind.DestroyGameObjectHierarchy:
+                        {
+                            hierarchyDeletion = true;
                             break;
                         }
                     default:
@@ -701,7 +722,8 @@ namespace CuttingRoom.Editor
         {
             // Whenever the hierarchy changes, regenerate as narrative
             // objects might have been destroyed.
-            RegenerateContents(false);
+            RegenerateContents(hierarchyDeletion);
+            hierarchyDeletion = false;
         }
 
         /// <summary>
