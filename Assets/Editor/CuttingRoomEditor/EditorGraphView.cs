@@ -6,6 +6,9 @@ using UnityEditor.Experimental.GraphView;
 using System;
 using System.Linq;
 using UnityEngine.SceneManagement;
+using UnityEditor.SceneManagement;
+using Newtonsoft.Json;
+using UnityEngine.UI;
 
 namespace CuttingRoom.Editor
 {
@@ -16,6 +19,10 @@ namespace CuttingRoom.Editor
         /// </summary>
         public Dictionary<string, NarrativeObjectNode> NarrativeObjectNodes { get; private set; } = new();
 
+        public Dictionary<string, NarrativeObjectNode> CopiedNodes { get; private set; } = new();
+        public Dictionary<string, NarrativeObjectNode> CutNodes { get; private set; } = new();
+        public Dictionary<string, NarrativeObjectNode> DeleteNodes { get; private set; } = new();
+
         /// <summary>
         /// Edges currently in the graph and their info.
         /// </summary>
@@ -25,6 +32,16 @@ namespace CuttingRoom.Editor
         /// Invoked whenever the OnGraphViewChangeEvent method is invoked.
         /// </summary>
         public event Action<GraphViewChange> OnGraphViewChanged;
+
+        /// <summary>
+        /// Invoked when paste operation is intiated.
+        /// </summary>
+        public event Action<string> OnPaste;
+
+        /// <summary>
+        /// Invoked when paste operation is completed.
+        /// </summary>
+        public event Action OnPasteComplete;
 
         /// <summary>
         /// Invoked whenever the view container changes.
@@ -154,6 +171,9 @@ namespace CuttingRoom.Editor
             window.OnNarrativeObjectCreated += OnNarrativeObjectCreated;
 
             graphViewChanged += OnGraphViewChangedEvent;
+            deleteSelection += OnDeleteSelection;
+            serializeGraphElements += CutCopyOperation;
+            unserializeAndPaste += PasteOperation;
 
             // Load the style sheet defining the style of the graph view.
             styleSheets.Add(Resources.Load<StyleSheet>("CuttingRoomEditorGraphView"));
@@ -186,6 +206,45 @@ namespace CuttingRoom.Editor
             // This element should never be removed and represents a container
             // for objects which are not part of another narrative object.
             viewContainerStack.Push(viewContainers[0]);
+        }
+
+        private string CutCopyOperation(IEnumerable<GraphElement> elements)
+        {
+            CopiedNodes.Clear();
+            // Delete Cut nodes if a new copy is made
+            foreach (var narrativeObject in CutNodes.Values)
+            {
+                UnityEngine.Object.DestroyImmediate(narrativeObject.NarrativeObject.gameObject);
+            }
+            CutNodes.Clear();
+            List<NarrativeObjectNode> narrativeObjectNodes = elements.Where(e => e is NarrativeObjectNode).Select(e => e as NarrativeObjectNode).ToList();
+
+            List<string> narrativeObjectGuids = new();
+
+            foreach (var narrativeObjectNode in narrativeObjectNodes)
+            {
+                if (narrativeObjectNode != null && narrativeObjectNode.NarrativeObject != null)
+                {
+                    narrativeObjectGuids.Add(narrativeObjectNode.NarrativeObject.guid);
+
+                    CopiedNodes.Add(narrativeObjectNode.NarrativeObject.guid, narrativeObjectNode);
+                }
+            }
+
+            return JsonConvert.SerializeObject(narrativeObjectGuids);
+        }
+
+        public virtual void PasteOperation(string operationName, string data)
+        {
+            OnPaste?.Invoke(data);
+            // Delete Cut nodes once paste is complete
+            foreach (var narrativeObject in CutNodes.Values)
+            {
+                UnityEngine.Object.DestroyImmediate(narrativeObject.NarrativeObject.gameObject);
+            }
+            CopiedNodes.Clear();
+            CutNodes.Clear();
+            OnPasteComplete?.Invoke();
         }
 
         /// <summary>
@@ -295,6 +354,41 @@ namespace CuttingRoom.Editor
             OnClearSelection?.Invoke();
 
             base.ClearSelection();
+        }
+
+        /// <summary>
+        /// Invoked whenever the selection is cleared within the graph view.
+        /// </summary>
+        private void OnDeleteSelection(string operationName, AskUser askUser)
+        {
+            if (operationName == "Cut")
+            {
+                foreach (var selection in selected)
+                {
+                    if (selection is NarrativeObjectNode)
+                    {
+                        NarrativeObjectNode narrativeObjectNode = selection as NarrativeObjectNode;
+                        // A copied object that is to be removed  is a cut object object. Do not delete until they are pasted
+                        if (CopiedNodes.ContainsKey(narrativeObjectNode.NarrativeObject.guid))
+                        {
+                            CutNodes.Add(narrativeObjectNode.NarrativeObject.guid, narrativeObjectNode);
+                            CopiedNodes.Remove(narrativeObjectNode.NarrativeObject.guid);
+                        }
+                    }
+                }
+            }
+            else if (operationName == "Delete")
+            {
+                foreach (var selection in selected)
+                {
+                    if (selection is NarrativeObjectNode)
+                    {
+                        NarrativeObjectNode narrativeObjectNode = selection as NarrativeObjectNode;
+                        DeleteNodes[narrativeObjectNode.NarrativeObject.guid] = narrativeObjectNode;
+                    }
+                }
+            }
+            DeleteSelection();
         }
 
         /// <summary>
@@ -431,11 +525,15 @@ namespace CuttingRoom.Editor
                             continue;
                         }
 
-                        // Disconnect the narrative objects in the edge state which has been removed.
-                        deletedEdgeState.OutputNarrativeObjectNode.NarrativeObject.OutputSelectionDecisionPoint.RemoveCandidate(deletedEdgeState.InputNarrativeObjectNode.NarrativeObject);
+                        // Only delete if not part of active cut
+                        if (!CutNodes.ContainsKey(deletedEdgeState.OutputNarrativeObjectNode.NarrativeObject.guid))
+                        {
+                            // Disconnect the narrative objects in the edge state which has been removed.
+                            deletedEdgeState.OutputNarrativeObjectNode.NarrativeObject.OutputSelectionDecisionPoint.RemoveCandidate(deletedEdgeState.InputNarrativeObjectNode.NarrativeObject);
 
-                        // Delete the edge state as it's corresponding edge no longer exists.
-                        EdgeStates.Remove(deletedEdgeState);
+                            // Delete the edge state as it's corresponding edge no longer exists.
+                            EdgeStates.Remove(deletedEdgeState);
+                        }
                     }
                     else if (graphElement is NarrativeObjectNode)
                     {
@@ -445,8 +543,19 @@ namespace CuttingRoom.Editor
                         ViewContainer visibleViewContainer = viewContainerStack.Peek();
                         RemoveNarrativeObjectAsCandidateOfViewContainer(visibleViewContainer, narrativeObjectNode.NarrativeObject);
 
-                        // Destroy the object in the hierarchy that the node being deleted represents.
-                        UnityEngine.Object.DestroyImmediate(narrativeObjectNode.NarrativeObject.gameObject);
+                        // Remove deleted node from list if deleted.
+                        if (DeleteNodes.ContainsKey(narrativeObjectNode.NarrativeObject.guid))
+                        {
+                            DeleteNodes.Remove(narrativeObjectNode.NarrativeObject.guid);
+
+                            if (CopiedNodes.ContainsKey(narrativeObjectNode.NarrativeObject.guid))
+                            {
+                                CopiedNodes.Remove(narrativeObjectNode.NarrativeObject.guid);
+                            }
+
+                            // Destroy the object in the hierarchy that the node being deleted represents.
+                            UnityEngine.Object.DestroyImmediate(narrativeObjectNode.NarrativeObject.gameObject);
+                        }
                     }
                 }
             }
