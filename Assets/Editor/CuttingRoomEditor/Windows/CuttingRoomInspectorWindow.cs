@@ -89,8 +89,8 @@ namespace CuttingRoom.Editor
             CREditorWindow = editorWindow;
             CREditorConnected = true;
 
-            CREditorWindow.OnDelete -= RegenerateContents;
-            CREditorWindow.OnDelete += RegenerateContents;
+            CREditorWindow.OnDelete -= OnEditorSelection;
+            CREditorWindow.OnDelete += OnEditorSelection;
 
             CREditorWindow.OnSelect -= OnEditorSelection;
             CREditorWindow.OnSelect += OnEditorSelection;
@@ -128,7 +128,7 @@ namespace CuttingRoom.Editor
             CREditorConnected = false;
             if (CREditorWindow != null)
             {
-                CREditorWindow.OnDelete -= RegenerateContents;
+                CREditorWindow.OnDelete -= OnEditorSelection;
                 CREditorWindow.OnSelect -= OnEditorSelection;
                 CREditorWindow.OnDeselect -= OnEditorSelection;
                 CREditorWindow.OnSelectionCleared -= OnEditorSelection;

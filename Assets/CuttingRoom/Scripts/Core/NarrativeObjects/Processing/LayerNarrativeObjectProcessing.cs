@@ -86,15 +86,12 @@ namespace CuttingRoom
             {
                 foreach (var layerRoot in selection)
                 {
+                    // Start secondary layers as sub sequences on sequencer.
+                    var layerSequencer = sequencer.StartSubSequence(layerRoot, layerCancellationToken.Token);
                     if (layerRoot == LayerNarrativeObject.primaryLayerRootNarrativeObject)
                     {
-                        subSequencer = new(layerRoot);
-                        subSequencer.Start(layerCancellationToken.Token);
+                        subSequencer = layerSequencer;
                         contentCoroutine = LayerNarrativeObject.StartCoroutine(subSequencer.WaitForSequenceComplete());
-                    }
-                    else
-                    {
-                        secondaryLayerCoroutines.Add(sequencer.SubSequenceNarrativeObject(layerRoot, layerCancellationToken.Token));
                     }
                 }    
             }

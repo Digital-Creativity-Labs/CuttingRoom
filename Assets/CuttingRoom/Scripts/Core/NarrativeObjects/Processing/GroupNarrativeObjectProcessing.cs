@@ -61,11 +61,7 @@ namespace CuttingRoom
 		{
 			if (selection != null)
 			{
-				if (subSequencer == null)
-				{
-					subSequencer = new(selection);
-				}
-                subSequencer.Start(groupCancellationToken.Token);
+                subSequencer = sequencer.StartSubSequence(selection, groupCancellationToken.Token);
 				contentCoroutine = GroupNarrativeObject.StartCoroutine(subSequencer.WaitForSequenceComplete());
             }
 			// Nothing asynchronous needed here so return null.

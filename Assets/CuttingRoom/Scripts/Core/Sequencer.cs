@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
-using static CuttingRoom.Sequencer;
 
 namespace CuttingRoom
 {
@@ -27,18 +26,22 @@ namespace CuttingRoom
 
         private Coroutine sequenceCoroutine = null;
 
+        public int sequenceDepth = 0;
+
         /// <summary>
         /// Class to pair Narrative Object with cancellation token.
         /// </summary>
         public class SequencedNarrativeObject
         {
             public NarrativeObject narrativeObject = null;
+            public int sequenceDepth = 0;
             public CancellationToken? cancellationToken = null;
 
-            public SequencedNarrativeObject(NarrativeObject narrativeObject, CancellationToken? cancellationToken)
+            public SequencedNarrativeObject(NarrativeObject narrativeObject, CancellationToken? cancellationToken, int sequenceDepth)
             {
                 this.narrativeObject = narrativeObject;
                 this.cancellationToken = cancellationToken;
+                this.sequenceDepth = sequenceDepth;
             }
         }
 
@@ -53,9 +56,9 @@ namespace CuttingRoom
         private Queue<SequencedNarrativeObject> narrativeObjectSequenceQueue = new Queue<SequencedNarrativeObject>();
 
         /// <summary>
-        /// List of narrative objects that are running as a sub sequence. These run in parallel.
+        /// List of sub sequences. These run in parallel.
         /// </summary>
-        private List<SequencedNarrativeObject> subSequenceNarrativeObjects = new List<SequencedNarrativeObject>();
+        private List<Sequencer> subSequences = new List<Sequencer>();
 
         /// <summary>
         /// Reference to latest processing Narrative Object for this sequence.
@@ -70,23 +73,65 @@ namespace CuttingRoom
         /// <summary>
         /// Static sequence history. Updated by all sequences/ sub sequences.
         /// </summary>
-        static public List<NarrativeObject> SequenceHistory { get; private set; } = new();
+        static public List<SequencedNarrativeObject> SequenceHistory { get; private set; } = new();
 
         /// <summary>
         /// Safely record Narrative Object to history.
         /// </summary>
         /// <param name="narrativeObject"></param>
-        static public void RecordToHistory(NarrativeObject narrativeObject)
+        static public void RecordToHistory(SequencedNarrativeObject sequencedNarrativeObject)
         {
-            if (narrativeObject != null)
+            if (sequencedNarrativeObject != null)
             {
                 lock (SequenceHistory)
                 {
-                    CurrentNarrativeObject = narrativeObject;
-                    SequenceHistory.Add(narrativeObject);
+                    CurrentNarrativeObject = sequencedNarrativeObject.narrativeObject;
+                    SequenceHistory.Add(sequencedNarrativeObject);
+
+#if UNITY_EDITOR
+                    LogSequence();
+#endif
                 }
             }
         }
+
+#if UNITY_EDITOR
+        static void LogSequence()
+        {
+            // Log sequence
+            string history = "";
+            int currentDepth = 0;
+
+            foreach (var playedNarrativeObject in SequenceHistory)
+            {
+                int nodeDepth = playedNarrativeObject.sequenceDepth;
+                string depthStartMarker = string.Empty;
+                string depthEndMarker = string.Empty;
+                if (nodeDepth > currentDepth)
+                {
+                    for (int i = currentDepth; i < nodeDepth; ++i)
+                    {
+                        depthStartMarker += "[";
+                    }
+                    currentDepth = nodeDepth;
+                }
+                else if (nodeDepth < currentDepth)
+                {
+                    for (int i = currentDepth; i > nodeDepth; --i)
+                    {
+                        depthEndMarker += "]";
+                    }
+                    currentDepth = nodeDepth;
+                }
+                if (!string.IsNullOrEmpty(history))
+                {
+                    history = $"{history}{depthEndMarker} -> {depthStartMarker}";
+                }
+                history = $"{history}{playedNarrativeObject.narrativeObject.name}";
+            }
+            Debug.Log(history);
+        }
+#endif
 
         /// <summary>
         /// Constructor for sequencer.
@@ -94,7 +139,7 @@ namespace CuttingRoom
         /// <param name="rootNarrativeObject"></param>
         /// <param name="narrativeSpace"></param>
         /// <param name="autoStartProcessing"></param>
-        public Sequencer(NarrativeObject rootNarrativeObject, NarrativeSpace narrativeSpace = null, bool autoStartProcessing = true)
+        public Sequencer(NarrativeObject rootNarrativeObject, NarrativeSpace narrativeSpace = null, bool autoStartProcessing = true, int sequenceDepth = 0)
         {
             this.rootNarrativeObject = rootNarrativeObject;
             if (narrativeSpace != null)
@@ -103,10 +148,11 @@ namespace CuttingRoom
             }
             else
             {
-                NarrativeSpace = Object.FindObjectOfType<NarrativeSpace>();
+                NarrativeSpace = UnityEngine.Object.FindObjectOfType<NarrativeSpace>();
             }
 
             this.autoStartProcessing = autoStartProcessing;
+            this.sequenceDepth = sequenceDepth;
         }
 
         /// <summary>
@@ -147,20 +193,16 @@ namespace CuttingRoom
 
             while (narrativeObjectSequenceQueue.Count > 0)
             {
-#if UNITY_EDITOR
-                // Log sequence
-                string history = "";
-                foreach (var narrativeObject in SequenceHistory)
-                {
-                    history = $"{history}{narrativeObject.name} -> ";
-                }
-                Debug.Log(history);
-#endif
                 SequencedNarrativeObject sequencedNarrativeObject = narrativeObjectSequenceQueue.Dequeue();
+
+                // Record new item on sequence
+                CurrentNarrativeObjectForSequence = sequencedNarrativeObject.narrativeObject;
+                RecordToHistory(sequencedNarrativeObject);
+
                 yield return ProcessNarrativeObject(sequencedNarrativeObject.narrativeObject, sequencedNarrativeObject.cancellationToken);
 
-                // Once complete clear the sub sequence
-                subSequenceNarrativeObjects.Clear();
+                // Once complete clear the sub sequences
+                subSequences.Clear();
             }
 
             SequenceComplete = true;
@@ -176,25 +218,23 @@ namespace CuttingRoom
         {
             if (NarrativeSpace != null)
             {
-                narrativeObjectSequenceQueue.Enqueue(new SequencedNarrativeObject(narrativeObject, cancellationToken));
+                narrativeObjectSequenceQueue.Enqueue(new SequencedNarrativeObject(narrativeObject, cancellationToken, sequenceDepth));
             }
         }
 
         /// <summary>
         /// Sequence a narrative object to be processed in parrallel to current sequence.
         /// </summary>
-        /// <param name="narrativeObject"></param>
+        /// <param name="rootNarrativeObject"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public Coroutine SubSequenceNarrativeObject(NarrativeObject narrativeObject, CancellationToken? cancellationToken = null)
+        public Sequencer StartSubSequence(NarrativeObject rootNarrativeObject, CancellationToken? cancellationToken = null)
         {
-            var subSequenceNarrativeObjectCoroutine = ProcessNarrativeObject(narrativeObject, cancellationToken);
-            if (subSequenceNarrativeObjectCoroutine != null)
-            {
-                subSequenceNarrativeObjects.Add(new SequencedNarrativeObject(narrativeObject, cancellationToken));
-            }
+            Sequencer subSequence = new(rootNarrativeObject, NarrativeSpace, autoStartProcessing, sequenceDepth + 1);
+            subSequence.Start(cancellationToken);
+            subSequences.Add(subSequence);
 
-            return subSequenceNarrativeObjectCoroutine;
+            return subSequence;
         }
 
         /// <summary>
@@ -235,10 +275,6 @@ namespace CuttingRoom
 
                 coroutine = NarrativeSpace.StartCoroutine(SequencerLayerNarrativeObject(layerNarrativeObject, cancellationToken));
             }
-
-            // Record new item on sequence
-            CurrentNarrativeObjectForSequence = narrativeObject;
-            RecordToHistory(CurrentNarrativeObjectForSequence);
 
             return coroutine;
         }
