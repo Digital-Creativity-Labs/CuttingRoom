@@ -395,30 +395,23 @@ namespace CuttingRoom.Editor
                     && narrativeObject.OutputSelectionDecisionPoint.Candidates != null
                     && narrativeObject.OutputSelectionDecisionPoint.Candidates.Count > 0)
                 {
-                    if (parentNarrativeObject == null || parentNarrativeObject is GraphNarrativeObject)
+                    List<NarrativeObject> candidatesToRemove = new();
+                    for (int i = 0; i < narrativeObject.OutputSelectionDecisionPoint.Candidates.Count; ++i)
                     {
-                        List<NarrativeObject> candidatesToRemove = new();
-                        for (int i = 0; i < narrativeObject.OutputSelectionDecisionPoint.Candidates.Count; ++i)
+                        var candidate = narrativeObject.OutputSelectionDecisionPoint.Candidates[i];
+                        if (changedGuidNarrativeObjectLookup.ContainsKey(candidate.guid))
                         {
-                            var candidate = narrativeObject.OutputSelectionDecisionPoint.Candidates[i];
-                            if (changedGuidNarrativeObjectLookup.ContainsKey(candidate.guid))
-                            {
-                                narrativeObject.OutputSelectionDecisionPoint.Candidates[i] = changedGuidNarrativeObjectLookup[candidate.guid];
-                            }
-                            else if (!changedGuidNarrativeObjectLookup.ContainsValue(candidate))
-                            {
-                                candidatesToRemove.Add(candidate);
-                            }
+                            narrativeObject.OutputSelectionDecisionPoint.Candidates[i] = changedGuidNarrativeObjectLookup[candidate.guid];
                         }
-
-                        foreach (var candidate in candidatesToRemove)
+                        else if (!changedGuidNarrativeObjectLookup.ContainsValue(candidate))
                         {
-                            narrativeObject.OutputSelectionDecisionPoint.RemoveCandidate(candidate);
+                            candidatesToRemove.Add(candidate);
                         }
                     }
-                    else
+
+                    foreach (var candidate in candidatesToRemove)
                     {
-                        narrativeObject.OutputSelectionDecisionPoint.Candidates.Clear();
+                        narrativeObject.OutputSelectionDecisionPoint.RemoveCandidate(candidate);
                     }
                 }
 
