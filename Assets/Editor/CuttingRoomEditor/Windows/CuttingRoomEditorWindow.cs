@@ -389,8 +389,6 @@ namespace CuttingRoom.Editor
             // Refresh Candidates
             foreach (var narrativeObject in narrativeObjects)
             {
-                NarrativeObject parentNarrativeObject = allNarrativeObjects.ContainsKey(viewContainerID) ? allNarrativeObjects[viewContainerID] : null;
-
                 if (narrativeObject != null && narrativeObject.OutputSelectionDecisionPoint != null
                     && narrativeObject.OutputSelectionDecisionPoint.Candidates != null
                     && narrativeObject.OutputSelectionDecisionPoint.Candidates.Count > 0)
