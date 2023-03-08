@@ -1,8 +1,6 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
-using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 using System;
 using UnityEditor.Experimental.GraphView;
@@ -81,6 +79,8 @@ namespace CuttingRoom.Editor
         /// If constraints have been modified.
         /// </summary>
         public bool NarrativeObjectConstraintsModified { get; set; } = false;
+
+        private NarrativeSpace narrativeSpace = null;
 
         /// <summary>
         /// Cache of all Narrative Objects
@@ -755,6 +755,13 @@ namespace CuttingRoom.Editor
         private void RegenerateContents(bool clearWindow)
         {
             Initialise();
+
+            // References become null when the project is built and this lets us detect it.
+            if (narrativeSpace == null)
+            {
+                narrativeSpace = FindObjectOfType<NarrativeSpace>();
+                clearWindow = true;
+            }
 
             // When coming from playmode change events, the window must be totally regenerated
             // (as all editor variables are discarded so old contents is now invalid).

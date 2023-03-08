@@ -11,8 +11,8 @@ namespace CuttingRoom.VariableSystem.Variables
 		public bool Value { get => value; }
         public bool defaultValue = false;
 
-		[InspectorVisible]
-		public bool value = false;
+        [InspectorVisible]
+        public bool value = false;
 
 		public void Start()
 		{

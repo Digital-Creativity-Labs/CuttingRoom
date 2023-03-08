@@ -7,9 +7,7 @@ using Unity.Collections;
 using UnityEngine;
 using CuttingRoom.VariableSystem.Variables;
 using System.Linq;
-#if UNITY_EDITOR
 using CuttingRoom.Editor;
-#endif
 
 namespace CuttingRoom
 {

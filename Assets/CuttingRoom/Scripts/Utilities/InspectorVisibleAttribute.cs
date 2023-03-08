@@ -7,6 +7,7 @@ namespace CuttingRoom.Editor
     {
     }
 
+#if UNITY_EDITOR
     [CustomPropertyDrawer(typeof(InspectorVisibleAttribute))]
     public class ReadOnlyDrawer : PropertyDrawer
     {
@@ -25,4 +26,5 @@ namespace CuttingRoom.Editor
             GUI.enabled = true;
         }
     }
+#endif
 }
