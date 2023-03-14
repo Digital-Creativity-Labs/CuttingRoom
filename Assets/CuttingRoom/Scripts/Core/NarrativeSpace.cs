@@ -59,7 +59,7 @@ namespace CuttingRoom
 #endif
             if (isPlaying)
             {
-                sequencer = new(rootNarrativeObject, this, true);
+                sequencer = new(rootNarrativeObject, this);
                 sequencer.Start(rootCancellationToken.Token);
             }
         }

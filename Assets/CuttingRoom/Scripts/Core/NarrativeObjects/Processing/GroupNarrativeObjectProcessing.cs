@@ -62,8 +62,9 @@ namespace CuttingRoom
         {
             if (selections != null && selections.Count > 0)
             {
-                subSequencer = sequencer.StartSubSequence(selections.First(), groupCancellationToken.Token);
+				subSequencer = sequencer.AddSubSequence(selections.First(), autoStartSequence: false);
 
+				// Queue all selections before starting to avoid race condition of an empty first selection
 				NarrativeObject selection;
                 for (int i = 1; i < selections.Count; ++i)
 				{
@@ -73,6 +74,8 @@ namespace CuttingRoom
 						subSequencer.SequenceNarrativeObject(selection);
 					}
 				}
+
+				subSequencer.Start(groupCancellationToken.Token);
 
                 contentCoroutine = GroupNarrativeObject.StartCoroutine(subSequencer.WaitForSequenceComplete());
             }

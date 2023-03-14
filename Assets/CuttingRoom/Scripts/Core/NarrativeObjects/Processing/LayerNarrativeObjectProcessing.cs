@@ -87,7 +87,7 @@ namespace CuttingRoom
                 foreach (var layerRoot in selection)
                 {
                     // Start secondary layers as sub sequences on sequencer.
-                    var layerSequencer = sequencer.StartSubSequence(layerRoot, layerCancellationToken.Token);
+                    var layerSequencer = sequencer.AddSubSequence(layerRoot, autoStartSequence: true, layerCancellationToken.Token);
                     if (layerRoot == LayerNarrativeObject.primaryLayerRootNarrativeObject)
                     {
                         subSequencer = layerSequencer;
