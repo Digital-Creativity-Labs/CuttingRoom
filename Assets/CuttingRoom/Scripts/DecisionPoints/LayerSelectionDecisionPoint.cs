@@ -14,7 +14,7 @@ namespace CuttingRoom
         public override IEnumerator Process(OnSelectionCallback onSelection)
         {
             // Not implemented
-            throw new NotImplementedException("Process() not implemented for multi selection on groups.");
+            throw new NotImplementedException("Process() not implemented for single selection on layers.");
         }
 
         public override IEnumerator Process(OnMultiSelectionCallback onSelection)

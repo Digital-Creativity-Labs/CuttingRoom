@@ -19,11 +19,6 @@ namespace CuttingRoom
 
         private NarrativeObject rootNarrativeObject = null;
 
-        /// <summary>
-        /// Whether processing should start automatically when object is created.
-        /// </summary>
-        private bool autoStartProcessing = true;
-
         private Coroutine sequenceCoroutine = null;
 
         public int sequenceDepth = 0;
@@ -138,8 +133,7 @@ namespace CuttingRoom
         /// </summary>
         /// <param name="rootNarrativeObject"></param>
         /// <param name="narrativeSpace"></param>
-        /// <param name="autoStartProcessing"></param>
-        public Sequencer(NarrativeObject rootNarrativeObject, NarrativeSpace narrativeSpace = null, bool autoStartProcessing = true, int sequenceDepth = 0)
+        public Sequencer(NarrativeObject rootNarrativeObject, NarrativeSpace narrativeSpace = null, int sequenceDepth = 0)
         {
             this.rootNarrativeObject = rootNarrativeObject;
             if (narrativeSpace != null)
@@ -151,7 +145,6 @@ namespace CuttingRoom
                 NarrativeSpace = UnityEngine.Object.FindObjectOfType<NarrativeSpace>();
             }
 
-            this.autoStartProcessing = autoStartProcessing;
             this.sequenceDepth = sequenceDepth;
         }
 
@@ -161,12 +154,9 @@ namespace CuttingRoom
         /// <param name="cancellationToken"></param>
         public void Start(CancellationToken? cancellationToken = null)
         {
-            if (autoStartProcessing)
+            if (NarrativeSpace != null && rootNarrativeObject != null)
             {
-                if (NarrativeSpace != null && rootNarrativeObject != null)
-                {
-                    sequenceCoroutine = NarrativeSpace.StartCoroutine(ProcessingCoroutine(cancellationToken));
-                }
+                sequenceCoroutine = NarrativeSpace.StartCoroutine(ProcessingCoroutine(cancellationToken));
             }
         }
 
@@ -223,16 +213,20 @@ namespace CuttingRoom
         }
 
         /// <summary>
-        /// Sequence a narrative object to be processed in parrallel to current sequence.
+        /// Add a sub sequence to be processed in parrallel to current sequence.
         /// </summary>
         /// <param name="rootNarrativeObject"></param>
         /// <param name="cancellationToken"></param>
+        /// <param name="autoStartSequence"></param>
         /// <returns></returns>
-        public Sequencer StartSubSequence(NarrativeObject rootNarrativeObject, CancellationToken? cancellationToken = null)
+        public Sequencer AddSubSequence(NarrativeObject rootNarrativeObject, bool autoStartSequence = false, CancellationToken? cancellationToken = null)
         {
-            Sequencer subSequence = new(rootNarrativeObject, NarrativeSpace, autoStartProcessing, sequenceDepth + 1);
-            subSequence.Start(cancellationToken);
+            Sequencer subSequence = new(rootNarrativeObject, NarrativeSpace, sequenceDepth + 1);
             subSequences.Add(subSequence);
+            if (autoStartSequence)
+            {
+                subSequence.Start(cancellationToken);
+            }
 
             return subSequence;
         }

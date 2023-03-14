@@ -68,9 +68,16 @@ namespace CuttingRoom
                     // We are rendering to the near plane (for now...)
                     videoPlayer.renderMode = VideoRenderMode.CameraNearPlane;
                     // Get or Add a camera for rendering.
-                    if (!gameObject.TryGetComponent(out videoPlayerCamera))
+                    if (videoPlayerCamera == null)
                     {
-                        videoPlayerCamera = gameObject.AddComponent<Camera>();
+                        if (Camera.main != null)
+                        {
+                            videoPlayerCamera = Camera.main;
+                        }
+                        else if (!gameObject.TryGetComponent(out videoPlayerCamera))
+                        {
+                            videoPlayerCamera = gameObject.AddComponent<Camera>();
+                        }
                     }
                     if (videoPlayerCamera != null)
                     {

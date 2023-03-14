@@ -42,7 +42,12 @@ namespace CuttingRoom
 		/// </summary>
 		protected OnSelectionCallback onSelection = null;
 
-		public abstract IEnumerator Process(OnSelectionCallback onSelection);
+        /// <summary>
+        /// Invoked when this decision point makes a selection.
+        /// </summary>
+        protected OnMultiSelectionCallback onMultiSelection = null;
+
+        public abstract IEnumerator Process(OnSelectionCallback onSelection);
         public abstract IEnumerator Process(OnMultiSelectionCallback onSelection);
 
         protected List<NarrativeObject> ProcessConstraints(List<Constraint> decisionPointConstraints)

@@ -47,7 +47,7 @@ namespace CuttingRoom
             GraphNarrativeObject.PreProcess();
 
             // Process from the defined root.
-            subSequencer = sequencer.StartSubSequence(GraphNarrativeObject.rootNarrativeObject, graphCancellationToken.Token);
+            subSequencer = sequencer.AddSubSequence(GraphNarrativeObject.rootNarrativeObject, autoStartSequence: true, graphCancellationToken.Token);
             contentCoroutine = GraphNarrativeObject.StartCoroutine(subSequencer.WaitForSequenceComplete());
 
             // Process the base functionality, output selection.

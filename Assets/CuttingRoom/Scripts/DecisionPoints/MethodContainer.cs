@@ -42,10 +42,15 @@ namespace CuttingRoom
 			/// </summary>
 			public OnSelectionCallback onSelection;
 
-			/// <summary>
-			/// Valid candidates to select from.
-			/// </summary>
-			public List<NarrativeObject> candidates;
+            /// <summary>
+            /// Method to invoke when a multi-selection is made.
+            /// </summary>
+            public OnMultiSelectionCallback onMultiSelection;
+
+            /// <summary>
+            /// Valid candidates to select from.
+            /// </summary>
+            public List<NarrativeObject> candidates;
 		}
 
 		/// <summary>

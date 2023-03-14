@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using UnityEngine;
 
@@ -52,20 +53,38 @@ namespace CuttingRoom
 			GroupNarrativeObject.PostProcess();
 		}
 
-		/// <summary>
-		/// Invoked when this group selects a narrative object.
-		/// </summary>
-		/// <param name="selection"></param>
-		/// <returns></returns>
-		public IEnumerator OnSelection(NarrativeObject selection)
-		{
-			if (selection != null)
-			{
-                subSequencer = sequencer.StartSubSequence(selection, groupCancellationToken.Token);
-				contentCoroutine = GroupNarrativeObject.StartCoroutine(subSequencer.WaitForSequenceComplete());
+        /// <summary>
+        /// Invoked when this group selects multiple narrative objects.
+        /// </summary>
+        /// <param name="selections"></param>
+        /// <returns></returns>
+        public IEnumerator OnSelection(List<NarrativeObject> selections)
+        {
+            if (selections != null && selections.Count > 0)
+            {
+				subSequencer = sequencer.AddSubSequence(selections.First(), autoStartSequence: false);
+
+				// Queue all selections before starting to avoid race condition of an empty first selection
+				NarrativeObject selection;
+                for (int i = 1; i < selections.Count; ++i)
+				{
+					selection = selections[i];
+					if (selection != null)
+					{
+						subSequencer.SequenceNarrativeObject(selection);
+					}
+				}
+
+				subSequencer.Start(groupCancellationToken.Token);
+
+                contentCoroutine = GroupNarrativeObject.StartCoroutine(subSequencer.WaitForSequenceComplete());
             }
-			// Nothing asynchronous needed here so return null.
-			yield return null;
+
+            // If no selections made then terminate the group
+            processingEnded = true;
+
+            // Nothing asynchronous needed here so return null.
+            yield return null;
         }
 
         /// <summary>
