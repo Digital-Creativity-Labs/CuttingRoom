@@ -1,7 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
+using static CuttingRoom.Sequencer;
 
 namespace CuttingRoom
 {
@@ -18,6 +20,8 @@ namespace CuttingRoom
         public NarrativeSpace NarrativeSpace { get { return narrativeSpace; } private set { narrativeSpace = value; } }
 
         private NarrativeObject rootNarrativeObject = null;
+
+        private CancellationTokenSource rootCancellationTokenSource = null;
 
         private Coroutine sequenceCoroutine = null;
 
@@ -133,9 +137,14 @@ namespace CuttingRoom
         /// </summary>
         /// <param name="rootNarrativeObject"></param>
         /// <param name="narrativeSpace"></param>
-        public Sequencer(NarrativeObject rootNarrativeObject, NarrativeSpace narrativeSpace = null, int sequenceDepth = 0)
+        public Sequencer(NarrativeObject rootNarrativeObject, NarrativeSpace narrativeSpace = null, CancellationTokenSource cancellationTokenSource = null, int sequenceDepth = 0)
         {
             this.rootNarrativeObject = rootNarrativeObject;
+            this.rootCancellationTokenSource = cancellationTokenSource;
+            if (rootCancellationTokenSource == null)
+            {
+                rootCancellationTokenSource = new();
+            }
             if (narrativeSpace != null)
             {
                 NarrativeSpace = narrativeSpace;
@@ -152,12 +161,17 @@ namespace CuttingRoom
         /// Start Function.
         /// </summary>
         /// <param name="cancellationToken"></param>
-        public void Start(CancellationToken? cancellationToken = null)
+        public void Start()
         {
             if (NarrativeSpace != null && rootNarrativeObject != null)
             {
-                sequenceCoroutine = NarrativeSpace.StartCoroutine(ProcessingCoroutine(cancellationToken));
+                sequenceCoroutine = NarrativeSpace.StartCoroutine(ProcessingCoroutine(rootCancellationTokenSource.Token));
             }
+        }
+
+        public void Stop()
+        {
+            rootCancellationTokenSource?.Cancel();  
         }
 
         /// <summary>
@@ -181,18 +195,46 @@ namespace CuttingRoom
         {
             SequenceNarrativeObject(rootNarrativeObject, cancellationToken);
 
-            while (narrativeObjectSequenceQueue.Count > 0)
+            SequencedNarrativeObject previousNarrativeObject = null;
+            SequencedNarrativeObject currentNarrativeObject = null;
+            while (narrativeObjectSequenceQueue.Count > 0 && !rootCancellationTokenSource.IsCancellationRequested)
             {
-                SequencedNarrativeObject sequencedNarrativeObject = narrativeObjectSequenceQueue.Dequeue();
+                previousNarrativeObject = currentNarrativeObject;
+                currentNarrativeObject = narrativeObjectSequenceQueue.Dequeue();
 
-                // Record new item on sequence
-                CurrentNarrativeObjectForSequence = sequencedNarrativeObject.narrativeObject;
-                RecordToHistory(sequencedNarrativeObject);
+                if (currentNarrativeObject != null)
+                {
+                    // Record new item on sequence
+                    RecordToHistory(currentNarrativeObject);
+                    CurrentNarrativeObjectForSequence = currentNarrativeObject.narrativeObject;
 
-                yield return ProcessNarrativeObject(sequencedNarrativeObject.narrativeObject, sequencedNarrativeObject.cancellationToken);
+                    currentNarrativeObject.narrativeObject.PreProcess();
 
-                // Once complete clear the sub sequences
-                subSequences.Clear();
+                    if (previousNarrativeObject != null)
+                    {
+                        previousNarrativeObject.narrativeObject.PostProcess();
+                    }
+                    bool processComplete = false;
+                    Coroutine processingCoroutine = NarrativeSpace.StartCoroutine(ProcessNarrativeObject(currentNarrativeObject.narrativeObject, () =>
+                    {
+                        processComplete = true;
+                    }, currentNarrativeObject.cancellationToken));
+
+                    yield return new WaitUntil(() => processComplete || rootCancellationTokenSource.IsCancellationRequested );
+
+                    // If cancelled post process now without waiting for next pre-process
+                    if (rootCancellationTokenSource.IsCancellationRequested || narrativeObjectSequenceQueue.Count == 0)
+                    {
+                        currentNarrativeObject.narrativeObject.PostProcess();
+                    }
+                    else
+                    {
+                        NarrativeSpace.StopCoroutine(processingCoroutine);
+                    }
+
+                    // Once complete clear the sub sequences
+                    TerminateSubSequences();
+                }
             }
 
             SequenceComplete = true;
@@ -219,16 +261,25 @@ namespace CuttingRoom
         /// <param name="cancellationToken"></param>
         /// <param name="autoStartSequence"></param>
         /// <returns></returns>
-        public Sequencer AddSubSequence(NarrativeObject rootNarrativeObject, bool autoStartSequence = false, CancellationToken? cancellationToken = null)
+        public Sequencer AddSubSequence(NarrativeObject rootNarrativeObject, bool autoStartSequence = false, CancellationTokenSource cancellationTokenSource = null)
         {
-            Sequencer subSequence = new(rootNarrativeObject, NarrativeSpace, sequenceDepth + 1);
+            Sequencer subSequence = new(rootNarrativeObject, NarrativeSpace, cancellationTokenSource, sequenceDepth + 1);
             subSequences.Add(subSequence);
             if (autoStartSequence)
             {
-                subSequence.Start(cancellationToken);
+                subSequence.Start();
             }
 
             return subSequence;
+        }
+
+        public void TerminateSubSequences()
+        {
+            foreach (var subSequence in subSequences)
+            {
+                subSequence.Stop();
+            }
+            subSequences.Clear();
         }
 
         /// <summary>
@@ -237,40 +288,43 @@ namespace CuttingRoom
         /// <param name="narrativeObject"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public Coroutine ProcessNarrativeObject(NarrativeObject narrativeObject, CancellationToken? cancellationToken = null)
+        public IEnumerator ProcessNarrativeObject(NarrativeObject narrativeObject, Action onProcessingComplete, CancellationToken? cancellationToken = null)
         {
             if (NarrativeSpace == null)
             {
-                return null;
+                yield return null;
+                onProcessingComplete?.Invoke();
             }
-
-            Coroutine coroutine = null;
             if (narrativeObject is AtomicNarrativeObject)
             {
                 AtomicNarrativeObject atomicNarrativeObject = narrativeObject as AtomicNarrativeObject;
 
-                coroutine = NarrativeSpace.StartCoroutine(SequenceAtomicNarrativeObject(atomicNarrativeObject, cancellationToken));
+                yield return NarrativeSpace.StartCoroutine(SequenceAtomicNarrativeObject(atomicNarrativeObject, cancellationToken));
             }
             else if (narrativeObject is GroupNarrativeObject)
             {
                 GroupNarrativeObject groupNarrativeObject = narrativeObject as GroupNarrativeObject;
 
-                coroutine = NarrativeSpace.StartCoroutine(SequencerGroupNarrativeObject(groupNarrativeObject, cancellationToken));
+                yield return NarrativeSpace.StartCoroutine(SequencerGroupNarrativeObject(groupNarrativeObject, cancellationToken));
             }
             else if (narrativeObject is GraphNarrativeObject)
             {
                 GraphNarrativeObject graphNarrativeObject = narrativeObject as GraphNarrativeObject;
 
-                coroutine = NarrativeSpace.StartCoroutine(SequencerGraphNarrativeObject(graphNarrativeObject, cancellationToken));
+                yield return NarrativeSpace.StartCoroutine(SequencerGraphNarrativeObject(graphNarrativeObject, cancellationToken));
             }
             else if (narrativeObject is LayerNarrativeObject)
             {
                 LayerNarrativeObject layerNarrativeObject = narrativeObject as LayerNarrativeObject;
 
-                coroutine = NarrativeSpace.StartCoroutine(SequencerLayerNarrativeObject(layerNarrativeObject, cancellationToken));
+                yield return NarrativeSpace.StartCoroutine(SequencerLayerNarrativeObject(layerNarrativeObject, cancellationToken));
+            }
+            else
+            {
+                yield return null;
             }
 
-            return coroutine;
+            onProcessingComplete?.Invoke();
         }
 
         /// <summary>
@@ -283,7 +337,7 @@ namespace CuttingRoom
         {
             AtomicNarrativeObjectProcessing atomicNarrativeObjectProcessing = new AtomicNarrativeObjectProcessing(atomicNarrativeObject);
 
-            yield return NarrativeSpace.StartCoroutine(atomicNarrativeObjectProcessing.Process(this, cancellationToken));
+            yield return atomicNarrativeObjectProcessing.Process(this, cancellationToken);
         }
 
         /// <summary>
@@ -296,7 +350,7 @@ namespace CuttingRoom
         {
             GroupNarrativeObjectProcessing groupNarrativeObjectProcessing = new GroupNarrativeObjectProcessing(groupNarrativeObject);
 
-            yield return NarrativeSpace.StartCoroutine(groupNarrativeObjectProcessing.Process(this, cancellationToken));
+            yield return groupNarrativeObjectProcessing.Process(this, cancellationToken);
         }
 
         /// <summary>
@@ -309,7 +363,7 @@ namespace CuttingRoom
         {
             GraphNarrativeObjectProcessing graphNarrativeObjectProcessing = new GraphNarrativeObjectProcessing(graphNarrativeObject);
 
-            yield return NarrativeSpace.StartCoroutine(graphNarrativeObjectProcessing.Process(this, cancellationToken));
+            yield return graphNarrativeObjectProcessing.Process(this, cancellationToken);
         }
 
         /// <summary>
@@ -322,7 +376,7 @@ namespace CuttingRoom
         {
             LayerNarrativeObjectProcessing layerNarrativeObjectProcessing = new LayerNarrativeObjectProcessing(layerNarrativeObject);
 
-            yield return NarrativeSpace.StartCoroutine(layerNarrativeObjectProcessing.Process(this, cancellationToken));
+            yield return layerNarrativeObjectProcessing.Process(this, cancellationToken);
         }
     }
 }

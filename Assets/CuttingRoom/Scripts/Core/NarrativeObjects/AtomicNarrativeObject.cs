@@ -48,5 +48,16 @@ namespace CuttingRoom
                 MediaController.Init();
             }
         }
+
+        public override void PostProcess()
+        {
+            base.PostProcess();
+
+            if (MediaController != null)
+            {
+                MediaController.Unload();
+                MediaController = null;
+            }
+        }
     }
 }

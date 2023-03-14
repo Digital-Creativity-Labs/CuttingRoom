@@ -44,13 +44,9 @@ namespace CuttingRoom
 
             OnProcessingTriggerComplete += GroupEndTriggered;
 
-            GroupNarrativeObject.PreProcess();
-
 			yield return GroupNarrativeObject.GroupSelectionDecisionPoint.Process(OnSelection);
 
 			yield return base.Process(sequencer, cancellationToken);
-
-			GroupNarrativeObject.PostProcess();
 		}
 
         /// <summary>
@@ -62,7 +58,7 @@ namespace CuttingRoom
         {
 			if (selections != null && selections.Count > 0)
 			{
-				subSequencer = sequencer.AddSubSequence(selections.First(), autoStartSequence: false);
+				subSequencer = sequencer.AddSubSequence(selections.First(), autoStartSequence: false, groupCancellationToken);
 
 				// Queue all selections before starting to avoid race condition of an empty first selection
 				NarrativeObject selection;
@@ -75,7 +71,7 @@ namespace CuttingRoom
 					}
 				}
 
-				subSequencer.Start(groupCancellationToken.Token);
+				subSequencer.Start();
 
 				contentCoroutine = GroupNarrativeObject.StartCoroutine(subSequencer.WaitForSequenceComplete());
 			}

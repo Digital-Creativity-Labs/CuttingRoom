@@ -47,15 +47,12 @@ namespace CuttingRoom
 
             OnProcessingTriggerComplete += LayerEndTriggered;
 
-            LayerNarrativeObject.PreProcess();
             yield return LayerNarrativeObject.LayerSelectionDecisionPoint.Process(OnSelection);
 
             // Process the base functionality, output selection.
             yield return base.Process(sequencer, cancellationToken);
 
             yield return WaitForSecondaryLayersToEnd();
-
-            LayerNarrativeObject.PostProcess();
         }
 
         /// <summary>
@@ -87,7 +84,7 @@ namespace CuttingRoom
                 foreach (var layerRoot in selection)
                 {
                     // Start secondary layers as sub sequences on sequencer.
-                    var layerSequencer = sequencer.AddSubSequence(layerRoot, autoStartSequence: true, layerCancellationToken.Token);
+                    var layerSequencer = sequencer.AddSubSequence(layerRoot, autoStartSequence: true, layerCancellationToken);
                     if (layerRoot == LayerNarrativeObject.primaryLayerRootNarrativeObject)
                     {
                         subSequencer = layerSequencer;
