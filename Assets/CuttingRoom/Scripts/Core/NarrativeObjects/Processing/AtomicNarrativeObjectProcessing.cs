@@ -32,20 +32,20 @@ namespace CuttingRoom
         /// <returns></returns>
         public override IEnumerator Process(Sequencer sequencer, CancellationToken? cancellationToken = null)
         {
-            //switch (AtomicNarrativeObject.MediaSourceUnloadEvent)
-            //{
-            //    case MediaSourceUnloadEvent.OnProcessingTriggerComplete:
+            switch (AtomicNarrativeObject.MediaSourceUnloadEvent)
+            {
+                case MediaSourceUnloadEvent.OnProcessingTriggerComplete:
 
-            //        OnProcessingTriggerComplete += UnloadMediaController;
+                    OnProcessingTriggerComplete += UnloadMediaController;
 
-            //        break;
+                    break;
 
-            //    case MediaSourceUnloadEvent.OnProcessingComplete:
+                case MediaSourceUnloadEvent.OnProcessingComplete:
 
-            //        OnProcessingComplete += UnloadMediaController;
+                    OnProcessingComplete += UnloadMediaController;
 
-            //        break;
-            //}
+                    break;
+            }
             LoadMediaController();
 
             if (mediaController != null)

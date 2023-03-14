@@ -199,8 +199,12 @@ namespace CuttingRoom
             SequencedNarrativeObject currentNarrativeObject = null;
             while (narrativeObjectSequenceQueue.Count > 0 && !rootCancellationTokenSource.IsCancellationRequested)
             {
-                previousNarrativeObject = currentNarrativeObject;
                 currentNarrativeObject = narrativeObjectSequenceQueue.Dequeue();
+
+                if (narrativeObjectSequenceQueue.Count > 0)
+                {
+                    narrativeObjectSequenceQueue.Peek().narrativeObject.PreProcess();
+                }
 
                 if (currentNarrativeObject != null)
                 {
@@ -210,10 +214,6 @@ namespace CuttingRoom
 
                     currentNarrativeObject.narrativeObject.PreProcess();
 
-                    if (previousNarrativeObject != null)
-                    {
-                        previousNarrativeObject.narrativeObject.PostProcess();
-                    }
                     bool processComplete = false;
                     Coroutine processingCoroutine = NarrativeSpace.StartCoroutine(ProcessNarrativeObject(currentNarrativeObject.narrativeObject, () =>
                     {
@@ -222,15 +222,8 @@ namespace CuttingRoom
 
                     yield return new WaitUntil(() => processComplete || rootCancellationTokenSource.IsCancellationRequested );
 
-                    // If cancelled post process now without waiting for next pre-process
-                    if (rootCancellationTokenSource.IsCancellationRequested || narrativeObjectSequenceQueue.Count == 0)
-                    {
-                        currentNarrativeObject.narrativeObject.PostProcess();
-                    }
-                    else
-                    {
-                        NarrativeSpace.StopCoroutine(processingCoroutine);
-                    }
+                    currentNarrativeObject.narrativeObject.PostProcess();
+                    NarrativeSpace.StopCoroutine(processingCoroutine);
 
                     // Once complete clear the sub sequences
                     TerminateSubSequences();

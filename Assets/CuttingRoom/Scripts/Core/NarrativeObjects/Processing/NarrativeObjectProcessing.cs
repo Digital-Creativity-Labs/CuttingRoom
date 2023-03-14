@@ -70,7 +70,10 @@ namespace CuttingRoom
 
                 foreach (var endTrig in endTriggers)
                 {
-                    narrativeObject.StopCoroutine(endTrig);
+                    if (endTrig != null)
+                    {
+                        narrativeObject.StopCoroutine(endTrig);
+                    }
                 }
             }
 

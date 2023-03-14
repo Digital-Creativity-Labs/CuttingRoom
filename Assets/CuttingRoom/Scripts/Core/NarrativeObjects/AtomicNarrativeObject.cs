@@ -41,22 +41,14 @@ namespace CuttingRoom
 
         public override void PreProcess()
         {
-            base.PreProcess();
-
-            if (MediaController != null)
+            if (!inProgress)
             {
-                MediaController.Init();
-            }
-        }
+                base.PreProcess();
 
-        public override void PostProcess()
-        {
-            base.PostProcess();
-
-            if (MediaController != null)
-            {
-                MediaController.Unload();
-                MediaController = null;
+                if (MediaController != null)
+                {
+                    MediaController.Init();
+                }
             }
         }
     }

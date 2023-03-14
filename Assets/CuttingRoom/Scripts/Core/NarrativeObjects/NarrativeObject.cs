@@ -68,6 +68,8 @@ namespace CuttingRoom
         /// </summary>
         public ConstraintMode constraintMode = ConstraintMode.ValidIfAll;
 
+        public bool inProgress = false;
+
 #if UNITY_EDITOR
         public void Awake()
         {
@@ -139,11 +141,15 @@ namespace CuttingRoom
         /// </summary>
         public virtual void PreProcess()
         {
-            foreach(var trigger in endTriggers)
+            if (!inProgress)
             {
-                if (trigger != null)
+                inProgress = true;
+                foreach (var trigger in endTriggers)
                 {
-                    trigger.StartMonitoring();
+                    if (trigger != null)
+                    {
+                        trigger.StartMonitoring();
+                    }
                 }
             }
         }
@@ -160,6 +166,7 @@ namespace CuttingRoom
                     trigger.StopMonitoring();
                 }
             }
+            inProgress = false;
         }
 
 #if UNITY_EDITOR

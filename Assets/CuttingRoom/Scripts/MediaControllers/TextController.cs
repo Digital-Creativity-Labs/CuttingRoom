@@ -91,6 +91,7 @@ namespace CuttingRoom
         /// </summary>
         public override void Unload()
         {
+            contentEnded = true;
             Destroy(textScreenObject);
         }
 

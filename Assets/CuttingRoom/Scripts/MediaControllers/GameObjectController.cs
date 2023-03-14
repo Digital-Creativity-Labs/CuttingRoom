@@ -49,6 +49,7 @@ namespace CuttingRoom
             {
                 Destroy(gameObject);
             }
+            contentEnded = true;
         }
 
         public override IEnumerator WaitForEndOfContent()
