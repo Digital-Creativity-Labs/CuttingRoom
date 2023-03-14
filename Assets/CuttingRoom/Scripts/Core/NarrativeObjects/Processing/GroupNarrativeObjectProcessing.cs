@@ -79,6 +79,10 @@ namespace CuttingRoom
 
                 contentCoroutine = GroupNarrativeObject.StartCoroutine(subSequencer.WaitForSequenceComplete());
             }
+
+            // If no selections made then terminate the group
+            processingEnded = true;
+
             // Nothing asynchronous needed here so return null.
             yield return null;
         }
