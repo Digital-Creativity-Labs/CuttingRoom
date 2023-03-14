@@ -60,13 +60,13 @@ namespace CuttingRoom
         /// <returns></returns>
         public IEnumerator OnSelection(List<NarrativeObject> selections)
         {
-            if (selections != null && selections.Count > 0)
-            {
+			if (selections != null && selections.Count > 0)
+			{
 				subSequencer = sequencer.AddSubSequence(selections.First(), autoStartSequence: false);
 
 				// Queue all selections before starting to avoid race condition of an empty first selection
 				NarrativeObject selection;
-                for (int i = 1; i < selections.Count; ++i)
+				for (int i = 1; i < selections.Count; ++i)
 				{
 					selection = selections[i];
 					if (selection != null)
@@ -77,11 +77,13 @@ namespace CuttingRoom
 
 				subSequencer.Start(groupCancellationToken.Token);
 
-                contentCoroutine = GroupNarrativeObject.StartCoroutine(subSequencer.WaitForSequenceComplete());
-            }
-
-            // If no selections made then terminate the group
-            processingEnded = true;
+				contentCoroutine = GroupNarrativeObject.StartCoroutine(subSequencer.WaitForSequenceComplete());
+			}
+			else
+			{
+				// If no selections made then terminate the group
+				processingEnded = true;
+			}
 
             // Nothing asynchronous needed here so return null.
             yield return null;
