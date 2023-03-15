@@ -201,11 +201,6 @@ namespace CuttingRoom
             {
                 currentNarrativeObject = narrativeObjectSequenceQueue.Dequeue();
 
-                if (narrativeObjectSequenceQueue.Count > 0)
-                {
-                    narrativeObjectSequenceQueue.Peek().narrativeObject.PreProcess();
-                }
-
                 if (currentNarrativeObject != null)
                 {
                     // Record new item on sequence
@@ -219,6 +214,15 @@ namespace CuttingRoom
                     {
                         processComplete = true;
                     }, currentNarrativeObject.cancellationToken));
+
+                    if (currentNarrativeObject.narrativeObject.OutputSelectionDecisionPoint != null
+                        && currentNarrativeObject.narrativeObject.OutputSelectionDecisionPoint.Candidates.Count > 0)
+                    {
+                        foreach (var candidate in currentNarrativeObject.narrativeObject.OutputSelectionDecisionPoint.Candidates)
+                        {
+                            candidate.PreProcess();
+                        }
+                    }
 
                     yield return new WaitUntil(() => processComplete || rootCancellationTokenSource.IsCancellationRequested );
 

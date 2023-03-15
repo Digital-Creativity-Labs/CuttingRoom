@@ -144,12 +144,19 @@ namespace CuttingRoom
             if (!inProgress)
             {
                 inProgress = true;
-                foreach (var trigger in endTriggers)
+            }
+        }
+
+        /// <summary>
+        /// Invoked immediately before process method starts execution.
+        /// </summary>
+        public virtual void StartProcess()
+        {
+            foreach (var trigger in endTriggers)
+            {
+                if (trigger != null)
                 {
-                    if (trigger != null)
-                    {
-                        trigger.StartMonitoring();
-                    }
+                    trigger.StartMonitoring();
                 }
             }
         }

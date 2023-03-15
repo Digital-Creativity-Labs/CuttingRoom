@@ -38,6 +38,7 @@ namespace CuttingRoom
         /// <returns></returns>
         public virtual IEnumerator Process(Sequencer sequencer, CancellationToken? cancellationToken = null)
         {
+            narrativeObject.StartProcess();
             if (narrativeObject.VariableStore != null)
             {
                 BoolVariable hasPlayed = narrativeObject.VariableStore.GetVariable(NarrativeObject.hasPlayedTagName) as BoolVariable;

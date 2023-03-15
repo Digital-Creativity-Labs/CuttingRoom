@@ -50,6 +50,7 @@ namespace CuttingRoom
 
         public override void Init()
         {
+            Initialised = false;
             contentEnded = false;
 
             // Get or Add video player. Use local video player for sub fullscreen video.
@@ -62,6 +63,11 @@ namespace CuttingRoom
                     videoPlayer.playOnAwake = false;
                     videoPlayer.aspectRatio = VideoAspectRatio.FitHorizontally;
                 }
+            }
+            else if (videoPlayer != null)
+            {
+                videoPlayer.seekCompleted -= StopVideoPlayerHandler;
+                videoPlayer.enabled = true;
             }
 
 
@@ -90,7 +96,7 @@ namespace CuttingRoom
 
                         // Set the render depth of the camera. This comes from the layer that this video controller is sequenced onto.
                         //videoPlayer.targetCamera.depth = renderDepth - 1;
-                        videoPlayer.targetCamera = videoPlayerCamera;
+                        //videoPlayer.targetCamera = videoPlayerCamera;
                     }
                 }
                 else
@@ -146,12 +152,27 @@ namespace CuttingRoom
 
                 videoPlayer.Pause();
 
-                // Preload the video player content.
-                videoPlayer.Prepare();
+                videoPlayer.prepareCompleted -= VideoPlayer_prepareCompleted;
+                if (!videoPlayer.isPrepared)
+                {
+                    videoPlayer.prepareCompleted += VideoPlayer_prepareCompleted;
+
+                    // Preload the video player content.
+                    videoPlayer.Prepare();
+                }
+                else
+                {
+                    Debug.Log($"{Video.name} already prepared");
+                }
 
 
-                Initialised = true;
+                base.Init();
             }
+        }
+
+        private void VideoPlayer_prepareCompleted(VideoPlayer source)
+        {
+            Debug.Log($"{Video.name} prepared");
         }
 
         /// <summary>
@@ -164,13 +185,22 @@ namespace CuttingRoom
             {
                 if (videoPlayerCamera != null)
                 {
-                    videoPlayerCamera.enabled = true;
+                    videoPlayer.targetCamera = videoPlayerCamera;
                 }
 
-                videoPlayer.loopPointReached += (player) => { contentEnded = true; };
+                videoPlayer.loopPointReached += LoopPointReached;
 
+                if (!videoPlayer.enabled)
+                {
+                    videoPlayer.enabled = true;
+                }
                 videoPlayer.Play();
             }
+        }
+
+        public void LoopPointReached(VideoPlayer player)
+        {
+            contentEnded = true;
         }
 
         /// <summary>
@@ -180,10 +210,15 @@ namespace CuttingRoom
         {
             if (videoPlayer != null)
             {
-                videoPlayer.Stop();
+                videoPlayer.loopPointReached -= LoopPointReached;
             }
             contentEnded = true;
             StartCoroutine(ShutdownDelay());
+        }
+
+        void StopVideoPlayerHandler(VideoPlayer vp)
+        {
+            vp.Stop();
         }
 
         private IEnumerator ShutdownDelay()
@@ -205,7 +240,10 @@ namespace CuttingRoom
             {
                 Debug.Log("Disabling video player: " + gameObject.name);
                 //Destroy(videoPlayer);
-                videoPlayer.targetCamera = null;
+                //videoPlayer.targetCamera = null;
+                //videoPlayer.enabled = false;
+                videoPlayer.seekCompleted += StopVideoPlayerHandler;
+                videoPlayer.frame = 0;
             }
             yield return null;
         }
