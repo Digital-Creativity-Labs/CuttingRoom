@@ -505,6 +505,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1684214837}
   - component: {fileID: 1684214836}
+  - component: {fileID: 1684214838}
   m_Layer: 0
   m_Name: XRRig
   m_TagString: Untagged
@@ -545,6 +546,19 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1684214838
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1684214835}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 994cf136295a02c45abb58948ad30953, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  speed: 3
 --- !u!1 &1780949887
 GameObject:
   m_ObjectHideFlags: 0

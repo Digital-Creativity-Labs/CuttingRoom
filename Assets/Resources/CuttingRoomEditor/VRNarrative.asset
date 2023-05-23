@@ -33,11 +33,15 @@ MonoBehaviour:
     narrativeObjectNodeGuids:
     - 987d59ef-3147-4239-8db7-c7623ceb119b
     - 02139cb5-d6c6-4d11-a399-c7a87e7cdb77
-    - 51c85242-67c8-4b37-8223-0d0cf340054b
     - 619a2361-3179-4217-a868-2465c41cde1e
+    - 8c014aec-9065-462d-bc41-2fa8a517d033
   - narrativeObjectGuid: f36e57a6-6573-4f91-bddb-09564596e6f6
     narrativeObjectNodeGuids:
     - 45340def-6997-4a2b-9fd3-861ca5cce371
     - b4b3d615-ae99-440b-a35b-144a590088e1
+  - narrativeObjectGuid: 8c014aec-9065-462d-bc41-2fa8a517d033
+    narrativeObjectNodeGuids:
+    - 8f91db22-1dce-494b-b04b-faea865f4b9d
+    - d2240769-5295-4402-a48b-764be46360a3
   viewContainerStackGuids:
   - 0
