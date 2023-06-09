@@ -4,6 +4,7 @@ using UnityEngine;
 using System;
 using UnityEngine.Video;
 using UnityEngine.UIElements;
+using CuttingRoom.Utilities.Immersive;
 
 namespace CuttingRoom
 {
@@ -86,22 +87,29 @@ namespace CuttingRoom
                     // Not supported or not configured correctly
                 }
 
+                // Get or Add a camera for rendering.
+                if (videoPlayerCamera == null)
+                {
+                    if (Camera.main != null)
+                    {
+                        videoPlayerCamera = Camera.main;
+                    }
+                }
+
                 if (fullscreen && renderType == RenderType.Fullscreen)
                 {
                     // We are rendering to the near plane (for now...)
                     videoPlayer.renderMode = VideoRenderMode.CameraNearPlane;
+
                     // Get or Add a camera for rendering.
                     if (videoPlayerCamera == null)
                     {
-                        if (Camera.main != null)
-                        {
-                            videoPlayerCamera = Camera.main;
-                        }
-                        else if (!gameObject.TryGetComponent(out videoPlayerCamera))
+                        if (!gameObject.TryGetComponent(out videoPlayerCamera))
                         {
                             videoPlayerCamera = gameObject.AddComponent<Camera>();
                         }
                     }
+
                     if (videoPlayerCamera != null)
                     {
                         videoPlayerCamera.clearFlags = CameraClearFlags.SolidColor;
@@ -156,6 +164,11 @@ namespace CuttingRoom
                 {
                     videoPlayer.renderMode = VideoRenderMode.RenderTexture;
 
+                    if (videoPlayerCamera != null)
+                    {
+                        videoPlayerCamera.gameObject.AddComponent<MouseNavigation360>();
+                    }
+
                     RenderTexture videoRenderTex = new RenderTexture((int)videoPlayer.width, (int)videoPlayer.height, 0);
                     videoPlayer.targetTexture = videoRenderTex;
 
@@ -207,6 +220,17 @@ namespace CuttingRoom
                 if (videoPlayerCamera != null)
                 {
                     videoPlayerCamera.enabled = true;
+
+                    if (renderType == RenderType.Fullscreen)
+                    {
+                        videoPlayerCamera.clearFlags = CameraClearFlags.SolidColor;
+                        videoPlayerCamera.backgroundColor = Color.black;
+                    }
+                    else if (renderType == RenderType.Immersive360 || renderType == RenderType.Immersive180)
+                    {
+                        videoPlayerCamera.clearFlags = CameraClearFlags.Skybox;
+                        videoPlayerCamera.backgroundColor = Color.clear;
+                    }
                 }
 
                 videoPlayer.loopPointReached += (player) => { contentEnded = true; };
@@ -225,6 +249,7 @@ namespace CuttingRoom
 
             }
             videoPlayer.Stop();
+            videoPlayer.frame = 0;
             StartCoroutine(ShutdownDelay());
         }
 

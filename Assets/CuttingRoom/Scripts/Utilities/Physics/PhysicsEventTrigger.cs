@@ -3,66 +3,69 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class PhysicsEventTrigger : MonoBehaviour
+namespace CuttingRoom.Utilities
 {
-    /// <summary>
-    /// Events which can invoke this trigger.
-    /// </summary>
-    public enum PhysicsEvent
+    public class PhysicsEventTrigger : MonoBehaviour
     {
-        Undefined,
-        OnTriggerEnter,
-        OnTriggerStay,
-        OnTriggerExit,
-    }
-
-    /// <summary>
-    /// The event which invokes this trigger.
-    /// </summary>
-    [SerializeField]
-    private PhysicsEvent physicsEvent = PhysicsEvent.Undefined;
-
-    [Space]
-
-    /// <summary>
-    /// The methods invoked when this trigger is invoked.
-    /// </summary>
-    [SerializeField]
-    private UnityEvent unityEvent = new UnityEvent();
-
-    /// <summary>
-    /// Unity event.
-    /// </summary>
-    /// <param name="other"></param>
-    private void OnTriggerEnter(Collider other)
-    {
-        if (physicsEvent == PhysicsEvent.OnTriggerEnter)
+        /// <summary>
+        /// Events which can invoke this trigger.
+        /// </summary>
+        public enum PhysicsEvent
         {
-            unityEvent.Invoke();
+            Undefined,
+            OnTriggerEnter,
+            OnTriggerStay,
+            OnTriggerExit,
         }
-    }
 
-    /// <summary>
-    /// Unity event.
-    /// </summary>
-    /// <param name="other"></param>
-    private void OnTriggerStay(Collider other)
-    {
-        if (physicsEvent == PhysicsEvent.OnTriggerStay)
+        /// <summary>
+        /// The event which invokes this trigger.
+        /// </summary>
+        [SerializeField]
+        private PhysicsEvent physicsEvent = PhysicsEvent.Undefined;
+
+        [Space]
+
+        /// <summary>
+        /// The methods invoked when this trigger is invoked.
+        /// </summary>
+        [SerializeField]
+        private UnityEvent unityEvent = new UnityEvent();
+
+        /// <summary>
+        /// Unity event.
+        /// </summary>
+        /// <param name="other"></param>
+        private void OnTriggerEnter(Collider other)
         {
-            unityEvent.Invoke();
+            if (physicsEvent == PhysicsEvent.OnTriggerEnter)
+            {
+                unityEvent.Invoke();
+            }
         }
-    }
 
-    /// <summary>
-    /// Unity event.
-    /// </summary>
-    /// <param name="other"></param>
-    private void OnTriggerExit(Collider other)
-    {
-        if (physicsEvent == PhysicsEvent.OnTriggerExit)
+        /// <summary>
+        /// Unity event.
+        /// </summary>
+        /// <param name="other"></param>
+        private void OnTriggerStay(Collider other)
         {
-            unityEvent.Invoke();
+            if (physicsEvent == PhysicsEvent.OnTriggerStay)
+            {
+                unityEvent.Invoke();
+            }
+        }
+
+        /// <summary>
+        /// Unity event.
+        /// </summary>
+        /// <param name="other"></param>
+        private void OnTriggerExit(Collider other)
+        {
+            if (physicsEvent == PhysicsEvent.OnTriggerExit)
+            {
+                unityEvent.Invoke();
+            }
         }
     }
 }
