@@ -20,7 +20,7 @@ MonoBehaviour:
   - narrativeObjectGuid: ed6e7509-4f05-4744-b3e6-864ae3d46969
     position: {x: 392, y: 323}
   - narrativeObjectGuid: 96528cc5-d2b1-4a2d-84f9-d64a0c40ef7f
-    position: {x: 985, y: 386}
+    position: {x: 985, y: 385}
   - narrativeObjectGuid: 970a6021-e911-4ca2-ab28-bf421260f913
     position: {x: 985, y: 182}
   - narrativeObjectGuid: 088508df-e4c6-4877-880d-25394ccffdb6
@@ -60,5 +60,4 @@ MonoBehaviour:
     - 8f91db22-1dce-494b-b04b-faea865f4b9d
     - d2240769-5295-4402-a48b-764be46360a3
   viewContainerStackGuids:
-  - 6aa3541b-c9e7-4333-a7e4-8f2f3d89efac
   - 0
