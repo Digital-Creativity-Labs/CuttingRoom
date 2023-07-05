@@ -167,19 +167,19 @@ namespace CuttingRoom.Editor
                         mediaSourceRow.Add(videoUrl);
                     }
 
-                    // Fullscreen video toggle
-                    VisualElement videoFullscreenToggle = UIElementsUtils.CreateBoolFieldRow("Fullscreen", videoController.fullscreen, (newValue) =>
+                    // Render Mode
+                    VisualElement videoRenderModePicker = UIElementsUtils.CreateEnumFieldRow("Video Render Mode", videoController.renderType, (newValue) =>
                     {
-                        Undo.RecordObject(videoController, "Set Video Fullscreen");
-                        videoController.fullscreen = newValue;
+                        Undo.RecordObject(videoController, "Set Video Render Mode");
+                        videoController.renderType = (VideoController.RenderType)newValue;
                         AtomicNarrativeObject.MediaController = videoController;
                         // Flag that the object has changed.
                         AtomicNarrativeObject.OnValidate();
                     });
-                    mediaSourceRow.Add(videoFullscreenToggle);
+                    mediaSourceRow.Add(videoRenderModePicker);
 
                     // Non-fullscreen video settings
-                    if (!videoController.fullscreen)
+                    if (videoController.renderType == VideoController.RenderType.PIP)
                     {
                         // Width
                         VisualElement videoWidth = UIElementsUtils.CreateIntegerFieldRow("Width", videoController.width, (newValue) =>

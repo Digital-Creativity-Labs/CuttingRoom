@@ -38,8 +38,6 @@ namespace CuttingRoom
 
         public VideoClip Video = null;
 
-        public bool fullscreen = true;
-
         public RenderType renderType = RenderType.Fullscreen;
 
         public string url = string.Empty;
@@ -96,7 +94,7 @@ namespace CuttingRoom
                     }
                 }
 
-                if (fullscreen && renderType == RenderType.Fullscreen)
+                if (renderType == RenderType.Fullscreen)
                 {
                     // We are rendering to the near plane (for now...)
                     videoPlayer.renderMode = VideoRenderMode.CameraNearPlane;

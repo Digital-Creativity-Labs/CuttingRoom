@@ -681,7 +681,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sourceLocation: 0
-  Video: {fileID: 0}
+  Video: {fileID: 32900000, guid: ff02bac269025e94bb8981bac5c34a00, type: 3}
   fullscreen: 1
   renderType: 2
   url: 
