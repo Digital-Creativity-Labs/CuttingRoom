@@ -28,7 +28,7 @@ MonoBehaviour:
   - narrativeObjectGuid: c635b73e-262f-4dab-9301-3c89b88892c4
     position: {x: 597, y: 274}
   - narrativeObjectGuid: f775b7f7-2f5c-4193-a08b-38fffb33b312
-    position: {x: 592, y: 434}
+    position: {x: 597, y: 437}
   - narrativeObjectGuid: cd6e7b1a-10b8-4ca7-872a-8cf3881acd0c
     position: {x: 911, y: 189}
   - narrativeObjectGuid: 2029c543-c88e-458e-ba10-f2e8fa43b1ce
@@ -67,6 +67,7 @@ MonoBehaviour:
     narrativeObjectNodeGuids:
     - 35a6da9a-3eb3-4a67-a340-f8028f77b6c9
     - ed6e7509-4f05-4744-b3e6-864ae3d46969
+    - 7a829c9c-96df-4b5c-8e4b-fc0b6692adc8
   - narrativeObjectGuid: e3688c26-18c5-46cc-b619-6dd532775396
     narrativeObjectNodeGuids:
     - e92b8e21-92df-4082-9f48-563107c6bbff
@@ -76,4 +77,5 @@ MonoBehaviour:
     - c635b73e-262f-4dab-9301-3c89b88892c4
     - f775b7f7-2f5c-4193-a08b-38fffb33b312
   viewContainerStackGuids:
+  - c1aeb9a6-c618-47f3-8134-222691c29d6a
   - 0

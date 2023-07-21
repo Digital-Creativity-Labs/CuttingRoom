@@ -13,10 +13,8 @@ GameObject:
   - component: {fileID: 4015128326712939853}
   - component: {fileID: 4015128326712939852}
   - component: {fileID: 4015128326712939848}
-  - component: {fileID: 7178688803179514643}
-  - component: {fileID: 839833310880330071}
   m_Layer: 5
-  m_Name: WorldSpaceButtonUIPrefab
+  m_Name: WorldSpaceCanvasPrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -30,7 +28,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4015128326712939855}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 300}
+  m_LocalPosition: {x: 0, y: 0, z: 500}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -122,34 +120,3 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4294967295
   m_RaycastTriggerInteraction: 1
---- !u!114 &7178688803179514643
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4015128326712939855}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cc4828c0784aedc4d93f32e43db93190, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  variableName: 
-  variableStoreLocation: 0
-  value: 
---- !u!114 &839833310880330071
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4015128326712939855}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8402b090a5f65c64b861619218308b1e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  numberOfButtons: 0
-  buttonTexts: []
-  buttonValues: []
-  variableSetter: {fileID: 7178688803179514643}

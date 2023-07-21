@@ -815,6 +815,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8402b090a5f65c64b861619218308b1e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  uiPrefabPath: CuttingRoom/UI/WorldSpaceCanvasPrefab
+  buttonPrefabPath: CuttingRoom/UI/WorldSpaceButtonPrefab
   numberOfButtons: 2
   buttonTexts:
   - Yes

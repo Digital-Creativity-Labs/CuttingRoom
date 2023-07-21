@@ -38,7 +38,10 @@ namespace CuttingRoom
         private GameObject uiObject = null;
 
         private UnityEngine.Object uiPrefab;
-        private UnityEngine.Object buttonUIPrefab = null;
+        private UnityEngine.Object buttonPrefab = null;
+
+        public string uiPrefabPath = "CuttingRoom/UI/WorldSpaceCanvasPrefab";
+        public string buttonPrefabPath = "CuttingRoom/UI/WorldSpaceButtonPrefab";
 
         private Canvas parentCanvas = null;
 
@@ -102,8 +105,8 @@ namespace CuttingRoom
                 variableSetter = gameObject.GetComponent<StringVariableSetter>();
             }
 
-            uiPrefab = Resources.Load<UnityEngine.Object>("CuttingRoom/UI/WorldSpaceButtonUIPrefab");
-            buttonUIPrefab = Resources.Load<UnityEngine.Object>("CuttingRoom/UI/WorldSpaceButtonPrefab");
+            uiPrefab = Resources.Load<UnityEngine.Object>(uiPrefabPath);
+            buttonPrefab = Resources.Load<UnityEngine.Object>(buttonPrefabPath);
             Initialised = uiPrefab != null;
         }
 
@@ -127,14 +130,14 @@ namespace CuttingRoom
 
             parentCanvas = uiObject.GetComponent<Canvas>();
 
-            if (parentCanvas != null && buttonUIPrefab != null && buttonTransforms.ContainsKey(numberOfButtons))
+            if (parentCanvas != null && buttonPrefab != null && buttonTransforms.ContainsKey(numberOfButtons))
             {
                 List<Vector3> transforms = buttonTransforms[numberOfButtons];
                 for (int i = 0; i < numberOfButtons; ++i)
                 {
                     Vector3 buttonTransform = transforms[i];
                     //buttonTransform += parentCanvas.transform.localPosition;
-                    GameObject newButton = Instantiate(buttonUIPrefab as GameObject, parentCanvas.transform);
+                    GameObject newButton = Instantiate(buttonPrefab as GameObject, parentCanvas.transform);
                     newButton.transform.SetLocalPositionAndRotation(buttonTransform, Quaternion.identity);
 
                     var newButtonComponent = newButton.GetComponentInChildren<Button>();

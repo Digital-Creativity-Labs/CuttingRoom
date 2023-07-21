@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   narrativeObjectNodeStates:
   - narrativeObjectGuid: 06b5b2ab-b71b-4009-b450-3dc6870491ce
-    position: {x: 905, y: -31}
+    position: {x: 905, y: -47}
   - narrativeObjectGuid: c91fec49-478e-4276-a06b-4c65af7db260
     position: {x: 905, y: 93}
   - narrativeObjectGuid: f1395552-c098-40f5-9656-a21a5f14c71e
@@ -24,7 +24,7 @@ MonoBehaviour:
   - narrativeObjectGuid: a5ed8bd6-36b7-4ccc-9814-6a5caa9bcff0
     position: {x: 905, y: 393}
   - narrativeObjectGuid: e16efe50-3b94-40fd-9f93-fb25e0f2f4b5
-    position: {x: 426, y: 184}
+    position: {x: 435, y: 184}
   - narrativeObjectGuid: 58f7e25e-38cd-4511-9015-fe6497a8366f
     position: {x: 464, y: 176}
   - narrativeObjectGuid: 5c6b3977-26df-4e11-a900-2d52b88878c7
@@ -44,7 +44,7 @@ MonoBehaviour:
   - narrativeObjectGuid: 987d59ef-3147-4239-8db7-c7623ceb119b
     position: {x: 809, y: 17}
   - narrativeObjectGuid: 02139cb5-d6c6-4d11-a399-c7a87e7cdb77
-    position: {x: 1053, y: 166}
+    position: {x: 809, y: 173}
   - narrativeObjectGuid: 51c85242-67c8-4b37-8223-0d0cf340054b
     position: {x: 809, y: 315}
   - narrativeObjectGuid: c446a44a-c5f7-4993-8ea0-62729730df12
@@ -260,7 +260,6 @@ MonoBehaviour:
     narrativeObjectNodeGuids:
     - 8f8ebc9d-7ea7-4438-9aff-8da513d26762
     - e0e2011d-fbfd-4079-a002-cded5d4b6ba7
-    - 20b8262e-bcec-4686-a6bc-669b12dc70be
   - narrativeObjectGuid: a5ed8bd6-36b7-4ccc-9814-6a5caa9bcff0
     narrativeObjectNodeGuids:
     - 2537d322-9ddf-48f6-959b-f10393847a84
@@ -269,9 +268,9 @@ MonoBehaviour:
   - narrativeObjectGuid: e16efe50-3b94-40fd-9f93-fb25e0f2f4b5
     narrativeObjectNodeGuids:
     - 987d59ef-3147-4239-8db7-c7623ceb119b
+    - 02139cb5-d6c6-4d11-a399-c7a87e7cdb77
     - 619a2361-3179-4217-a868-2465c41cde1e
     - 8c014aec-9065-462d-bc41-2fa8a517d033
-    - e3688c26-18c5-46cc-b619-6dd532775396
   - narrativeObjectGuid: ea19580d-cf21-4388-9dc4-c2f871889a86
     narrativeObjectNodeGuids:
     - 58b54b3e-9c11-4fa8-9f64-63bb17a9f44b
@@ -396,6 +395,7 @@ MonoBehaviour:
     narrativeObjectNodeGuids:
     - 35a6da9a-3eb3-4a67-a340-f8028f77b6c9
     - ed6e7509-4f05-4744-b3e6-864ae3d46969
+    - 7a829c9c-96df-4b5c-8e4b-fc0b6692adc8
   - narrativeObjectGuid: e3688c26-18c5-46cc-b619-6dd532775396
     narrativeObjectNodeGuids:
     - e92b8e21-92df-4082-9f48-563107c6bbff
