@@ -14,11 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   narrativeObjectNodeStates:
   - narrativeObjectGuid: 6aa3541b-c9e7-4333-a7e4-8f2f3d89efac
-    position: {x: 570, y: 282}
+    position: {x: 571, y: 282}
   - narrativeObjectGuid: 35a6da9a-3eb3-4a67-a340-f8028f77b6c9
     position: {x: 392, y: 127}
   - narrativeObjectGuid: ed6e7509-4f05-4744-b3e6-864ae3d46969
-    position: {x: 392, y: 323}
+    position: {x: 392, y: 321}
   - narrativeObjectGuid: 96528cc5-d2b1-4a2d-84f9-d64a0c40ef7f
     position: {x: 985, y: 385}
   - narrativeObjectGuid: 970a6021-e911-4ca2-ab28-bf421260f913
@@ -29,11 +29,22 @@ MonoBehaviour:
     position: {x: 985, y: 309}
   - narrativeObjectGuid: ade04694-5c32-4a14-ad48-b0d230ade58b
     position: {x: 1046, y: 126}
+  - narrativeObjectGuid: b1ee0e1c-00f6-4fdb-aaeb-234b7da801fc
+    position: {x: 392, y: 515}
+  - narrativeObjectGuid: d83c1e8b-1f12-42e9-aeb3-ee29983255a0
+    position: {x: 439, y: 529}
+  - narrativeObjectGuid: a513eace-4ee2-4e1a-9488-9e9999828b33
+    position: {x: 392, y: 520}
+  - narrativeObjectGuid: 0b6ce283-df2f-494d-86da-9064eb48cf03
+    position: {x: 392, y: 495}
+  - narrativeObjectGuid: 7a829c9c-96df-4b5c-8e4b-fc0b6692adc8
+    position: {x: 401, y: 524}
   viewContainerStates:
   - narrativeObjectGuid: 6aa3541b-c9e7-4333-a7e4-8f2f3d89efac
     narrativeObjectNodeGuids:
     - 35a6da9a-3eb3-4a67-a340-f8028f77b6c9
     - ed6e7509-4f05-4744-b3e6-864ae3d46969
+    - 7a829c9c-96df-4b5c-8e4b-fc0b6692adc8
   - narrativeObjectGuid: 0
     narrativeObjectNodeGuids:
     - 6aa3541b-c9e7-4333-a7e4-8f2f3d89efac
@@ -59,5 +70,10 @@ MonoBehaviour:
     narrativeObjectNodeGuids:
     - 8f91db22-1dce-494b-b04b-faea865f4b9d
     - d2240769-5295-4402-a48b-764be46360a3
+  - narrativeObjectGuid: c1aeb9a6-c618-47f3-8134-222691c29d6a
+    narrativeObjectNodeGuids:
+    - c635b73e-262f-4dab-9301-3c89b88892c4
+    - f775b7f7-2f5c-4193-a08b-38fffb33b312
   viewContainerStackGuids:
+  - 6aa3541b-c9e7-4333-a7e4-8f2f3d89efac
   - 0

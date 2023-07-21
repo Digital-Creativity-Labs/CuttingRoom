@@ -563,7 +563,7 @@ public static class UIElementsUtils
     /// <param name="values"></param>
     /// <param name="onListChanged"></param>
     /// <returns></returns>
-    public static VisualElement CreateCustomListFieldRow<T>(string labelText, List<T> values, Action<List<T>> onListChanged, Func<T, Action<T>, VisualElement> renderElement, StyleSheet elementStyleSheet = null, string elementStyleClass = null) where T : VisualElement, new()
+    public static VisualElement CreateCustomListFieldRow<T>(string labelText, List<T> values, Action<List<T>> onListChanged, Func<T, Action<T>, VisualElement> renderElement, StyleSheet elementStyleSheet = null, string elementStyleClass = null) where T : new()
     {
         VisualElement labelWithAdd = GetRowContainer();
         labelWithAdd.Add(new Label(labelText));
