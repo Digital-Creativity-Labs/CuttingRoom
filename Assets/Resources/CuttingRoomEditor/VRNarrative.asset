@@ -36,9 +36,9 @@ MonoBehaviour:
   viewContainerStates:
   - narrativeObjectGuid: 0
     narrativeObjectNodeGuids:
+    - 2029c543-c88e-458e-ba10-f2e8fa43b1ce
     - c1aeb9a6-c618-47f3-8134-222691c29d6a
     - cd6e7b1a-10b8-4ca7-872a-8cf3881acd0c
-    - 2029c543-c88e-458e-ba10-f2e8fa43b1ce
   - narrativeObjectGuid: f1395552-c098-40f5-9656-a21a5f14c71e
     narrativeObjectNodeGuids:
     - 58f7e25e-38cd-4511-9015-fe6497a8366f
