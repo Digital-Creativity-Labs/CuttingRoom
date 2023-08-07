@@ -37,11 +37,11 @@ namespace CuttingRoom
 
         private GameObject uiObject = null;
 
-        private UnityEngine.Object uiPrefab;
-        private UnityEngine.Object buttonPrefab = null;
+        public UnityEngine.Object uiPrefab = null;
+        public UnityEngine.Object buttonPrefab = null;
 
-        public string uiPrefabPath = "CuttingRoom/UI/WorldSpaceCanvasPrefab";
-        public string buttonPrefabPath = "CuttingRoom/UI/WorldSpaceButtonPrefab";
+        private string defaultUICanvasPrefabPath = "CuttingRoom/UI/WorldSpaceCanvasPrefab";
+        private string defaultbuttonPrefabPath = "CuttingRoom/UI/WorldSpaceButtonPrefab";
 
         private Canvas parentCanvas = null;
 
@@ -105,8 +105,14 @@ namespace CuttingRoom
                 variableSetter = gameObject.GetComponent<StringVariableSetter>();
             }
 
-            uiPrefab = Resources.Load<UnityEngine.Object>(uiPrefabPath);
-            buttonPrefab = Resources.Load<UnityEngine.Object>(buttonPrefabPath);
+            if (uiPrefab == null)
+            {
+                uiPrefab = Resources.Load<UnityEngine.Object>(defaultUICanvasPrefabPath);
+            }
+            if (buttonPrefab == null)
+            {
+                buttonPrefab = Resources.Load<UnityEngine.Object>(defaultbuttonPrefabPath);
+            }
             Initialised = uiPrefab != null;
         }
 

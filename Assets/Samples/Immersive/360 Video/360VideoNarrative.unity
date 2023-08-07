@@ -815,8 +815,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8402b090a5f65c64b861619218308b1e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  uiPrefabPath: CuttingRoom/UI/WorldSpaceCanvasPrefab
-  buttonPrefabPath: CuttingRoom/UI/WorldSpaceButtonPrefab
+  uiPrefab: {fileID: 0}
+  buttonPrefab: {fileID: 5443255418442957531, guid: b2d30f2340ea92d408a6c44c825ad0ea, type: 3}
   numberOfButtons: 2
   buttonTexts:
   - Yes
@@ -1362,6 +1362,7 @@ GameObject:
   - component: {fileID: 1780949889}
   - component: {fileID: 1780949888}
   - component: {fileID: 1780949893}
+  - component: {fileID: 1780949895}
   m_Layer: 0
   m_Name: NarrativeSpace
   m_TagString: Untagged
@@ -1435,6 +1436,7 @@ MonoBehaviour:
   - {fileID: 1780949889}
   - {fileID: 1780949888}
   - {fileID: 1780949893}
+  - {fileID: 1780949895}
 --- !u!4 &1780949892
 Transform:
   m_ObjectHideFlags: 0
@@ -1465,5 +1467,22 @@ MonoBehaviour:
   variableCategory: 2
   variableName: Choice
   guid: 01fe3924-ab30-4eeb-b86d-3d174fc42e66
+  defaultValue: 
+  value: 
+--- !u!114 &1780949895
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1780949887}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ae69c8d62e9129a4e91f655cd5dcc1c1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  variableCategory: 2
+  variableName: 
+  guid: 3b293e15-4728-44bd-9a66-223abdf93c9c
   defaultValue: 
   value: 

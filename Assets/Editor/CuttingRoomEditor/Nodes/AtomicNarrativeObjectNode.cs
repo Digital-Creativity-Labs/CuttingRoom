@@ -590,6 +590,27 @@ namespace CuttingRoom.Editor
                         mediaSourceRow.Add(variableNamePopUpField);
                     }
 
+                    VisualElement customButtonCanvasPrefab = UIElementsUtils.CreateObjectFieldRow("Custom UI Canvas Prefab", buttonController.uiPrefab, (newValue) =>
+                    {
+                        Undo.RecordObject(buttonController, "Change Custom UI Canvas Prefab");
+                        buttonController.uiPrefab = newValue;
+                        AtomicNarrativeObject.MediaController = buttonController;
+                        // Flag that the object has changed.
+                        AtomicNarrativeObject.OnValidate();
+                    });
+
+                    mediaSourceRow.Add(customButtonCanvasPrefab);
+
+                    VisualElement customButtonStylePrefab = UIElementsUtils.CreateObjectFieldRow("Custom Button Prefab", buttonController.buttonPrefab, (newValue) =>
+                    {
+                        Undo.RecordObject(buttonController, "Change Custom Button Prefab");
+                        buttonController.buttonPrefab = newValue;
+                        AtomicNarrativeObject.MediaController = buttonController;
+                        // Flag that the object has changed.
+                        AtomicNarrativeObject.OnValidate();
+                    });
+                    mediaSourceRow.Add(customButtonStylePrefab);
+
                     VisualElement numOfButtons = UIElementsUtils.CreateIntegerFieldRow("Number Of Buttons", buttonController.numberOfButtons, (newValue) =>
                     {
                         Undo.RecordObject(buttonController, "Set Number of Buttons");
