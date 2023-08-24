@@ -30,7 +30,7 @@ Work in progress
 
 ## Samples
 
-Samples are available within the `Assets/Samples` directory of the repository. This includes the `VideoNarrative` sample scene which showcases an interactive video with a button UI using all of the node types. The `Advanced` folder contains examples of using cutting room to change a 3D game scene, although these require a more advanced understanding of unity.
+Samples are available within the `Assets/Samples/CuttingRoom` directory of the repository. This includes the `VideoNarrative` sample scene which showcases an interactive video with a button UI using all of the node types. You can also find samples utilising 360 video in a 2D and VR in the `Immersive` folder. The `Advanced` folder contains examples of using cutting room to change a 3D game scene, although these require a more advanced understanding of unity.
 
 ## Contributions
 
