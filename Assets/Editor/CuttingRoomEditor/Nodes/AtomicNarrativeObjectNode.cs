@@ -167,19 +167,19 @@ namespace CuttingRoom.Editor
                         mediaSourceRow.Add(videoUrl);
                     }
 
-                    // Fullscreen video toggle
-                    VisualElement videoFullscreenToggle = UIElementsUtils.CreateBoolFieldRow("Fullscreen", videoController.fullscreen, (newValue) =>
+                    // Render Mode
+                    VisualElement videoRenderModePicker = UIElementsUtils.CreateEnumFieldRow("Video Render Mode", videoController.renderType, (newValue) =>
                     {
-                        Undo.RecordObject(videoController, "Set Video Fullscreen");
-                        videoController.fullscreen = newValue;
+                        Undo.RecordObject(videoController, "Set Video Render Mode");
+                        videoController.renderType = (VideoController.RenderType)newValue;
                         AtomicNarrativeObject.MediaController = videoController;
                         // Flag that the object has changed.
                         AtomicNarrativeObject.OnValidate();
                     });
-                    mediaSourceRow.Add(videoFullscreenToggle);
+                    mediaSourceRow.Add(videoRenderModePicker);
 
                     // Non-fullscreen video settings
-                    if (!videoController.fullscreen)
+                    if (videoController.renderType == VideoController.RenderType.PIP)
                     {
                         // Width
                         VisualElement videoWidth = UIElementsUtils.CreateIntegerFieldRow("Width", videoController.width, (newValue) =>
@@ -501,7 +501,154 @@ namespace CuttingRoom.Editor
                     mediaSourceRow.Add(buttonList);
                 }
             }
-            else if(contentType == MediaController.ContentTypeEnum.GameObject)
+            else if (contentType == MediaController.ContentTypeEnum.ButtonUI_VR)
+            {
+                WorldSpaceButtonUIController buttonController = AtomicNarrativeObject.MediaController as WorldSpaceButtonUIController;
+                if (buttonController != null)
+                {
+                    VariableSetter variableSetter = buttonController.variableSetter;
+                    VariableStore targetVariableStore = null;
+
+                    // Find the narrative space.
+                    NarrativeSpace narrativeSpace = UnityEngine.Object.FindObjectOfType<NarrativeSpace>();
+
+                    if (narrativeSpace != null && !narrativeSpace.UnlockAdvancedFeatures)
+                    {
+                        // Force only global variable without advance feature unlock
+                        variableSetter.variableStoreLocation = VariableStoreLocation.Global;
+                    }
+
+                    // Find Variable Store
+                    switch (variableSetter.variableStoreLocation)
+                    {
+                        case VariableStoreLocation.Global:
+                            if (narrativeSpace != null)
+                            {
+                                targetVariableStore = narrativeSpace.GlobalVariableStore;
+                            }
+                            break;
+
+                        case VariableStoreLocation.Local:
+                            targetVariableStore = NarrativeObject.GetComponent<NarrativeObject>().VariableStore; ;
+                            break;
+
+                        default:
+                            break;
+                    }
+
+                    if (narrativeSpace != null && narrativeSpace.UnlockAdvancedFeatures)
+                    {
+                        // Variable Location
+                        VisualElement variableStoreLocationEnumField = UIElementsUtils.CreateEnumFieldRow("Button Variable Location", variableSetter.variableStoreLocation, (newValue) =>
+                        {
+                            Undo.RecordObject(variableSetter, "Edit Button UI Variable Location");
+                            variableSetter.variableStoreLocation = (VariableStoreLocation)newValue;
+                            variableSetter.variableName = string.Empty;
+                            buttonController.variableSetter = variableSetter;
+                            // Flag that the object has changed.
+                            NarrativeObject.OnValidate();
+                        });
+                        // Add to parent container
+                        mediaSourceRow.Add(variableStoreLocationEnumField);
+                    }
+
+                    if (targetVariableStore != null)
+                    {
+                        List<string> variableNames = new List<string>();
+                        variableNames.Add("Undefined");
+                        foreach (Variable v in targetVariableStore.variableList)
+                        {
+                            if (v != null)
+                            {
+                                variableNames.Add(v.Name);
+                            }
+                        }
+
+                        if (string.IsNullOrEmpty(variableSetter.variableName))
+                        {
+                            variableSetter.variableName = "Undefined";
+                        }
+
+                        // Variable Name
+                        VisualElement variableNamePopUpField = UIElementsUtils.CreatePopUpFieldRow("Variable Name", variableSetter.variableName, variableNames, (newValue) =>
+                        {
+                            Undo.RecordObject(variableSetter, "Edit Button UI Variable Name");
+                            if (string.IsNullOrEmpty(newValue))
+                            {
+                                variableSetter.variableName = "Undefined";
+                            }
+                            else
+                            {
+                                variableSetter.variableName = newValue;
+                            }
+                            buttonController.variableSetter = variableSetter;
+
+                            // Flag that the object has changed.
+                            NarrativeObject.OnValidate();
+                        });
+                        // Add to parent container
+                        mediaSourceRow.Add(variableNamePopUpField);
+                    }
+
+                    VisualElement customButtonCanvasPrefab = UIElementsUtils.CreateObjectFieldRow("Custom UI Canvas Prefab", buttonController.uiPrefab, (newValue) =>
+                    {
+                        Undo.RecordObject(buttonController, "Change Custom UI Canvas Prefab");
+                        buttonController.uiPrefab = newValue;
+                        AtomicNarrativeObject.MediaController = buttonController;
+                        // Flag that the object has changed.
+                        AtomicNarrativeObject.OnValidate();
+                    });
+
+                    mediaSourceRow.Add(customButtonCanvasPrefab);
+
+                    VisualElement customButtonStylePrefab = UIElementsUtils.CreateObjectFieldRow("Custom Button Prefab", buttonController.buttonPrefab, (newValue) =>
+                    {
+                        Undo.RecordObject(buttonController, "Change Custom Button Prefab");
+                        buttonController.buttonPrefab = newValue;
+                        AtomicNarrativeObject.MediaController = buttonController;
+                        // Flag that the object has changed.
+                        AtomicNarrativeObject.OnValidate();
+                    });
+                    mediaSourceRow.Add(customButtonStylePrefab);
+
+                    VisualElement numOfButtons = UIElementsUtils.CreateIntegerFieldRow("Number Of Buttons", buttonController.numberOfButtons, (newValue) =>
+                    {
+                        Undo.RecordObject(buttonController, "Set Number of Buttons");
+                        buttonController.numberOfButtons = newValue;
+                        AtomicNarrativeObject.MediaController = buttonController;
+                        // Flag that the object has changed.
+                        AtomicNarrativeObject.OnValidate();
+                    });
+                    mediaSourceRow.Add(numOfButtons);
+
+                    List<WorldSpaceButtonUIController.UIButtonDefinition> uiButtons = buttonController.Buttons;
+                    VisualElement buttonList = UIElementsUtils.CreateCustomListFieldRow("Buttons", uiButtons, (newValue) =>
+                    {
+                        bool elementAddedOrDeleted = false;
+                        List<WorldSpaceButtonUIController.UIButtonDefinition> updatedButtons = new List<WorldSpaceButtonUIController.UIButtonDefinition>();
+                        foreach (var button in newValue)
+                        {
+                            updatedButtons.Add(button);
+                        }
+
+                        elementAddedOrDeleted = updatedButtons.Count != buttonController.Buttons.Count;
+
+                        Undo.RecordObject(buttonController, "Add or Edit Button");
+
+                        buttonController.Buttons = updatedButtons;
+                        AtomicNarrativeObject.MediaController = buttonController;
+
+                        if (elementAddedOrDeleted)
+                        {
+                            // Flag that the object has changed.
+                            AtomicNarrativeObject.OnValidate();
+                        }
+                    }, WorldSpaceUIButtonInspectorComponent.Render, Resources.Load<StyleSheet>("UIButtonInspector"), "button-list-element");
+
+                    mediaSourceRow.Add(buttonList);
+                }
+            }
+            else if (contentType == MediaController.ContentTypeEnum.GameObject)
             {
                 GameObjectController gameObjController = AtomicNarrativeObject.MediaController as GameObjectController;
                 if (gameObjController != null)

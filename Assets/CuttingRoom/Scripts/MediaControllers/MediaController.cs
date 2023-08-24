@@ -16,6 +16,7 @@ namespace CuttingRoom
             Text,
             Image,
             ButtonUI,
+            ButtonUI_VR,
             GameObject
         }
 
@@ -64,6 +65,8 @@ namespace CuttingRoom
                         return parentObject.GetComponent<ImageController>() ?? parentObject.AddComponent<ImageController>();
                     case ContentTypeEnum.ButtonUI:
                         return parentObject.GetComponent<ButtonUIController>() ?? parentObject.AddComponent<ButtonUIController>();
+                    case ContentTypeEnum.ButtonUI_VR:
+                        return parentObject.GetComponent<WorldSpaceButtonUIController>() ?? parentObject.AddComponent<WorldSpaceButtonUIController>();
                     case ContentTypeEnum.GameObject:
                         return parentObject.GetComponent<GameObjectController>() ?? parentObject.AddComponent<GameObjectController>();
                     default:

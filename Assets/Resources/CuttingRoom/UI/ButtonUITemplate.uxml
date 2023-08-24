@@ -1,6 +1,6 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
     <Style src="project://database/Assets/Resources/CuttingRoom/UI/Style/ButtonUITemplate.uss?fileID=7433441132597879392&amp;guid=05d3b8ec0e1fdfd4aadfee068ea64590&amp;type=3#ButtonUITemplate" />
-    <ui:VisualElement name="RootElement" class="fullscreen-canvas" picking-mode="Ignore">
-        <ui:VisualElement name="ButtonContainer" class="button-container" />
+    <ui:VisualElement name="RootElement" picking-mode="Ignore" class="fullscreen-canvas">
+        <ui:VisualElement name="ButtonContainer" picking-mode="Ignore" class="button-container" />
     </ui:VisualElement>
 </ui:UXML>
