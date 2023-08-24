@@ -17,7 +17,15 @@ This latest version of Cutting Room is actually a complete rewrite based off our
 Cutting Room now has a custom Node based editor built into Unity, powered by the Unity GraphView library and a custom Inspector for Cutting Room elements. The editor makes planning and structuring your Object Based Media project much easier. The inspector hides the complexities of the Unity inspector and presents Cutting Room users with only the essential information they need to see. These new tools make creating OBM projects easier than ever and can be used even by those who are not familiar with Unity. 
 
 ## Getting Started
+Download the latest [Cutting Room Unity Package](https://github.com/Digital-Creativity-Labs/CuttingRoom/releases/latest).
+When installing the package to your own project, you also need to add the following to the `manifest.json` of your own project:
+`"com.unity.inputsystem": "1.4.4"`
+`"com.unity.nuget.newtonsoft-json": "3.0.2"`
 
+and if you want to use the VR support you will need to enable VR support in your project and you can add the XR interaction toolkit to your `manifest.json` as:
+`"com.unity.xr.interaction.toolkit": "2.4.1"` 
+
+If you want
 * Ensure that you have [Git LFS](https://git-lfs.github.com/) installed.
 * Clone or fork the repository: `https://github.com/Digital-Creativity-Labs/CuttingRoom.git`
 * Open the project with <b>Unity (2021.3.X or above)</b>.
