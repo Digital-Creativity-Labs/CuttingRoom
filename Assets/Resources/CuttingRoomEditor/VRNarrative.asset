@@ -1,0 +1,80 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6193bfad6901e284098419ef30595741, type: 3}
+  m_Name: VRNarrative
+  m_EditorClassIdentifier: 
+  narrativeObjectNodeStates:
+  - narrativeObjectGuid: c9e5b256-7448-4577-8d14-e0392c38788b
+    position: {x: 606, y: 342}
+  - narrativeObjectGuid: 6aa3541b-c9e7-4333-a7e4-8f2f3d89efac
+    position: {x: 577, y: 237}
+  - narrativeObjectGuid: 35a6da9a-3eb3-4a67-a340-f8028f77b6c9
+    position: {x: 474, y: 256}
+  - narrativeObjectGuid: ed6e7509-4f05-4744-b3e6-864ae3d46969
+    position: {x: 474, y: 412}
+  - narrativeObjectGuid: 7fc9770e-e8cb-41fe-a27b-85b518733d82
+    position: {x: 587, y: 264}
+  - narrativeObjectGuid: c1aeb9a6-c618-47f3-8134-222691c29d6a
+    position: {x: 521, y: 286}
+  - narrativeObjectGuid: c635b73e-262f-4dab-9301-3c89b88892c4
+    position: {x: 597, y: 273}
+  - narrativeObjectGuid: f775b7f7-2f5c-4193-a08b-38fffb33b312
+    position: {x: 597, y: 437}
+  - narrativeObjectGuid: cd6e7b1a-10b8-4ca7-872a-8cf3881acd0c
+    position: {x: 911, y: 189}
+  - narrativeObjectGuid: 2029c543-c88e-458e-ba10-f2e8fa43b1ce
+    position: {x: 911, y: 420}
+  viewContainerStates:
+  - narrativeObjectGuid: 0
+    narrativeObjectNodeGuids:
+    - 2029c543-c88e-458e-ba10-f2e8fa43b1ce
+    - c1aeb9a6-c618-47f3-8134-222691c29d6a
+    - cd6e7b1a-10b8-4ca7-872a-8cf3881acd0c
+  - narrativeObjectGuid: f1395552-c098-40f5-9656-a21a5f14c71e
+    narrativeObjectNodeGuids:
+    - 58f7e25e-38cd-4511-9015-fe6497a8366f
+    - 5c6b3977-26df-4e11-a900-2d52b88878c7
+    - 728eeafd-4ccd-4fcf-a56f-72e3676bc3f4
+  - narrativeObjectGuid: a5ed8bd6-36b7-4ccc-9814-6a5caa9bcff0
+    narrativeObjectNodeGuids:
+    - 2537d322-9ddf-48f6-959b-f10393847a84
+    - f8d958bf-99b0-4029-84af-b0fe51e51367
+    - 5b7d1dd5-7b87-4e0b-9751-7a06c7ebde18
+  - narrativeObjectGuid: e16efe50-3b94-40fd-9f93-fb25e0f2f4b5
+    narrativeObjectNodeGuids:
+    - 987d59ef-3147-4239-8db7-c7623ceb119b
+    - 619a2361-3179-4217-a868-2465c41cde1e
+    - 8c014aec-9065-462d-bc41-2fa8a517d033
+    - e3688c26-18c5-46cc-b619-6dd532775396
+  - narrativeObjectGuid: f36e57a6-6573-4f91-bddb-09564596e6f6
+    narrativeObjectNodeGuids:
+    - 45340def-6997-4a2b-9fd3-861ca5cce371
+    - b4b3d615-ae99-440b-a35b-144a590088e1
+  - narrativeObjectGuid: 8c014aec-9065-462d-bc41-2fa8a517d033
+    narrativeObjectNodeGuids:
+    - 8f91db22-1dce-494b-b04b-faea865f4b9d
+    - d2240769-5295-4402-a48b-764be46360a3
+  - narrativeObjectGuid: 6aa3541b-c9e7-4333-a7e4-8f2f3d89efac
+    narrativeObjectNodeGuids:
+    - 35a6da9a-3eb3-4a67-a340-f8028f77b6c9
+    - ed6e7509-4f05-4744-b3e6-864ae3d46969
+    - 7a829c9c-96df-4b5c-8e4b-fc0b6692adc8
+  - narrativeObjectGuid: e3688c26-18c5-46cc-b619-6dd532775396
+    narrativeObjectNodeGuids:
+    - e92b8e21-92df-4082-9f48-563107c6bbff
+    - 68235ab3-5fdc-457f-ae16-e481ef2af4af
+  - narrativeObjectGuid: c1aeb9a6-c618-47f3-8134-222691c29d6a
+    narrativeObjectNodeGuids:
+    - c635b73e-262f-4dab-9301-3c89b88892c4
+    - f775b7f7-2f5c-4193-a08b-38fffb33b312
+  viewContainerStackGuids:
+  - 0
