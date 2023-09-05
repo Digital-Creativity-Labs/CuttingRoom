@@ -132,37 +132,6 @@ namespace CuttingRoom
             OnChanged?.Invoke();
         }
 
-#endif
-
-        /// <summary>
-        /// Invoked immediately before process method starts execution.
-        /// </summary>
-        public virtual void PreProcess()
-        {
-            foreach(var trigger in endTriggers)
-            {
-                if (trigger != null)
-                {
-                    trigger.StartMonitoring();
-                }
-            }
-        }
-
-        /// <summary>
-        /// Invoked immediately after process method completes execution.
-        /// </summary>
-        public virtual void PostProcess()
-        {
-            foreach (var trigger in endTriggers)
-            {
-                if (trigger != null)
-                {
-                    trigger.StopMonitoring();
-                }
-            }
-        }
-
-#if UNITY_EDITOR
         public event Action OnChanged;
 
         protected Action OnChangedInternal { get { return OnChanged; } }

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace CuttingRoom
@@ -38,15 +39,5 @@ namespace CuttingRoom
         /// Media source unload event for this object.
         /// </summary>
         public MediaSourceUnloadEvent MediaSourceUnloadEvent { get { return mediaSourceUnloadEvent; } }
-
-        public override void PreProcess()
-        {
-            base.PreProcess();
-
-            if (MediaController != null)
-            {
-                MediaController.Init();
-            }
-        }
     }
 }

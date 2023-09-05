@@ -28,6 +28,11 @@ namespace CuttingRoom
         public bool Initialised { get; set; }
 
         /// <summary>
+        /// Whether this media controller is loaded.
+        /// </summary>
+        public bool Loaded { get; set; }
+
+        /// <summary>
         /// Initialises this media controller.
         /// </summary>
         public virtual void Init()
@@ -40,12 +45,18 @@ namespace CuttingRoom
         /// <summary>
         /// Event telling this media controller to load itself.
         /// </summary>
-        public virtual void Load(AtomicNarrativeObject atomicNarrativeObject) { }
+        public virtual void Load(AtomicNarrativeObject atomicNarrativeObject) { Loaded = true; }
+
+        /// <summary>
+        /// Event telling this media controller to play its content.
+        /// </summary>
+        /// <param name="atomicNarrativeObject"></param>
+        public virtual void Play(AtomicNarrativeObject atomicNarrativeObject) { }
 
         /// <summary>
         /// Event telling this media controller to unload itself.
         /// </summary>
-        public virtual void Unload() { }
+        public virtual void Unload() { Loaded = false; }
 
         public abstract IEnumerator WaitForEndOfContent();
 

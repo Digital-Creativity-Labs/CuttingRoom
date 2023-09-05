@@ -50,10 +50,10 @@ namespace CuttingRoom
         }
 
         /// <summary>
-        /// Load the game objects represented by this controller.
+        /// Play the game objects represented by this controller.
         /// </summary>
         /// <param name="atomicNarrativeObject"></param>
-        public override void Load(AtomicNarrativeObject atomicNarrativeObject)
+        public override void Play(AtomicNarrativeObject atomicNarrativeObject)
         {
             contentEnded = false;
             LoadUIDocument(atomicNarrativeObject);
@@ -87,6 +87,7 @@ namespace CuttingRoom
         public override void Unload()
         {
             Destroy(imageScreenObject);
+            base.Unload();
         }
 
         public override IEnumerator WaitForEndOfContent()

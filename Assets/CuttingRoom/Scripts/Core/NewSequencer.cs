@@ -222,8 +222,9 @@ namespace Assets.CuttingRoom.Scripts.Core
             {
                 AtomicNarrativeObject atomicNarrativeObject = narrativeObject as AtomicNarrativeObject;
 
-                var processor = new AtomicNarrativeObjectProcessing(atomicNarrativeObject);
 
+                var processor = new AtomicNarrativeObjectProcessing(atomicNarrativeObject);
+                // Need to implement preloading and loading flow.
             }
             else if (narrativeObject is GroupNarrativeObject)
             {
@@ -247,7 +248,7 @@ namespace Assets.CuttingRoom.Scripts.Core
 
             }
 
-            return narrativeObjectTask;
+            //return narrativeObjectTask;
         }
     }
 }

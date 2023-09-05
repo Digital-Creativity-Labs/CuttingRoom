@@ -44,13 +44,9 @@ namespace CuttingRoom
 
             OnProcessingTriggerComplete += GroupEndTriggered;
 
-            GroupNarrativeObject.PreProcess();
-
 			yield return GroupNarrativeObject.GroupSelectionDecisionPoint.Process(OnSelection);
 
 			yield return base.Process(sequencer, cancellationToken);
-
-			GroupNarrativeObject.PostProcess();
 		}
 
         /// <summary>

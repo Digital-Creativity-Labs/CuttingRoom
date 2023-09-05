@@ -5,6 +5,7 @@ using System;
 using UnityEngine.Video;
 using UnityEngine.UIElements;
 using CuttingRoom.Utilities.Immersive;
+using JetBrains.Annotations;
 
 namespace CuttingRoom
 {
@@ -148,7 +149,7 @@ namespace CuttingRoom
                         rootVisualElement.style.flexDirection = FlexDirection.Row;
 
                         VisualElement videoImage = new VisualElement();
-                        videoImage.style.backgroundImage = new Background() { renderTexture = videoRenderTex } ;
+                        videoImage.style.backgroundImage = new Background() { renderTexture = videoRenderTex };
                         videoImage.style.width = width;
                         videoImage.style.height = height;
                         videoImage.style.position = Position.Relative;
@@ -183,7 +184,14 @@ namespace CuttingRoom
 
                     RenderSettings.skybox = skyboxMaterial;
                 }
+                Initialised = true;
+            }
+        }
 
+        public override void Load(AtomicNarrativeObject atomicNarrativeObject)
+        {
+            if (videoPlayer != null)
+            {
                 if (sourceLocation == SourceLocation.VideoClip && Video != null)
                 {
                     videoPlayer.clip = Video;
@@ -202,8 +210,7 @@ namespace CuttingRoom
                 // Preload the video player content.
                 videoPlayer.Prepare();
 
-
-                Initialised = true;
+                base.Load(atomicNarrativeObject);
             }
         }
 
@@ -211,28 +218,10 @@ namespace CuttingRoom
         /// Load the game objects represented by this controller.
         /// </summary>
         /// <param name="atomicNarrativeObject"></param>
-        public override void Load(AtomicNarrativeObject atomicNarrativeObject)
+        public override void Play(AtomicNarrativeObject atomicNarrativeObject)
         {
-            if (videoPlayer != null)
+            if (videoPlayer != null && )
             {
-                if (videoPlayerCamera != null)
-                {
-                    videoPlayerCamera.enabled = true;
-
-                    if (renderType == RenderType.Fullscreen)
-                    {
-                        videoPlayerCamera.clearFlags = CameraClearFlags.SolidColor;
-                        videoPlayerCamera.backgroundColor = Color.black;
-                    }
-                    else if (renderType == RenderType.Immersive360 || renderType == RenderType.Immersive180)
-                    {
-                        videoPlayerCamera.clearFlags = CameraClearFlags.Skybox;
-                        videoPlayerCamera.backgroundColor = Color.clear;
-                    }
-                }
-
-                videoPlayer.loopPointReached += (player) => { contentEnded = true; };
-
                 videoPlayer.Play();
             }
         }
@@ -267,6 +256,7 @@ namespace CuttingRoom
             {
                 Destroy(uiDocument);
             }
+            base.Unload();
         }
 
         public override IEnumerator WaitForEndOfContent()

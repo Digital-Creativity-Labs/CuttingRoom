@@ -46,16 +46,12 @@ namespace CuttingRoom
             this.sequencer = sequencer;
 
             OnProcessingTriggerComplete += LayerEndTriggered;
-
-            LayerNarrativeObject.PreProcess();
             yield return LayerNarrativeObject.LayerSelectionDecisionPoint.Process(OnSelection);
 
             // Process the base functionality, output selection.
             yield return base.Process(sequencer, cancellationToken);
 
             yield return WaitForSecondaryLayersToEnd();
-
-            LayerNarrativeObject.PostProcess();
         }
 
         /// <summary>

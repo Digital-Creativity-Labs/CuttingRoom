@@ -32,6 +32,11 @@ namespace CuttingRoom
         protected delegate void OnCancellationCallback();
         protected event OnCancellationCallback OnCancellation;
 
+        public virtual IEnumerator PreProcess(Sequencer sequencer, CancellationToken? cancellationToken = null)
+        {
+            yield return null;
+        }
+
         /// <summary>
         /// Process this narrative object.
         /// </summary>
@@ -56,6 +61,7 @@ namespace CuttingRoom
                     }
                     if (trigger != null)
                     {
+                        trigger.StartMonitoring();
                         endTriggers.Add(narrativeObject.StartCoroutine(trigger.WaitForProcessingTrigger()));
                     }
                 }
@@ -68,6 +74,13 @@ namespace CuttingRoom
                 yield return MonitorForProcessComplete();
                 yield return cancellationMonitor;
 
+                foreach (var trigger in narrativeObject.EndTriggers)
+                {
+                    if (trigger != null)
+                    {
+                        trigger.StopMonitoring();
+                    }
+                }
                 foreach (var endTrig in endTriggers)
                 {
                     narrativeObject.StopCoroutine(endTrig);
@@ -93,6 +106,11 @@ namespace CuttingRoom
             }
 
             OnProcessingComplete?.Invoke();
+        }
+
+        public virtual IEnumerator PostProcess(Sequencer sequencer, CancellationToken? cancellationToken = null)
+        {
+            yield return null;
         }
 
         private IEnumerator MonitorForProcessComplete()

@@ -26,6 +26,12 @@ namespace CuttingRoom
             narrativeObject = atomicNarrativeObject;
         }
 
+        public override IEnumerator PreProcess(Sequencer sequencer, CancellationToken? cancellationToken = null)
+        {
+            LoadMediaController();
+            return base.PreProcess(sequencer, cancellationToken);
+        }
+
         /// <summary>
         /// Processessing method for the Atomic Narrative Object.
         /// </summary>
@@ -47,9 +53,7 @@ namespace CuttingRoom
                     break;
             }
 
-            AtomicNarrativeObject.PreProcess();
-
-            LoadMediaController();
+            PlayMediaController();
 
             if (mediaController != null)
             {
@@ -57,8 +61,6 @@ namespace CuttingRoom
             }
 
             yield return base.Process(sequencer, cancellationToken);
-
-            AtomicNarrativeObject.PostProcess();
         }
 
         /// <summary>
@@ -69,7 +71,20 @@ namespace CuttingRoom
             if (AtomicNarrativeObject.MediaController != null && AtomicNarrativeObject.MediaController.Initialised)
             {
                 mediaController = AtomicNarrativeObject.MediaController;
+                mediaController.Init();
                 mediaController.Load(narrativeObject as AtomicNarrativeObject);
+            }
+        }
+
+        /// <summary>
+        /// Load the media controller associated with the narrative object being processed by this object.
+        /// </summary>
+        private void PlayMediaController()
+        {
+            if (AtomicNarrativeObject.MediaController != null && AtomicNarrativeObject.MediaController.Loaded)
+            {
+                mediaController = AtomicNarrativeObject.MediaController;
+                mediaController.Play(narrativeObject as AtomicNarrativeObject);
             }
         }
 

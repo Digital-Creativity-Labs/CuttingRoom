@@ -52,7 +52,7 @@ namespace CuttingRoom
         }
 
         /// <summary>
-        /// Load the game objects represented by this controller.
+        /// Load the audio represented by this controller.
         /// </summary>
         /// <param name="atomicNarrativeObject"></param>
         public override void Load(AtomicNarrativeObject atomicNarrativeObject)
@@ -60,7 +60,20 @@ namespace CuttingRoom
             if (Audio != null)
             {
                 audioSource.clip = Audio;
+                audioSource.clip.LoadAudioData();
 
+                base.Load(atomicNarrativeObject);
+            }
+        }
+
+        /// <summary>
+        /// Play the audio represented by this controller.
+        /// </summary>
+        /// <param name="atomicNarrativeObject"></param>
+        public override void Play(AtomicNarrativeObject atomicNarrativeObject)
+        {
+            if (Audio != null)
+            {
                 audioSource.Play();
             }
         }
@@ -74,6 +87,7 @@ namespace CuttingRoom
             Debug.Log("Destroying audio source: " + gameObject.name);
 
             Destroy(audioSource);
+            base.Unload();
         }
 
         public override IEnumerator WaitForEndOfContent()

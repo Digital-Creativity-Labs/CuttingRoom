@@ -22,7 +22,7 @@ namespace CuttingRoom
         /// Load the game objects represented by this controller.
         /// </summary>
         /// <param name="atomicNarrativeObject"></param>
-        public override void Load(AtomicNarrativeObject atomicNarrativeObject)
+        public override void Play(AtomicNarrativeObject atomicNarrativeObject)
         {
             contentEnded = false;
             if (gameObjects.Count == 0)
@@ -49,6 +49,7 @@ namespace CuttingRoom
             {
                 Destroy(gameObject);
             }
+            base.Unload();
         }
 
         public override IEnumerator WaitForEndOfContent()
