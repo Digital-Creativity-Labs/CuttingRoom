@@ -72,6 +72,7 @@ namespace CuttingRoom
         /// <param name="atomicNarrativeObject"></param>
         public override void Play(AtomicNarrativeObject atomicNarrativeObject)
         {
+            base.Play(atomicNarrativeObject);
             if (Audio != null)
             {
                 audioSource.Play();

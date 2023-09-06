@@ -51,7 +51,12 @@ namespace CuttingRoom
         /// Event telling this media controller to play its content.
         /// </summary>
         /// <param name="atomicNarrativeObject"></param>
-        public virtual void Play(AtomicNarrativeObject atomicNarrativeObject) { }
+        public virtual void Play(AtomicNarrativeObject atomicNarrativeObject) {
+            if (!Loaded)
+            {
+                Load(atomicNarrativeObject);
+            }
+        }
 
         /// <summary>
         /// Event telling this media controller to unload itself.

@@ -32,9 +32,8 @@ namespace CuttingRoom
         protected delegate void OnCancellationCallback();
         protected event OnCancellationCallback OnCancellation;
 
-        public virtual IEnumerator PreProcess(Sequencer sequencer, CancellationToken? cancellationToken = null)
+        public virtual void PreProcess()
         {
-            yield return null;
         }
 
         /// <summary>
@@ -108,9 +107,8 @@ namespace CuttingRoom
             OnProcessingComplete?.Invoke();
         }
 
-        public virtual IEnumerator PostProcess(Sequencer sequencer, CancellationToken? cancellationToken = null)
+        public virtual void PostProcess()
         {
-            yield return null;
         }
 
         private IEnumerator MonitorForProcessComplete()

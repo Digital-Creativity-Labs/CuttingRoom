@@ -220,7 +220,8 @@ namespace CuttingRoom
         /// <param name="atomicNarrativeObject"></param>
         public override void Play(AtomicNarrativeObject atomicNarrativeObject)
         {
-            if (videoPlayer != null && )
+            base.Play(atomicNarrativeObject);
+            if (videoPlayer != null)
             {
                 videoPlayer.Play();
             }

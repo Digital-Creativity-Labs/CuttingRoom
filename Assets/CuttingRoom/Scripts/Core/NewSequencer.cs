@@ -1,5 +1,6 @@
 ﻿using CuttingRoom;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,10 +21,12 @@ namespace Assets.CuttingRoom.Scripts.Core
             public NarrativeObject narrativeObject;
             public int sequenceDepth = 0;
             public CancellationToken cancellationToken;
+            public NarrativeObjectProcessing processor;
 
-            public SequencedNarrativeObject(NarrativeObject narrativeObject, CancellationToken cancellationToken, int sequenceDepth)
+            public SequencedNarrativeObject(NarrativeObject narrativeObject, NarrativeObjectProcessing processor, CancellationToken cancellationToken, int sequenceDepth)
             {
                 this.narrativeObject = narrativeObject;
+                this.processor = processor;
                 this.cancellationToken = cancellationToken;
                 this.sequenceDepth = sequenceDepth;
             }
@@ -41,7 +44,7 @@ namespace Assets.CuttingRoom.Scripts.Core
 
         private NarrativeObject rootNarrativeObject = null;
 
-        private Task sequencerTask = null;
+        private Coroutine sequenceCoroutine = null;
 
         private CancellationTokenSource sequencerCancellationTokenSource = new();
 
@@ -70,7 +73,12 @@ namespace Assets.CuttingRoom.Scripts.Core
         /// <summary>
         /// Static reference to latest processing Narrative Object.
         /// </summary>
-        static public NarrativeObject CurrentNarrativeObject { get; private set; } = null;
+        static public SequencedNarrativeObject CurrentNarrativeObject { get; private set; } = null;
+
+        /// <summary>
+        /// Static reference to the next processing Narrative Object.
+        /// </summary>
+        static public SequencedNarrativeObject NextNarrativeObject { get; private set; } = null;
 
         /// <summary>
         /// Static sequence history. Updated by all sequences/ sub sequences.
@@ -87,7 +95,7 @@ namespace Assets.CuttingRoom.Scripts.Core
             {
                 lock (SequenceHistory)
                 {
-                    CurrentNarrativeObject = sequencedNarrativeObject.narrativeObject;
+                    CurrentNarrativeObject = sequencedNarrativeObject;
                     SequenceHistory.Add(sequencedNarrativeObject);
 
 #if UNITY_EDITOR
@@ -170,13 +178,44 @@ namespace Assets.CuttingRoom.Scripts.Core
         {
             if (NarrativeSpace != null)
             {
-                narrativeObjectSequenceQueue.Enqueue(new SequencedNarrativeObject(narrativeObject, sequencerCancellationTokenSource.Token, sequenceDepth));
+                NarrativeObjectProcessing processor = null;
+                if (narrativeObject is AtomicNarrativeObject)
+                {
+                    AtomicNarrativeObject atomicNarrativeObject = narrativeObject as AtomicNarrativeObject;
+                    processor = new AtomicNarrativeObjectProcessing(atomicNarrativeObject);
+                }
+                else if (narrativeObject is GroupNarrativeObject)
+                {
+                    GroupNarrativeObject groupNarrativeObject = narrativeObject as GroupNarrativeObject;
+                    processor = new GroupNarrativeObjectProcessing(groupNarrativeObject);
+                }
+                else if (narrativeObject is GraphNarrativeObject)
+                {
+                    GraphNarrativeObject graphNarrativeObject = narrativeObject as GraphNarrativeObject;
+                    processor = new GraphNarrativeObjectProcessing(graphNarrativeObject);
+                }
+                else if (narrativeObject is LayerNarrativeObject)
+                {
+                    LayerNarrativeObject layerNarrativeObject = narrativeObject as LayerNarrativeObject;
+                    processor = new LayerNarrativeObjectProcessing(layerNarrativeObject);
+                }
+
+                if (processor != null)
+                {
+                    narrativeObjectSequenceQueue.Enqueue(new SequencedNarrativeObject(narrativeObject, processor, sequencerCancellationTokenSource.Token, sequenceDepth));
+                }
             }
         }
 
         public void Start()
         {
-            sequencerTask = ProcessingTask();
+            if (narrativeObjectSequenceQueue != null && narrativeObjectSequenceQueue.Count > 0)
+            {
+                // Pre process first narrative object
+                SequencedNarrativeObject firstSequencedNarrativeObject = narrativeObjectSequenceQueue.Peek();
+                firstSequencedNarrativeObject.processor.PreProcess(this, firstSequencedNarrativeObject.cancellationToken);
+                sequenceCoroutine = NarrativeSpace.StartCoroutine(ProcessingCoroutine());
+            }
         }
 
         public void Stop()
@@ -184,12 +223,19 @@ namespace Assets.CuttingRoom.Scripts.Core
             sequencerCancellationTokenSource?.Cancel();
         }
 
-        public async Task WaitForSequenceComplete()
+        /// <summary>
+        /// Coroutine for waiting for sequence to complete.
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerator WaitForSequenceComplete()
         {
-            await sequencerTask;
+            if (sequenceCoroutine != null)
+            {
+                yield return new WaitUntil(() => { return SequenceComplete; });
+            }
         }
 
-        private async Task ProcessingTask()
+        private IEnumerator ProcessingCoroutine()
         {
             SequenceNarrativeObject(rootNarrativeObject);
 
@@ -201,7 +247,16 @@ namespace Assets.CuttingRoom.Scripts.Core
                 CurrentNarrativeObjectForSequence = sequencedNarrativeObject.narrativeObject;
                 RecordToHistory(sequencedNarrativeObject);
 
-                await ProcessNarrativeObject(sequencedNarrativeObject.narrativeObject, sequencedNarrativeObject.cancellationToken);
+                Coroutine currentProcessing = NarrativeSpace.StartCoroutine(ProcessNarrativeObject(sequencedNarrativeObject, sequencedNarrativeObject.cancellationToken));
+
+                List<NarrativeObjectProcessing> outputProcessors = new();
+                // PreProcess possible outputs
+                foreach(var nextNarrativeObject in sequencedNarrativeObject.narrativeObject.OutputSelectionDecisionPoint.Candidates)
+                {
+                    PreProcessNarrativeObject(nextNarrativeObject);
+                }
+
+                yield return currentProcessing;
 
                 // Once complete clear the sub sequences
                 subSequences.Clear();
@@ -210,45 +265,43 @@ namespace Assets.CuttingRoom.Scripts.Core
             SequenceComplete = true;
         }
 
-        private async Task ProcessNarrativeObject(NarrativeObject narrativeObject, CancellationToken cancellationToken)
+        private void PreProcessNarrativeObject(NarrativeObject narrativeObject)
         {
-            if (NarrativeSpace == null)
-            {
-                return;
-            }
-
-            Task narrativeObjectTask = null;
+            NarrativeObjectProcessing processor = null;
             if (narrativeObject is AtomicNarrativeObject)
             {
                 AtomicNarrativeObject atomicNarrativeObject = narrativeObject as AtomicNarrativeObject;
-
-
-                var processor = new AtomicNarrativeObjectProcessing(atomicNarrativeObject);
-                // Need to implement preloading and loading flow.
+                processor = new AtomicNarrativeObjectProcessing(atomicNarrativeObject);
             }
             else if (narrativeObject is GroupNarrativeObject)
             {
                 GroupNarrativeObject groupNarrativeObject = narrativeObject as GroupNarrativeObject;
-
-                var processor = new GroupNarrativeObjectProcessing(groupNarrativeObject);
-
+                processor = new GroupNarrativeObjectProcessing(groupNarrativeObject);
             }
             else if (narrativeObject is GraphNarrativeObject)
             {
                 GraphNarrativeObject graphNarrativeObject = narrativeObject as GraphNarrativeObject;
-
-                var processor = new GraphNarrativeObjectProcessing(graphNarrativeObject);
-
+                processor = new GraphNarrativeObjectProcessing(graphNarrativeObject);
             }
             else if (narrativeObject is LayerNarrativeObject)
             {
                 LayerNarrativeObject layerNarrativeObject = narrativeObject as LayerNarrativeObject;
-
-                var processor = new LayerNarrativeObjectProcessing(layerNarrativeObject);
-
+                processor = new LayerNarrativeObjectProcessing(layerNarrativeObject);
             }
 
-            //return narrativeObjectTask;
+            processor?.PreProcess();
+        }
+
+
+
+        private IEnumerator ProcessNarrativeObject(SequencedNarrativeObject narrativeObject, CancellationToken cancellationToken)
+        {
+            if (NarrativeSpace == null)
+            {
+                yield return null;
+            }
+
+            yield return narrativeObject.processor.Process(this, cancellationToken);
         }
     }
 }

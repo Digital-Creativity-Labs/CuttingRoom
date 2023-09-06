@@ -26,10 +26,10 @@ namespace CuttingRoom
             narrativeObject = atomicNarrativeObject;
         }
 
-        public override IEnumerator PreProcess(Sequencer sequencer, CancellationToken? cancellationToken = null)
+        public override void PreProcess()
         {
             LoadMediaController();
-            return base.PreProcess(sequencer, cancellationToken);
+            base.PreProcess();
         }
 
         /// <summary>
