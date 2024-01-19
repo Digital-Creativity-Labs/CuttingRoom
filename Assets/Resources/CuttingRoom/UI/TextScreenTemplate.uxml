@@ -1,6 +1,6 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
     <Style src="project://database/Assets/Resources/CuttingRoom/UI/Style/TextScreenTemplate.uss?fileID=7433441132597879392&amp;guid=ea7b9901a2a06404b9fb23512ae36472&amp;type=3#TextScreenTemplate" />
     <ui:VisualElement name="RootElement" picking-mode="Ignore" class="fullscreen-canvas" style="align-items: center; justify-content: center;">
-        <ui:Label display-tooltip-when-elided="true" name="TextContainer" picking-mode="Ignore" text="test" class="text-container" />
+        <ui:Label display-tooltip-when-elided="true" name="TextContainer" picking-mode="Ignore" text="Text" enable-rich-text="false" class="text-container" style="overflow: visible; white-space: normal; align-items: center; justify-content: center; display: flex; visibility: visible;" />
     </ui:VisualElement>
 </ui:UXML>
