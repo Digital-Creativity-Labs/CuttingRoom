@@ -286,6 +286,13 @@ public static class UIElementsUtils
         textField.isDelayed = true;
         textField.multiline = multiline;
         textField.value = value;
+
+        if (multiline)
+        {
+            // Setting this means the text will wrap.
+            textField.style.whiteSpace = WhiteSpace.Normal;
+        }
+
         textField.RegisterValueChangedCallback(evt =>
         {
             OnValueChanged?.Invoke(evt.newValue);

@@ -8,12 +8,16 @@
     width: auto;
     justify-content: center;
     padding: 10%;
-    padding-left: 2px;
-    padding-right: 2px;
-    padding-top: 2px;
-    padding-bottom: 2px;
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-top: 5px;
+    padding-bottom: 5px;
     font-size: 32px;
-    color: rgba(255, 255, 255, 255);
+    color: rgb(255, 255, 255);
     align-items: center;
     -unity-text-align: upper-center;
+    flex-wrap: wrap;
+    max-width: 90%;
+    max-height: 90%;
+    overflow: visible;
 }
